@@ -1,15 +1,23 @@
 <template>
   <v-form v-model="valid">
+    <v-text-field v-model="template.name" label="Name"></v-text-field>
+
+    <v-text-field
+      v-model="template.exporter"
+      label="Exporter"
+      disabled
+    ></v-text-field>
+
     <v-textarea
       outlined
-      v-model="exportPdfDto.content"
+      v-model="template.data.content"
       label="Content"
       required
     ></v-textarea>
 
     <v-card-text>
       <v-slider
-        v-model="exportPdfDto.scale"
+        v-model="template.data.scale"
         :step="0.1"
         label="scale"
         class="align-center"
@@ -19,7 +27,7 @@
       >
         <template v-slot:append>
           <v-text-field
-            v-model="exportPdfDto.scale"
+            v-model="template.data.scale"
             class="mt-0 pt-0"
             hide-details
             single-line
@@ -33,90 +41,91 @@
     </v-card-text>
 
     <v-checkbox
-      v-model="exportPdfDto.displayHeaderFooter"
+      v-model="template.data.displayHeaderFooter"
       label="Display header & footer"
     ></v-checkbox>
 
     <v-textarea
-      v-if="exportPdfDto.displayHeaderFooter"
+      v-if="template.data.displayHeaderFooter"
       outlined
-      v-model="exportPdfDto.headerTemplate"
+      v-model="template.data.headerTemplate"
       label="Header template"
       required
     ></v-textarea>
 
     <v-textarea
-      v-if="exportPdfDto.displayHeaderFooter"
+      v-if="template.data.displayHeaderFooter"
       outlined
-      v-model="exportPdfDto.footerTemplate"
+      v-model="template.data.footerTemplate"
       label="Footer template"
       required
     ></v-textarea>
 
     <v-checkbox
-      v-model="exportPdfDto.printBackground"
+      v-model="template.data.printBackground"
       label="Print background"
     ></v-checkbox>
 
-    <v-checkbox v-model="exportPdfDto.landscape" label="Landscape"></v-checkbox>
+    <v-checkbox
+      v-model="template.data.landscape"
+      label="Landscape"
+    ></v-checkbox>
 
     <v-text-field
-      v-model="exportPdfDto.pageRanges"
+      v-model="template.data.pageRanges"
       label="Page ranges"
     ></v-text-field>
 
     <v-select
-      v-model="exportPdfDto.format"
+      v-model="template.data.format"
       :items="allowedFormats"
       label="Format"
     ></v-select>
 
     <v-text-field
-      v-if="!exportPdfDto.format"
-      v-model="exportPdfDto.width"
+      v-if="!template.data.format"
+      v-model="template.data.width"
       label="Width"
     ></v-text-field>
 
     <v-text-field
-      v-if="!exportPdfDto.format"
-      v-model="exportPdfDto.height"
+      v-if="!template.data.format"
+      v-model="template.data.height"
       label="Height"
     ></v-text-field>
 
     <v-text-field
-      v-model="exportPdfDto.marginTop"
+      v-model="template.data.marginTop"
       label="Margin top"
     ></v-text-field>
     <v-text-field
-      v-model="exportPdfDto.marginRight"
+      v-model="template.data.marginRight"
       label="Margin right"
     ></v-text-field>
     <v-text-field
-      v-model="exportPdfDto.marginBottom"
+      v-model="template.data.marginBottom"
       label="Margin bottom"
     ></v-text-field>
     <v-text-field
-      v-model="exportPdfDto.marginLeft"
+      v-model="template.data.marginLeft"
       label="Margin left"
     ></v-text-field>
 
     <v-checkbox
-      v-model="exportPdfDto.preferCSSPageSize"
+      v-model="template.data.preferCSSPageSize"
       label="Prefer CSS page size"
     ></v-checkbox>
   </v-form>
 </template>
 
 <script lang="ts">
+import * as R from "ramda";
 import { Component, Vue, Prop, Watch } from "vue-property-decorator";
-import { ExportPdfDto } from "@/api/exporter";
+import Template from "@/store/Template";
 
 @Component
 export default class TemplatePdfForm extends Vue {
-  @Prop({
-    type: Object
-  })
-  readonly initialExportPdfDto!: ExportPdfDto;
+  @Prop({ required: true }) readonly initialTemplate!: Template;
 
   private readonly allowedFormats = [
     "",
@@ -134,15 +143,13 @@ export default class TemplatePdfForm extends Vue {
   ];
 
   private valid = false;
-  private exportPdfDto: ExportPdfDto = {
-    ...this.initialExportPdfDto
-  };
+  private template: Template = R.clone(this.initialTemplate);
 
-  @Watch("exportPdfDto", {
+  @Watch("template", {
     deep: true
   })
-  async exportPdfDtoChanged(exportPdfDto: ExportPdfDto) {
-    this.$emit("change", this.valid, exportPdfDto);
+  async templateChanged(template: Template) {
+    this.$emit("change", template);
   }
 }
 </script>

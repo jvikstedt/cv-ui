@@ -12,8 +12,8 @@
           Cancel
         </v-btn>
 
-        <v-btn color="green darken-1" text @click="onSave">
-          Save
+        <v-btn color="green darken-1" text @click="onUse">
+          Use
         </v-btn>
       </v-card-actions>
 
@@ -60,9 +60,9 @@ export default class EditJsonDialog extends Vue {
     }
   }
 
-  private async onSave() {
+  private async onUse() {
     if (this.editor) {
-      this.$emit("save", this.editor.get());
+      this.$emit("use", this.editor.get());
     }
 
     this.setDialog(false);
