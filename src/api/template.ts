@@ -1,31 +1,21 @@
 import Api from "@/api/api";
 import Template from "@/store/Template";
 
-export interface CreateTemplateDto {
+export interface TemplateDto {
+  id?: number;
+
   name: string;
 
-  exporter: "pdf";
+  exporter?: string;
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   data: any;
-}
-
-export interface UpdateTemplateDto {
-  name: string;
-
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  data: any;
-}
-
-export interface SearchTemplateDto {
-  name: string;
-  limit?: number;
 }
 
 export const CreateTemplate = async (
-  createTemplateDto: CreateTemplateDto
+  templateDto: TemplateDto
 ): Promise<Template> => {
-  const template = await Api.post("/skill_subjects", createTemplateDto);
+  const template = await Api.post("/templates", templateDto);
 
   Template.insert({
     data: template
@@ -36,9 +26,9 @@ export const CreateTemplate = async (
 
 export const UpdateTemplate = async (
   templateId: number,
-  updateTemplateDto: UpdateTemplateDto
+  templateDto: TemplateDto
 ): Promise<Template> => {
-  const template = await Api.put(`/templates/${templateId}`, updateTemplateDto);
+  const template = await Api.put(`/templates/${templateId}`, templateDto);
 
   Template.insert({
     data: template

@@ -4,15 +4,15 @@
       v-if="editTemplateDialog"
       :dialog="editTemplateDialog"
       :setDialog="setEditTemplateDialog"
-      :template="templates[0]"
-      @save="onTemplateSave"
+      :initialTemplate="template"
+      @use="onTemplateUse"
     />
     <EditJsonDialog
       v-if="editJsonDialog"
       :dialog="editJsonDialog"
       :setDialog="setEditJsonDialog"
       :cv="cvData"
-      @save="onJsonSave"
+      @use="onJsonUse"
     />
     <v-btn @click="editTemplateDialog = true">
       Template
@@ -29,6 +29,7 @@
       width="100%"
       height="600px"
     />
+    <p v-if="!pdfblob">Select template</p>
   </div>
 </template>
 
@@ -37,9 +38,8 @@ import { Component, Vue } from "vue-property-decorator";
 import * as handlebars from "handlebars";
 import { GetCVDetailsById } from "@/api/cv";
 import CV from "@/store/CV";
-import { ExportPdfDto, ExportPdf } from "@/api/exporter";
+import { ExportPdf } from "@/api/exporter";
 import Template from "@/store/Template";
-import { GetTemplates } from "@/api/template";
 import TemplatePdfForm from "./components/TemplatePdfForm.vue";
 import EditTemplateDialog from "./components/EditTemplateDialog.vue";
 import EditJsonDialog from "./components/EditJsonDialog.vue";
@@ -55,15 +55,11 @@ export default class PDFView extends Vue {
   public id: number | null = null;
   private cvData: CV | null = null;
 
-  private exportPdfDto: ExportPdfDto = new ExportPdfDto();
+  private template: Template | null = null;
   private editTemplateDialog = false;
   private editJsonDialog = false;
 
   private pdfblob = "";
-
-  get templates(): Template[] {
-    return Template.all();
-  }
 
   private async created(): Promise<void> {
     try {
@@ -77,12 +73,6 @@ export default class PDFView extends Vue {
         .with("skills")
         .with("skills.skillSubject")
         .find(this.id);
-
-      const templates = await GetTemplates();
-      if (templates[0]) {
-        this.exportPdfDto = templates[0].data;
-      }
-      await this.print();
     } catch (err) {
       // TODO Handle this better, maybe some error notification
       this.$router.push("/");
@@ -97,24 +87,28 @@ export default class PDFView extends Vue {
     this.editJsonDialog = dialog;
   }
 
-  private async onTemplateSave(exportPdfDto: ExportPdfDto): Promise<void> {
-    this.exportPdfDto = exportPdfDto;
+  private async onTemplateUse(template: Template): Promise<void> {
+    this.template = template;
     await this.print();
   }
 
-  private async onJsonSave(cv: CV): Promise<void> {
+  private async onJsonUse(cv: CV): Promise<void> {
     this.cvData = cv;
     await this.print();
   }
 
   private async print(): Promise<void> {
-    const data = handlebars.compile(this.exportPdfDto.content)(this.cvData);
+    if (this.template) {
+      const content = handlebars.compile(this.template.data.content)(
+        this.cvData
+      );
 
-    const pdf = await ExportPdf({ ...this.exportPdfDto, content: data });
+      const pdf = await ExportPdf({ ...this.template.data, content });
 
-    const blob = new Blob([pdf], { type: "application/pdf" });
-    const url = window.URL.createObjectURL(blob);
-    this.pdfblob = url;
+      const blob = new Blob([pdf], { type: "application/pdf" });
+      const url = window.URL.createObjectURL(blob);
+      this.pdfblob = url;
+    }
   }
 }
 </script>
