@@ -5,7 +5,7 @@ import SkillSubjectsListView from "@/views/skill_subjects/SkillSubjectsListView.
 import SkillSubjectsNewView from "@/views/skill_subjects/SkillSubjectsNewView.vue";
 import SkillSubjectsEditView from "@/views/skill_subjects/SkillSubjectsEditView.vue";
 import CVShowView from "@/views/cv/CVShowView.vue";
-import PDFView from "@/views/PDFView.vue";
+import PDFView from "@/views/cv/pdf/PDFView.vue";
 
 Vue.use(VueRouter);
 
