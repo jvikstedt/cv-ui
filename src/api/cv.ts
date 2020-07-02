@@ -6,6 +6,11 @@ export interface PatchCVDto {
   description?: string;
 }
 
+export interface SearchCVDto {
+  name: string;
+  limit?: number;
+}
+
 export const GetCVDetailsById = async (cvId: number): Promise<void> => {
   const cvPromise = Api.get(`/cv/${cvId}`).then((cv: CV) => {
     CV.insert({ data: cv });
@@ -33,4 +38,10 @@ export const PatchCV = async (
   });
 
   return cv;
+};
+
+export const SearchCVs = async (searchCVDto: SearchCVDto): Promise<CV[]> => {
+  const cvs = await Api.post("/cv/search", searchCVDto);
+
+  return cvs;
 };
