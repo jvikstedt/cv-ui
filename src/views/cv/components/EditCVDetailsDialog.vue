@@ -1,7 +1,7 @@
 <template>
   <v-dialog
     v-model="dialog"
-    max-width="500"
+    max-width="600"
     v-if="cv"
     v-on:click:outside="onCancel"
   >

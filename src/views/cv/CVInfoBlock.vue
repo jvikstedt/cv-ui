@@ -5,9 +5,7 @@
         <v-col cols="12">
           <p class="text-center">
             <v-avatar size="146.6" tile @click="editUserDetailsDialog = true">
-              <v-img
-                src="https://cdn.vuetifyjs.com/images/profiles/marcus.jpg"
-              ></v-img>
+              <v-img :src="avatarSrc"></v-img>
             </v-avatar>
           </p>
         </v-col>
@@ -63,6 +61,13 @@ export default class CVInfoBlock extends Vue {
 
   private editUserDetailsDialog = false;
   private editCVDetailsDialog = false;
+
+  get avatarSrc(): string {
+    if (this.user && this.user.avatarId) {
+      return `/api/files/${this.user.avatarId}`;
+    }
+    return "";
+  }
 
   private setUserDetailsDialog(dialog: boolean) {
     this.editUserDetailsDialog = dialog;

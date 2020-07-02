@@ -27,7 +27,7 @@
       v-bind:data="pdfblob"
       type="application/pdf"
       width="100%"
-      height="600px"
+      height="750px"
     />
     <p v-if="!pdfblob">Select template</p>
   </div>
