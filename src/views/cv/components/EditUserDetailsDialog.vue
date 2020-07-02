@@ -1,7 +1,7 @@
 <template>
   <v-dialog
     v-model="dialog"
-    max-width="500"
+    max-width="600"
     v-if="user"
     v-on:click:outside="onCancel"
   >
@@ -11,6 +11,13 @@
       </v-card-title>
 
       <v-card-text>
+        <p class="text-center">
+          <v-avatar size="146.6" tile>
+            <v-img :src="avatarSrc"></v-img>
+          </v-avatar>
+        </p>
+        <v-file-input label="File input" @change="onFileChange" />
+
         <v-text-field v-model="firstName" label="First name"></v-text-field>
 
         <v-text-field v-model="lastName" label="Last name"></v-text-field>
@@ -32,9 +39,11 @@
 </template>
 
 <script lang="ts">
+import * as R from "ramda";
 import { Component, Vue, Prop, Watch } from "vue-property-decorator";
 import User from "@/store/User";
 import { PatchUser, PatchUserDto } from "@/api/user";
+import { CreateFile } from "@/api/file";
 
 @Component
 export default class EditUserNamesDialog extends Vue {
@@ -44,19 +53,36 @@ export default class EditUserNamesDialog extends Vue {
 
   private firstName = "";
   private lastName = "";
+  private avatarId = "";
 
   @Watch("dialog")
-  userChanged(dialog: boolean) {
+  dialogChanged(dialog: boolean) {
     if (dialog && this.user) {
       this.firstName = this.user.firstName;
       this.lastName = this.user.lastName;
+      this.avatarId = this.user.avatarId;
+    }
+  }
+
+  get avatarSrc(): string {
+    if (!R.isEmpty(this.avatarId)) {
+      return `/api/files/${this.avatarId}`;
+    }
+    return "";
+  }
+
+  private async onFileChange(file: File) {
+    if (file) {
+      const createdFile = await CreateFile({ file });
+      this.avatarId = createdFile.id;
     }
   }
 
   private async onSave() {
     const patchUserDto: PatchUserDto = {
       firstName: this.firstName,
-      lastName: this.lastName
+      lastName: this.lastName,
+      avatarId: this.avatarId
     };
 
     if (this.user) {

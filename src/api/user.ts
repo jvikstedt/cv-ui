@@ -4,6 +4,7 @@ import User from "@/store/User";
 export interface PatchUserDto {
   firstName?: string;
   lastName?: string;
+  avatarId?: string;
 }
 
 export const PatchUser = async (

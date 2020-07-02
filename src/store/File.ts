@@ -2,23 +2,32 @@ import { Model } from "@vuex-orm/core";
 
 import { AttrField, OrmModel, PrimaryKey } from "vuex-orm-decorators";
 
-@OrmModel("users")
-export default class User extends Model {
+@OrmModel("files")
+export default class File extends Model {
   @PrimaryKey()
   @AttrField(undefined)
-  public id!: number;
+  public id!: string;
 
   @AttrField(undefined)
-  public username!: string;
+  public originalname!: string;
 
   @AttrField(undefined)
-  public firstName!: string;
+  public encoding!: string;
 
   @AttrField(undefined)
-  public lastName!: string;
+  public mimetype!: string;
 
   @AttrField(undefined)
-  public avatarId!: string;
+  public destination!: string;
+
+  @AttrField(undefined)
+  public filename!: string;
+
+  @AttrField(undefined)
+  public path!: string;
+
+  @AttrField(undefined)
+  public size!: number;
 
   @AttrField(undefined)
   public createdAt!: string;

@@ -1,4 +1,5 @@
 import axios from "axios";
+import * as R from "ramda";
 
 class Api {
   baseURL = process.env.VUE_APP_ENDPOINT;
@@ -9,46 +10,52 @@ class Api {
     }
   };
 
-  async get(uri: string) {
-    const response = await axios.get(`${this.baseURL}${uri}`, this.config);
+  async get(uri: string, headers = {}) {
+    const response = await axios.get(
+      `${this.baseURL}${uri}`,
+      R.mergeDeepRight(this.config, headers)
+    );
 
     return response.data;
   }
 
-  async delete(uri: string) {
-    const response = await axios.delete(`${this.baseURL}${uri}`, this.config);
+  async delete(uri: string, headers = {}) {
+    const response = await axios.delete(
+      `${this.baseURL}${uri}`,
+      R.mergeDeepRight(this.config, headers)
+    );
 
     return response.data;
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  async post(uri: string, body: any) {
+  async post(uri: string, body: any, headers = {}) {
     const response = await axios.post(
       `${this.baseURL}${uri}`,
       body,
-      this.config
+      R.mergeDeepRight(this.config, headers)
     );
 
     return response.data;
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  async put(uri: string, body: any) {
+  async put(uri: string, body: any, headers = {}) {
     const response = await axios.put(
       `${this.baseURL}${uri}`,
       body,
-      this.config
+      R.mergeDeepRight(this.config, headers)
     );
 
     return response.data;
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  async patch(uri: string, body: any) {
+  async patch(uri: string, body: any, headers = {}) {
     const response = await axios.patch(
       `${this.baseURL}${uri}`,
       body,
-      this.config
+      R.mergeDeepRight(this.config, headers)
     );
 
     return response.data;
