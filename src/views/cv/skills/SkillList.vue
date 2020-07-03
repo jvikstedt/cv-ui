@@ -100,10 +100,12 @@ import {
 } from "@/api/skill";
 import SkillSubject from "@/store/SkillSubject";
 import { SearchSkillSubjects } from "@/api/skill_subject";
+import CV from "@/store/CV";
 
 @Component
 export default class SkillList extends Vue {
   @Prop({ required: true }) readonly skills!: Skill[];
+  @Prop({ required: true }) readonly cv!: CV;
 
   private dialog = false;
   private selectedSkill: Skill | null = null;
@@ -163,7 +165,7 @@ export default class SkillList extends Vue {
       await UpdateSkill(this.selectedSkill.id, updateSkillDto);
     } else if (this.selectedSkillSubject) {
       const createSkillDto: CreateSkillDto = {
-        cvId: 2,
+        cvId: this.cv.id,
         experienceInYears: this.experienceInYears,
         skillSubjectId: this.selectedSkillSubject.id
       };
