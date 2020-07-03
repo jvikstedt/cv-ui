@@ -4,12 +4,12 @@
       Export
     </v-btn>
     <CVInfoBlock :user="cvUser" :cv="cv" />
-    <SkillList :skills="cvSkills" />
+    <SkillList :skills="cvSkills" :cv="cv" />
   </v-container>
 </template>
 
 <script lang="ts">
-import { Component, Vue } from "vue-property-decorator";
+import { Component, Vue, Watch } from "vue-property-decorator";
 import CVInfoBlock from "@/views/cv/CVInfoBlock.vue";
 import { SkillList } from "./skills";
 import CV from "@/store/CV";
@@ -49,6 +49,13 @@ export default class CVShowView extends Vue {
 
   private onExport() {
     this.$router.push(`/cv/${this.id}/pdf`);
+  }
+
+  @Watch("$route.params.id")
+  async routerChanged(id: string) {
+    this.id = parseInt(id, 10);
+
+    await GetCVDetailsById(this.id);
   }
 
   private async created() {
