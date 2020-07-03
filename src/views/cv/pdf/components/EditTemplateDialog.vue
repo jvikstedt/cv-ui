@@ -84,13 +84,13 @@ export default class EditTemplateDialog extends Vue {
 
   private async onSave() {
     if (this.template && !this.template.id) {
-      await CreateTemplate({
+      this.template = await CreateTemplate({
         name: this.template.name,
         exporter: this.template.exporter,
         data: this.template.data
       });
     } else if (this.template) {
-      await UpdateTemplate(this.template.id, {
+      this.template = await UpdateTemplate(this.template.id, {
         name: this.template.name,
         data: this.template.data
       });
