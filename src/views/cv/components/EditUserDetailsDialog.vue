@@ -1,10 +1,5 @@
 <template>
-  <v-dialog
-    v-model="dialog"
-    max-width="600"
-    v-if="user"
-    v-on:click:outside="onCancel"
-  >
+  <v-dialog v-model="dialog" max-width="600" v-if="user" persistent>
     <v-card>
       <v-card-title class="headline">
         {{ user.firstName }} {{ user.lastName }}

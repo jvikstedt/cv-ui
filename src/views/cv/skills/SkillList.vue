@@ -3,7 +3,7 @@
     <v-dialog
       v-model="dialog"
       max-width="600"
-      v-on:click:outside="onSkillCancel"
+      persistent
     >
       <v-card>
         <v-card-title class="headline">{{
