@@ -1,10 +1,6 @@
 <template>
   <v-row>
-    <v-dialog
-      v-model="dialog"
-      max-width="600"
-      persistent
-    >
+    <v-dialog v-model="dialog" max-width="600" persistent>
       <v-card>
         <v-card-title class="headline">{{
           selectedSkill ? selectedSkill.skillSubject.name : "New Skill"
