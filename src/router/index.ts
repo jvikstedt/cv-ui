@@ -6,6 +6,7 @@ import SkillSubjectsNewView from "@/views/skill_subjects/SkillSubjectsNewView.vu
 import SkillSubjectsEditView from "@/views/skill_subjects/SkillSubjectsEditView.vue";
 import CVShowView from "@/views/cv/CVShowView.vue";
 import PDFView from "@/views/cv/pdf/PDFView.vue";
+import CVSearchView from "@/views/cv/search/CVSearchView.vue";
 
 Vue.use(VueRouter);
 
@@ -29,6 +30,11 @@ const routes: Array<RouteConfig> = [
     path: "/skill_subjects/:id/edit",
     name: "SkillSubjectsEditView",
     component: SkillSubjectsEditView
+  },
+  {
+    path: "/cv/search",
+    name: "CVSearchView",
+    component: CVSearchView
   },
   {
     path: "/cv/:id",

@@ -6,9 +6,22 @@ export interface PatchCVDto {
   description?: string;
 }
 
-export interface SearchCVDto {
-  name: string;
-  limit?: number;
+export class SkillSearch {
+  required? = false;
+
+  skillSubjectId!: number;
+}
+
+export class SearchCVDto {
+  fullName?: string = "";
+
+  limit?: number = 10;
+
+  skills?: SkillSearch[] = [];
+
+  public constructor(init?: Partial<SearchCVDto>) {
+    Object.assign(this, init);
+  }
 }
 
 export const GetCVDetailsById = async (cvId: number): Promise<void> => {
