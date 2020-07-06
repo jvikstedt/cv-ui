@@ -30,7 +30,7 @@
 <script lang="ts">
 import { Component, Vue, Watch } from "vue-property-decorator";
 import CV from "@/store/CV";
-import { SearchCVs } from "@/api/cv";
+import { SearchCVs, SearchCVDto } from "@/api/cv";
 
 @Component
 export default class SearchBar extends Vue {
@@ -44,7 +44,8 @@ export default class SearchBar extends Vue {
     clearTimeout(this.debounce);
 
     this.debounce = window.setTimeout(async () => {
-      this.cvs = await SearchCVs({ name: input || "" });
+      const searchCVDto = new SearchCVDto({ fullName: input || "" });
+      this.cvs = await SearchCVs(searchCVDto);
     }, 500);
   }
 
