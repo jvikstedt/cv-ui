@@ -1,54 +1,56 @@
 <template>
-  <v-dialog v-model="dialog" max-width="600">
-    <template v-slot:activator="{ on, attrs }">
-      <v-btn icon small v-bind="attrs" v-on="on">
-        <v-icon>mdi-pencil</v-icon>
+  <v-card>
+    <v-card-title class="headline">
+      {{ cv.id }}
+    </v-card-title>
+
+    <v-card-text>
+      <v-textarea v-model="description" label="Description" />
+    </v-card-text>
+
+    <v-card-actions>
+      <v-spacer></v-spacer>
+
+      <v-btn color="green darken-1" text @click="onCancel">
+        Cancel
       </v-btn>
-    </template>
-    <v-card>
-      <v-card-title class="headline">
-        {{ cv.id }}
-      </v-card-title>
 
-      <v-card-text>
-        <v-textarea v-model="description" label="Description" />
-      </v-card-text>
-
-      <v-card-actions>
-        <v-spacer></v-spacer>
-
-        <v-btn color="green darken-1" text @click="onCancel">
-          Cancel
-        </v-btn>
-
-        <v-btn color="green darken-1" text @click="onSave">
-          Save
-        </v-btn>
-      </v-card-actions>
-    </v-card>
-  </v-dialog>
+      <v-btn color="green darken-1" text @click="onSave">
+        Save
+      </v-btn>
+    </v-card-actions>
+  </v-card>
 </template>
 
 <script lang="ts">
-import { Component, Vue, Prop, Watch } from "vue-property-decorator";
+import { Component, Vue, Prop } from "vue-property-decorator";
+import { namespace } from "vuex-class";
 import { CV, PatchCVDto } from "@/model/cv";
+
+const CVShowStore = namespace("CVShowStore");
+const DialogStore = namespace("DialogStore");
 
 @Component
 export default class EditCVDetailsDialog extends Vue {
-  @Prop({ required: true }) readonly cv!: CV;
-  @Prop({ required: true }) readonly patchCV!: (
-    patchCVDto: PatchCVDto
-  ) => Promise<void>;
+  @Prop({ required: true }) readonly id!: number;
 
-  private dialog = false;
+  @CVShowStore.Getter
+  public getCV!: (id: number) => CV;
+
+  @CVShowStore.Action
+  public patchCV!: (patchCVDto: PatchCVDto) => Promise<void>;
+
+  @DialogStore.Action
+  public hideDialogAction!: () => void;
 
   private description = "";
 
-  @Watch("dialog")
-  dialogChanged(dialog: boolean) {
-    if (dialog) {
-      this.description = this.cv.description;
-    }
+  get cv(): CV {
+    return this.getCV(this.id);
+  }
+
+  private created() {
+    this.description = this.cv.description;
   }
 
   private async onSave() {
@@ -61,11 +63,11 @@ export default class EditCVDetailsDialog extends Vue {
 
     await this.patchCV(patchCVDto);
 
-    this.dialog = false;
+    this.hideDialogAction();
   }
 
   private async onCancel() {
-    this.dialog = false;
+    this.hideDialogAction();
   }
 }
 </script>

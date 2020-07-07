@@ -1,64 +1,60 @@
 <template>
-  <v-dialog v-model="dialog" max-width="600">
-    <template v-slot:activator="{ on, attrs }">
-      <v-btn v-bind="attrs" v-on="on">
-        Template
+  <v-card>
+    <v-card-title class="headline">
+      Template
+    </v-card-title>
+
+    <v-card-actions>
+      <v-spacer></v-spacer>
+
+      <v-btn color="red darken-1" text @click="onSave">
+        Save
       </v-btn>
-    </template>
-    <v-card>
-      <v-card-title class="headline">
-        Template
-      </v-card-title>
 
-      <v-card-actions>
-        <v-spacer></v-spacer>
+      <v-btn color="blue darken-1" text @click="onCancel">
+        Cancel
+      </v-btn>
 
-        <v-btn color="red darken-1" text @click="onSave">
-          Save
-        </v-btn>
+      <v-btn color="green darken-1" text @click="onUse">
+        Use
+      </v-btn>
+    </v-card-actions>
 
-        <v-btn color="blue darken-1" text @click="onCancel">
-          Cancel
-        </v-btn>
+    <v-card-text>
+      <v-select
+        v-model="template"
+        :items="templates"
+        label="Template"
+        item-text="name"
+        return-object
+      >
+        <template v-slot:append-outer>
+          <v-btn @click="createTemplate">
+            New
+          </v-btn>
+        </template>
+      </v-select>
 
-        <v-btn color="green darken-1" text @click="onUse">
-          Use
-        </v-btn>
-      </v-card-actions>
-
-      <v-card-text>
-        <v-select
-          v-model="template"
-          :items="templates"
-          label="Template"
-          item-text="name"
-          return-object
-        >
-          <template v-slot:append-outer>
-            <v-btn @click="createTemplate">
-              New
-            </v-btn>
-          </template>
-        </v-select>
-
-        <TemplatePdfForm
-          :key="template.id"
-          v-if="template"
-          :initialTemplate="template"
-          @change="onChange"
-        />
-      </v-card-text>
-    </v-card>
-  </v-dialog>
+      <TemplatePdfForm
+        :key="template.id"
+        v-if="template"
+        :initialTemplate="template"
+        @change="onChange"
+      />
+    </v-card-text>
+  </v-card>
 </template>
 
 <script lang="ts">
 import * as R from "ramda";
 import { Component, Vue, Prop } from "vue-property-decorator";
+import { namespace } from "vuex-class";
 import { Template } from "@/model/template";
 import TemplatePdfForm from "./TemplatePdfForm.vue";
 import { ExportPdfDto } from "@/model/exporter";
 import { CreateTemplate, UpdateTemplate } from "@/api/template";
+
+const DialogStore = namespace("DialogStore");
 
 @Component({
   components: {
@@ -68,10 +64,14 @@ import { CreateTemplate, UpdateTemplate } from "@/api/template";
 export default class EditTemplateDialog extends Vue {
   @Prop({ required: false }) readonly initialTemplate!: Template;
   @Prop({ required: true }) readonly templates!: Template[];
-
-  private dialog = false;
+  @Prop({ required: true }) readonly use!: (
+    template: Template
+  ) => Promise<void>;
 
   private template: Template | null = null;
+
+  @DialogStore.Action
+  public hideDialogAction!: () => void;
 
   private async created(): Promise<void> {
     if (this.initialTemplate) {
@@ -99,13 +99,14 @@ export default class EditTemplateDialog extends Vue {
   }
 
   private async onUse() {
-    this.$emit("use", this.template);
-
-    this.dialog = false;
+    if (this.template) {
+      await this.use(this.template);
+    }
+    this.hideDialogAction();
   }
 
   private async onCancel() {
-    this.dialog = false;
+    this.hideDialogAction();
   }
 
   private async createTemplate() {

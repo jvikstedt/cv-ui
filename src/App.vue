@@ -1,5 +1,6 @@
 <template>
   <v-app id="inspire">
+    <Dialog />
     <v-navigation-drawer v-model="drawer" app clipped>
       <v-list dense>
         <v-list-item link router to="/skill_subjects">
@@ -38,10 +39,12 @@
 <script lang="ts">
 import { Component, Vue } from "vue-property-decorator";
 import { CVSearchBar } from "@/views/cv/search";
+import { Dialog } from "@/dialog";
 
 @Component({
   components: {
-    CVSearchBar
+    CVSearchBar,
+    Dialog
   }
 })
 export default class App extends Vue {
