@@ -36,7 +36,7 @@
 <script lang="ts">
 import JSONEditor from "jsoneditor";
 import { Component, Vue, Prop, Watch } from "vue-property-decorator";
-import { CVExportData } from "@/model";
+import { CVExportData } from "@/model/cv";
 
 @Component
 export default class EditJsonDialog extends Vue {

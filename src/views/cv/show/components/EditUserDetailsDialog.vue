@@ -41,7 +41,7 @@
 <script lang="ts">
 import * as R from "ramda";
 import { Component, Vue, Prop, Watch } from "vue-property-decorator";
-import { User, PatchUserDto } from "@/model";
+import { User, PatchUserDto } from "@/model/user";
 import { CreateFile } from "@/api/file";
 
 @Component

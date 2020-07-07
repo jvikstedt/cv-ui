@@ -55,10 +55,10 @@
 <script lang="ts">
 import * as R from "ramda";
 import { Component, Vue, Prop } from "vue-property-decorator";
-import { Template } from "@/model";
+import { Template } from "@/model/template";
 import TemplatePdfForm from "./TemplatePdfForm.vue";
-import { ExportPdfDto } from "@/api/exporter";
-import { GetTemplates, CreateTemplate, UpdateTemplate } from "@/api/template";
+import { ExportPdfDto } from "@/model/exporter";
+import { CreateTemplate, UpdateTemplate } from "@/api/template";
 
 @Component({
   components: {
@@ -67,17 +67,16 @@ import { GetTemplates, CreateTemplate, UpdateTemplate } from "@/api/template";
 })
 export default class EditTemplateDialog extends Vue {
   @Prop({ required: false }) readonly initialTemplate!: Template;
+  @Prop({ required: true }) readonly templates!: Template[];
 
   private dialog = false;
 
   private template: Template | null = null;
-  private templates: Template[] = [];
 
   private async created(): Promise<void> {
     if (this.initialTemplate) {
       this.template = R.clone(this.initialTemplate);
     }
-    this.templates = await GetTemplates();
   }
 
   private async onChange(template: Template): Promise<void> {

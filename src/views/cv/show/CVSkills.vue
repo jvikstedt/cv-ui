@@ -10,7 +10,6 @@
           <v-autocomplete
             v-model="selectedSkillSubject"
             :items="skillSubjects"
-            :loading="isLoading"
             :search-input.sync="search"
             item-text="name"
             item-value="id"
@@ -92,12 +91,12 @@ import * as R from "ramda";
 import { Component, Vue, Prop, Watch } from "vue-property-decorator";
 import { namespace } from "vuex-class";
 import {
-  CV,
   Skill,
   SkillSubject,
   CreateSkillDto,
   PatchSkillDto
-} from "@/model";
+} from "@/model/skill";
+import { CV } from "@/model/cv";
 import { SearchSkillSubjects } from "@/api/skill_subject";
 
 const CVShowStore = namespace("CVShowStore");
@@ -110,7 +109,6 @@ export default class CVSkills extends Vue {
   private selectedSkill: Skill | null = null;
   private experienceInYears = 1;
   private search = "";
-  private isLoading = false;
   private selectedSkillSubject: SkillSubject | null = null;
 
   private skillSubjects: SkillSubject[] = [];
@@ -206,7 +204,6 @@ export default class CVSkills extends Vue {
     this.selectedSkillSubject = null;
     this.search = "";
     this.dialog = false;
-    this.isLoading = false;
     this.experienceInYears = 1;
     this.skillSubjects = [];
   }

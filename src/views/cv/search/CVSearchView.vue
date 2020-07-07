@@ -5,7 +5,6 @@
     <v-autocomplete
       v-model="selectedSkillSubject"
       :items="skillSubjects"
-      :loading="isLoading"
       :search-input.sync="search"
       item-text="name"
       item-value="id"
@@ -43,7 +42,13 @@
     </v-btn>
 
     <v-list class="mt-2">
-      <template v-if="results.length">
+      <template v-if="searching">
+        <v-progress-circular
+          indeterminate
+          color="primary"
+        ></v-progress-circular>
+      </template>
+      <template v-else-if="results.length">
         <template v-for="item in results">
           <v-list-item :key="item.id" @click="onResultClick(item)">
             <v-list-item-avatar>
@@ -76,12 +81,8 @@
 import * as R from "ramda";
 import { Component, Vue, Watch } from "vue-property-decorator";
 import { namespace } from "vuex-class";
-import {
-  SkillSubject,
-  CVSearchDtoSkill,
-  CVSearchDto,
-  CVSearchResult
-} from "@/model";
+import { CVSearchDtoSkill, CVSearchDto, CVSearchResult } from "@/model/cv";
+import { SkillSubject } from "@/model/skill";
 import { SearchSkillSubjects } from "@/api/skill_subject";
 
 class SkillSearchOption extends CVSearchDtoSkill {
@@ -90,14 +91,11 @@ class SkillSearchOption extends CVSearchDtoSkill {
 
 const CVSearchStore = namespace("CVSearchStore");
 
-@Component({
-  components: {}
-})
+@Component
 export default class CVSearchView extends Vue {
   private fullName = "";
 
   private search = "";
-  private isLoading = false;
   private selectedSkillSubject: SkillSubject | null = null;
   private skillSubjects: SkillSubject[] = [];
 

@@ -121,7 +121,7 @@
 <script lang="ts">
 import * as R from "ramda";
 import { Component, Vue, Prop, Watch } from "vue-property-decorator";
-import { Template } from "@/model";
+import { Template } from "@/model/template";
 
 @Component
 export default class TemplatePdfForm extends Vue {

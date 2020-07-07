@@ -1,5 +1,5 @@
 import Api from "@/api/api";
-import { Template, TemplateDto } from "@/model";
+import { Template, TemplateDto } from "@/model/template";
 
 export const CreateTemplate = async (
   templateDto: TemplateDto
@@ -16,22 +16,4 @@ export const UpdateTemplate = async (
   const template = await Api.put(`/templates/${templateId}`, templateDto);
 
   return template;
-};
-
-export const GetTemplates = async (): Promise<Template[]> => {
-  const templates = await Api.get("/templates");
-
-  return templates;
-};
-
-export const GetTemplateById = async (
-  templateId: number
-): Promise<Template> => {
-  const template = await Api.get(`/templates/${templateId}`);
-
-  return template;
-};
-
-export const DeleteTemplateById = async (templateId: number): Promise<void> => {
-  await Api.delete(`/templates/${templateId}`);
 };

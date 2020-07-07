@@ -33,7 +33,8 @@ import { Component, Vue, Prop } from "vue-property-decorator";
 import { namespace } from "vuex-class";
 import EditUserDetailsDialog from "./components/EditUserDetailsDialog.vue";
 import EditCVDetailsDialog from "./components/EditCVDetailsDialog.vue";
-import { CV, PatchUserDto, PatchCVDto } from "@/model";
+import { CV, PatchCVDto } from "@/model/cv";
+import { PatchUserDto } from "@/model/user";
 
 const CVShowStore = namespace("CVShowStore");
 
