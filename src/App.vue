@@ -17,7 +17,7 @@
       <v-app-bar-nav-icon @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
       <v-toolbar-title>Application</v-toolbar-title>
       <v-toolbar-title class="ml-2">
-        <SearchBar />
+        <CVSearchBar />
       </v-toolbar-title>
     </v-app-bar>
 
@@ -37,11 +37,11 @@
 
 <script lang="ts">
 import { Component, Vue } from "vue-property-decorator";
-import SearchBar from "./components/SearchBar.vue";
+import { CVSearchBar } from "@/views/cv/search";
 
 @Component({
   components: {
-    SearchBar
+    CVSearchBar
   }
 })
 export default class App extends Vue {

@@ -43,8 +43,8 @@
     </v-btn>
 
     <v-list class="mt-2">
-      <template v-if="cvs.length">
-        <template v-for="item in cvs">
+      <template v-if="results.length">
+        <template v-for="item in results">
           <v-list-item :key="item.id" @click="onResultClick(item)">
             <v-list-item-avatar>
               <img :src="'/api/files/' + item.avatarId" />
@@ -75,21 +75,26 @@
 <script lang="ts">
 import * as R from "ramda";
 import { Component, Vue, Watch } from "vue-property-decorator";
-import { SearchCVs, SearchCVDto, SkillSearch } from "@/api/cv";
-import CV from "@/store/CV";
-import SkillSubject from "@/store/SkillSubject";
+import { namespace } from "vuex-class";
+import {
+  SkillSubject,
+  CVSearchDtoSkill,
+  CVSearchDto,
+  CVSearchResult
+} from "@/model";
 import { SearchSkillSubjects } from "@/api/skill_subject";
 
-class SkillSearchOption extends SkillSearch {
+class SkillSearchOption extends CVSearchDtoSkill {
   name!: string;
 }
+
+const CVSearchStore = namespace("CVSearchStore");
 
 @Component({
   components: {}
 })
 export default class CVSearchView extends Vue {
   private fullName = "";
-  private cvs: CV[] = [];
 
   private search = "";
   private isLoading = false;
@@ -97,6 +102,15 @@ export default class CVSearchView extends Vue {
   private skillSubjects: SkillSubject[] = [];
 
   private skillSearchOptions: SkillSearchOption[] = [];
+
+  @CVSearchStore.State
+  public searching!: boolean;
+
+  @CVSearchStore.State
+  public results!: CVSearchResult[];
+
+  @CVSearchStore.Action
+  public searchCVs!: (cvSearchDto: CVSearchDto) => Promise<void>;
 
   @Watch("search")
   async searchChanged(keyword: string) {
@@ -116,27 +130,27 @@ export default class CVSearchView extends Vue {
     );
   }
 
-  private commonSkills(cv: CV) {
+  private commonSkills(cvSearchResult: CVSearchResult) {
     return R.filter(
       skill =>
         !!R.find(
           option => R.equals(option.skillSubjectId, skill.skillSubjectId),
           this.skillSearchOptions
         ),
-      cv.skills
+      cvSearchResult.skills
     );
   }
 
-  private onResultClick(cv: CV) {
-    this.$router.push(`/cv/${cv.id}`);
+  private onResultClick(cvSearchResult: CVSearchResult) {
+    this.$router.push(`/cv/${cvSearchResult.id}`);
   }
 
   private async onSearch() {
-    const searchCVDto = new SearchCVDto({
+    const cvSearchDto = new CVSearchDto({
       fullName: this.fullName,
       skills: this.skillSearchOptions
     });
-    this.cvs = await SearchCVs(searchCVDto);
+    await this.searchCVs(cvSearchDto);
   }
 
   private async removeSelectedSkillSubject(

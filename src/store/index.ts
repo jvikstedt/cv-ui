@@ -1,10 +1,17 @@
 import Vue from "vue";
 import Vuex from "vuex";
-import { ORMDatabase } from "vuex-orm-decorators";
+
+import { CVShowStore } from "@/views/cv/show";
+import { CVSearchStore } from "@/views/cv/search";
+import { CVPDFStore } from "@/views/cv/pdf";
 
 Vue.use(Vuex);
 
 const store = new Vuex.Store({
-  plugins: [ORMDatabase.install()]
+  modules: {
+    CVShowStore,
+    CVSearchStore,
+    CVPDFStore
+  }
 });
 export default store;

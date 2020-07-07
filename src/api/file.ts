@@ -1,5 +1,5 @@
 import Api from "@/api/api";
-import StoreFile from "@/store/File";
+import { File as StoreFile } from "@/model";
 
 export interface FileDto {
   file: File;
@@ -12,10 +12,6 @@ export const CreateFile = async (fileDto: FileDto): Promise<StoreFile> => {
     headers: {
       "Content-Type": "multipart/form-data"
     }
-  });
-
-  StoreFile.insert({
-    data: file
   });
 
   return file;

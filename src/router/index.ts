@@ -1,12 +1,10 @@
 import Vue from "vue";
 import VueRouter, { RouteConfig } from "vue-router";
 import Home from "@/views/Home.vue";
-import SkillSubjectsListView from "@/views/skill_subjects/SkillSubjectsListView.vue";
-import SkillSubjectsNewView from "@/views/skill_subjects/SkillSubjectsNewView.vue";
-import SkillSubjectsEditView from "@/views/skill_subjects/SkillSubjectsEditView.vue";
-import CVShowView from "@/views/cv/CVShowView.vue";
-import PDFView from "@/views/cv/pdf/PDFView.vue";
-import CVSearchView from "@/views/cv/search/CVSearchView.vue";
+
+import { CVShowView } from "@/views/cv/show";
+import { CVSearchView } from "@/views/cv/search";
+import { CVPDFView } from "@/views/cv/pdf";
 
 Vue.use(VueRouter);
 
@@ -15,21 +13,6 @@ const routes: Array<RouteConfig> = [
     path: "/",
     name: "Home",
     component: Home
-  },
-  {
-    path: "/skill_subjects",
-    name: "SkillSubjectsListView",
-    component: SkillSubjectsListView
-  },
-  {
-    path: "/skill_subjects/new",
-    name: "SkillSubjectsNewView",
-    component: SkillSubjectsNewView
-  },
-  {
-    path: "/skill_subjects/:id/edit",
-    name: "SkillSubjectsEditView",
-    component: SkillSubjectsEditView
   },
   {
     path: "/cv/search",
@@ -43,8 +26,8 @@ const routes: Array<RouteConfig> = [
   },
   {
     path: "/cv/:id/pdf",
-    name: "PDFView",
-    component: PDFView
+    name: "CVPDFView",
+    component: CVPDFView
   }
 ];
 
