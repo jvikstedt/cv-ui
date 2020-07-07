@@ -1,6 +1,6 @@
 <template>
   <v-row>
-    <v-dialog v-model="dialog" max-width="600" persistent>
+    <v-dialog v-model="dialog" max-width="600">
       <v-card>
         <v-card-title class="headline">{{
           selectedSkill ? selectedSkill.skillSubject.name : "New Skill"
@@ -73,7 +73,7 @@
         text-color="white"
         v-for="skill in skills"
         :key="skill.id"
-        @click="onSkillClick(skill)"
+        @click.stop="onSkillClick(skill)"
       >
         <v-avatar left class="green darken-4">
           {{ skill.experienceInYears }}
@@ -90,22 +90,21 @@
 <script lang="ts">
 import * as R from "ramda";
 import { Component, Vue, Prop, Watch } from "vue-property-decorator";
-import Skill from "@/store/Skill";
+import { namespace } from "vuex-class";
 import {
-  UpdateSkillDto,
-  UpdateSkill,
+  CV,
+  Skill,
+  SkillSubject,
   CreateSkillDto,
-  CreateSkill,
-  DeleteSkillById
-} from "@/api/skill";
-import SkillSubject from "@/store/SkillSubject";
+  PatchSkillDto
+} from "@/model";
 import { SearchSkillSubjects } from "@/api/skill_subject";
-import CV from "@/store/CV";
+
+const CVShowStore = namespace("CVShowStore");
 
 @Component
-export default class SkillList extends Vue {
-  @Prop({ required: true }) readonly skills!: Skill[];
-  @Prop({ required: true }) readonly cv!: CV;
+export default class CVSkills extends Vue {
+  @Prop({ required: true }) readonly id!: number;
 
   private dialog = false;
   private selectedSkill: Skill | null = null;
@@ -115,6 +114,29 @@ export default class SkillList extends Vue {
   private selectedSkillSubject: SkillSubject | null = null;
 
   private skillSubjects: SkillSubject[] = [];
+
+  @CVShowStore.Action
+  public patchSkill!: (patchSkillDto: PatchSkillDto) => Promise<void>;
+
+  @CVShowStore.Action
+  public deleteSkill!: (id: number) => Promise<void>;
+
+  @CVShowStore.Action
+  public createSkill!: (createSkillDto: CreateSkillDto) => Promise<void>;
+
+  @CVShowStore.Getter
+  public getCV!: (id: number) => CV;
+
+  @CVShowStore.Getter
+  public getCVSkills!: (id: number) => Skill[];
+
+  get cv(): CV {
+    return this.getCV(this.id);
+  }
+
+  get skills(): Skill[] {
+    return this.getCVSkills(this.id);
+  }
 
   @Watch("search")
   async searchChanged(keyword: string) {
@@ -152,24 +174,27 @@ export default class SkillList extends Vue {
 
   private async onSkillDelete() {
     if (this.selectedSkill) {
-      await DeleteSkillById(this.selectedSkill.id);
+      await this.deleteSkill(this.selectedSkill.id);
     }
     this.resetFields();
   }
 
   private async onSkillSave() {
     if (this.selectedSkill) {
-      const updateSkillDto: UpdateSkillDto = {
-        experienceInYears: this.experienceInYears
+      const patchSkillDto: PatchSkillDto = {
+        id: this.selectedSkill.id,
+        data: {
+          experienceInYears: this.experienceInYears
+        }
       };
-      await UpdateSkill(this.selectedSkill.id, updateSkillDto);
+      await this.patchSkill(patchSkillDto);
     } else if (this.selectedSkillSubject) {
       const createSkillDto: CreateSkillDto = {
         cvId: this.cv.id,
         experienceInYears: this.experienceInYears,
         skillSubjectId: this.selectedSkillSubject.id
       };
-      await CreateSkill(createSkillDto);
+      await this.createSkill(createSkillDto);
     }
 
     this.resetFields();

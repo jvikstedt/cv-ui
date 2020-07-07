@@ -1,5 +1,10 @@
 <template>
-  <v-dialog v-model="dialog" max-width="600" persistent>
+  <v-dialog v-model="dialog" max-width="600">
+    <template v-slot:activator="{ on, attrs }">
+      <v-btn v-bind="attrs" v-on="on">
+        Template
+      </v-btn>
+    </template>
     <v-card>
       <v-card-title class="headline">
         Template
@@ -50,7 +55,7 @@
 <script lang="ts">
 import * as R from "ramda";
 import { Component, Vue, Prop } from "vue-property-decorator";
-import Template from "@/store/Template";
+import { Template } from "@/model";
 import TemplatePdfForm from "./TemplatePdfForm.vue";
 import { ExportPdfDto } from "@/api/exporter";
 import { GetTemplates, CreateTemplate, UpdateTemplate } from "@/api/template";
@@ -62,20 +67,17 @@ import { GetTemplates, CreateTemplate, UpdateTemplate } from "@/api/template";
 })
 export default class EditTemplateDialog extends Vue {
   @Prop({ required: false }) readonly initialTemplate!: Template;
-  @Prop({ required: true }) readonly dialog!: boolean;
-  @Prop({ required: true }) readonly setDialog!: (dialog: boolean) => void;
+
+  private dialog = false;
 
   private template: Template | null = null;
-
-  get templates(): Template[] {
-    return Template.all();
-  }
+  private templates: Template[] = [];
 
   private async created(): Promise<void> {
     if (this.initialTemplate) {
       this.template = R.clone(this.initialTemplate);
     }
-    await GetTemplates();
+    this.templates = await GetTemplates();
   }
 
   private async onChange(template: Template): Promise<void> {
@@ -100,11 +102,11 @@ export default class EditTemplateDialog extends Vue {
   private async onUse() {
     this.$emit("use", this.template);
 
-    this.setDialog(false);
+    this.dialog = false;
   }
 
   private async onCancel() {
-    this.setDialog(false);
+    this.dialog = false;
   }
 
   private async createTemplate() {

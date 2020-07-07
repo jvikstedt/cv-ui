@@ -1,5 +1,10 @@
 <template>
-  <v-dialog v-model="dialog" max-width="600" v-if="cv" persistent>
+  <v-dialog v-model="dialog" max-width="600">
+    <template v-slot:activator="{ on, attrs }">
+      <v-btn icon small v-bind="attrs" v-on="on">
+        <v-icon>mdi-pencil</v-icon>
+      </v-btn>
+    </template>
     <v-card>
       <v-card-title class="headline">
         {{ cv.id }}
@@ -26,38 +31,41 @@
 
 <script lang="ts">
 import { Component, Vue, Prop, Watch } from "vue-property-decorator";
-import CV from "@/store/CV";
-import { PatchCV, PatchCVDto } from "@/api/cv";
+import { CV, PatchCVDto } from "@/model";
 
 @Component
 export default class EditCVDetailsDialog extends Vue {
-  @Prop({ required: true }) readonly cv!: CV | null;
-  @Prop({ required: true }) readonly dialog!: boolean;
-  @Prop({ required: true }) readonly setDialog!: (dialog: boolean) => void;
+  @Prop({ required: true }) readonly cv!: CV;
+  @Prop({ required: true }) readonly patchCV!: (
+    patchCVDto: PatchCVDto
+  ) => Promise<void>;
+
+  private dialog = false;
 
   private description = "";
 
   @Watch("dialog")
   dialogChanged(dialog: boolean) {
-    if (dialog && this.cv) {
+    if (dialog) {
       this.description = this.cv.description;
     }
   }
 
   private async onSave() {
     const patchCVDto: PatchCVDto = {
-      description: this.description
+      id: this.cv.id,
+      data: {
+        description: this.description
+      }
     };
 
-    if (this.cv) {
-      await PatchCV(this.cv.id, patchCVDto);
-    }
+    await this.patchCV(patchCVDto);
 
-    this.setDialog(false);
+    this.dialog = false;
   }
 
   private async onCancel() {
-    this.setDialog(false);
+    this.dialog = false;
   }
 }
 </script>

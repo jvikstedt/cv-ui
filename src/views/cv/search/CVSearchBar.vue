@@ -1,7 +1,7 @@
 <template>
   <v-autocomplete
     v-model="cv"
-    :items="cvs"
+    :items="results"
     label="Search"
     item-text="fullName"
     return-object
@@ -29,23 +29,33 @@
 
 <script lang="ts">
 import { Component, Vue, Watch } from "vue-property-decorator";
-import CV from "@/store/CV";
-import { SearchCVs, SearchCVDto } from "@/api/cv";
+import { namespace } from "vuex-class";
+import { CV, CVSearchResult, CVSearchDto } from "@/model";
+
+const CVSearchStore = namespace("CVSearchStore");
 
 @Component
-export default class SearchBar extends Vue {
+export default class CVSearchBar extends Vue {
   private cv: CV | null = null;
-  private cvs: CV[] = [];
   private searchInput = "";
   private debounce = 0;
+
+  @CVSearchStore.State
+  public searching!: boolean;
+
+  @CVSearchStore.State
+  public results!: CVSearchResult[];
+
+  @CVSearchStore.Action
+  public searchCVs!: (cvSearchDto: CVSearchDto) => Promise<void>;
 
   @Watch("searchInput")
   async searchInputChanged(input: string) {
     clearTimeout(this.debounce);
 
     this.debounce = window.setTimeout(async () => {
-      const searchCVDto = new SearchCVDto({ fullName: input || "" });
-      this.cvs = await SearchCVs(searchCVDto);
+      const cvSearchDto = new CVSearchDto({ fullName: input || "" });
+      await this.searchCVs(cvSearchDto);
     }, 500);
   }
 

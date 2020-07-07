@@ -1,5 +1,10 @@
 <template>
-  <v-dialog v-model="dialog" max-width="600" v-if="user" persistent>
+  <v-dialog v-model="dialog" max-width="600">
+    <template v-slot:activator="{ on, attrs }">
+      <v-btn icon small v-bind="attrs" v-on="on">
+        <v-icon>mdi-pencil</v-icon>
+      </v-btn>
+    </template>
     <v-card>
       <v-card-title class="headline">
         {{ user.firstName }} {{ user.lastName }}
@@ -36,15 +41,17 @@
 <script lang="ts">
 import * as R from "ramda";
 import { Component, Vue, Prop, Watch } from "vue-property-decorator";
-import User from "@/store/User";
-import { PatchUser, PatchUserDto } from "@/api/user";
+import { User, PatchUserDto } from "@/model";
 import { CreateFile } from "@/api/file";
 
 @Component
 export default class EditUserNamesDialog extends Vue {
-  @Prop({ required: true }) readonly user!: User | null;
-  @Prop({ required: true }) readonly dialog!: boolean;
-  @Prop({ required: true }) readonly setDialog!: (dialog: boolean) => void;
+  @Prop({ required: true }) readonly user!: User;
+  @Prop({ required: true }) readonly patchUser!: (
+    patchUserDto: PatchUserDto
+  ) => Promise<void>;
+
+  private dialog = false;
 
   private firstName = "";
   private lastName = "";
@@ -52,7 +59,7 @@ export default class EditUserNamesDialog extends Vue {
 
   @Watch("dialog")
   dialogChanged(dialog: boolean) {
-    if (dialog && this.user) {
+    if (dialog) {
       this.firstName = this.user.firstName;
       this.lastName = this.user.lastName;
       this.avatarId = this.user.avatarId;
@@ -75,20 +82,21 @@ export default class EditUserNamesDialog extends Vue {
 
   private async onSave() {
     const patchUserDto: PatchUserDto = {
-      firstName: this.firstName,
-      lastName: this.lastName,
-      avatarId: this.avatarId
+      id: this.user.id,
+      data: {
+        firstName: this.firstName,
+        lastName: this.lastName,
+        avatarId: this.avatarId
+      }
     };
 
-    if (this.user) {
-      await PatchUser(this.user.id, patchUserDto);
-    }
+    await this.patchUser(patchUserDto);
 
-    this.setDialog(false);
+    this.dialog = false;
   }
 
   private async onCancel() {
-    this.setDialog(false);
+    this.dialog = false;
   }
 }
 </script>

@@ -1,5 +1,10 @@
 <template>
-  <v-dialog v-model="dialog" max-width="600" persistent>
+  <v-dialog v-model="dialog" max-width="600">
+    <template v-slot:activator="{ on, attrs }">
+      <v-btn v-bind="attrs" v-on="on">
+        JSON
+      </v-btn>
+    </template>
     <v-card>
       <v-card-title class="headline">
         JSON
@@ -31,32 +36,32 @@
 <script lang="ts">
 import JSONEditor from "jsoneditor";
 import { Component, Vue, Prop, Watch } from "vue-property-decorator";
-import CV from "@/store/CV";
+import { CVExportData } from "@/model";
 
 @Component
 export default class EditJsonDialog extends Vue {
-  @Prop({ required: true }) readonly cv!: CV | null;
-  @Prop({ required: true }) readonly dialog!: boolean;
-  @Prop({ required: true }) readonly setDialog!: (dialog: boolean) => void;
+  @Prop({ required: true }) readonly cvData!: CVExportData;
 
+  private dialog = false;
   private valid = false;
 
   private editor?: JSONEditor;
 
-  @Watch("cv")
-  dialogChanged(cv: CV) {
-    if (this.editor) {
-      this.editor.set(cv);
-    }
-  }
-
-  private async mounted() {
-    const element = document.getElementById("jsoneditor");
-    if (this.dialog && this.cv && element) {
-      if (!this.editor) {
-        this.editor = new JSONEditor(element, { mode: "tree", search: true });
-      }
-      this.editor.set(this.cv);
+  @Watch("dialog")
+  dialogChanged(dialog: boolean) {
+    if (dialog) {
+      this.$nextTick(() => {
+        const element = document.getElementById("jsoneditor");
+        if (element) {
+          if (!this.editor) {
+            this.editor = new JSONEditor(element, {
+              mode: "tree",
+              search: true
+            });
+          }
+          this.editor.set(this.cvData);
+        }
+      });
     }
   }
 
@@ -65,11 +70,11 @@ export default class EditJsonDialog extends Vue {
       this.$emit("use", this.editor.get());
     }
 
-    this.setDialog(false);
+    this.dialog = false;
   }
 
   private async onCancel() {
-    this.setDialog(false);
+    this.dialog = false;
   }
 }
 </script>
