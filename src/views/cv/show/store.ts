@@ -16,6 +16,10 @@ export class CVShowStore extends VuexModule {
     return (id: number): CV => this.cvs[id];
   }
 
+  get getSkill() {
+    return (id: number): Skill => this.skills[id];
+  }
+
   get getCVSkills() {
     return (id: number): Skill[] =>
       R.filter(

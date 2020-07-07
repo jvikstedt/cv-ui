@@ -1,11 +1,11 @@
 <template>
   <div style="width:800px">
-    <EditTemplateDialog
-      :initialTemplate="selectedTemplate"
-      @use="onTemplateUse"
-      :templates="getTemplates"
-    />
-    <EditJsonDialog v-if="cvData" :cvData="cvData" @use="onJsonUse" />
+    <v-btn @click="openEditTemplateDialog">
+      TEMPLATE
+    </v-btn>
+    <v-btn @click="openEditJsonDialog">
+      JSON
+    </v-btn>
 
     <object
       v-if="pdfUrl"
@@ -26,11 +26,13 @@ import * as handlebars from "handlebars";
 import { Template } from "@/model/template";
 import { CVExportData } from "@/model/cv";
 import { ExportPdfDto } from "@/model/exporter";
+import { ShowDialogDto } from "@/dialog";
 import TemplatePdfForm from "./components/TemplatePdfForm.vue";
 import EditTemplateDialog from "./components/EditTemplateDialog.vue";
 import EditJsonDialog from "./components/EditJsonDialog.vue";
 
 const CVPDFStore = namespace("CVPDFStore");
+const DialogStore = namespace("DialogStore");
 
 @Component({
   components: {
@@ -72,6 +74,9 @@ export default class CVPDFView extends Vue {
   @CVPDFStore.Action
   public exportPDF!: (exportPdfDto: ExportPdfDto) => Promise<void>;
 
+  @DialogStore.Action
+  public showDialogAction!: (showDialogDto: ShowDialogDto) => Promise<void>;
+
   get pdfUrl() {
     if (this.blob) {
       return window.URL.createObjectURL(this.blob);
@@ -106,6 +111,24 @@ export default class CVPDFView extends Vue {
 
       await this.exportPDF({ ...this.selectedTemplate.data, content });
     }
+  }
+
+  private openEditJsonDialog() {
+    this.showDialogAction({
+      component: EditJsonDialog,
+      props: { data: this.cvData, use: this.onJsonUse }
+    });
+  }
+
+  private openEditTemplateDialog() {
+    this.showDialogAction({
+      component: EditTemplateDialog,
+      props: {
+        initialTemplate: this.selectedTemplate,
+        templates: this.getTemplates,
+        use: this.onTemplateUse
+      }
+    });
   }
 }
 </script>
