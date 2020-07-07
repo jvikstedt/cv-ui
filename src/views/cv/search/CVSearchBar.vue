@@ -10,6 +10,7 @@
     dense
     hide-details
     filled
+    :loading="searching"
     :search-input.sync="searchInput"
     @change="onSelect"
   >
@@ -30,7 +31,7 @@
 <script lang="ts">
 import { Component, Vue, Watch } from "vue-property-decorator";
 import { namespace } from "vuex-class";
-import { CV, CVSearchResult, CVSearchDto } from "@/model";
+import { CV, CVSearchResult, CVSearchDto } from "@/model/cv";
 
 const CVSearchStore = namespace("CVSearchStore");
 

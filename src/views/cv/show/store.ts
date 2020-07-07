@@ -2,15 +2,9 @@ import * as R from "ramda";
 import Vue from "vue";
 import { VuexModule, Module, Mutation, Action } from "vuex-module-decorators";
 import Api from "@/api/api";
-import {
-  Skill,
-  CV,
-  User,
-  PatchUserDto,
-  PatchCVDto,
-  PatchSkillDto,
-  CreateSkillDto
-} from "@/model";
+import { Skill, PatchSkillDto, CreateSkillDto } from "@/model/skill";
+import { CV, PatchCVDto } from "@/model/cv";
+import { User, PatchUserDto } from "@/model/user";
 
 @Module({ namespaced: true })
 export class CVShowStore extends VuexModule {

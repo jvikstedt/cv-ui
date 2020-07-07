@@ -1,6 +1,6 @@
 import { VuexModule, Module, Mutation, Action } from "vuex-module-decorators";
 import Api from "@/api/api";
-import { CVSearchResult, CVSearchDto } from "@/model";
+import { CVSearchResult, CVSearchDto } from "@/model/cv";
 
 @Module({ namespaced: true })
 export class CVSearchStore extends VuexModule {

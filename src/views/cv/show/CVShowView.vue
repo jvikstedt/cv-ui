@@ -19,7 +19,7 @@
 <script lang="ts">
 import { Component, Vue, Watch } from "vue-property-decorator";
 import { namespace } from "vuex-class";
-import { CV } from "@/model";
+import { CV } from "@/model/cv";
 import CVDetails from "./CVDetails.vue";
 import CVSkills from "./CVSkills.vue";
 

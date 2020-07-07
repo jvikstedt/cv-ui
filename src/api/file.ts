@@ -1,5 +1,5 @@
 import Api from "@/api/api";
-import { File as StoreFile } from "@/model";
+import { File as StoreFile } from "@/model/file";
 
 export interface FileDto {
   file: File;

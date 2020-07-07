@@ -31,7 +31,7 @@
 
 <script lang="ts">
 import { Component, Vue, Prop, Watch } from "vue-property-decorator";
-import { CV, PatchCVDto } from "@/model";
+import { CV, PatchCVDto } from "@/model/cv";
 
 @Component
 export default class EditCVDetailsDialog extends Vue {

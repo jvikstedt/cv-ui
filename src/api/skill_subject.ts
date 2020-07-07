@@ -1,5 +1,5 @@
 import Api from "@/api/api";
-import { SkillSubject } from "@/model";
+import { SkillSubject } from "@/model/skill";
 
 export interface SearchSkillSubjectDto {
   name: string;
