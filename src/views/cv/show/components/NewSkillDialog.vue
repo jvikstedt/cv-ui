@@ -12,7 +12,17 @@
         label="Skill subject"
         placeholder="Start typing to search"
         return-object
-      ></v-autocomplete>
+      >
+        <template v-slot:append-outer>
+          <v-btn @click="isCreatingSkillSubject = !isCreatingSkillSubject">
+            {{ isCreatingSkillSubject ? "Cancel" : "New" }}
+          </v-btn>
+        </template>
+      </v-autocomplete>
+
+      <template v-if="isCreatingSkillSubject">
+        <NewSkillSubjectForm :afterCreate="afterSkillSubjectCreate" />
+      </template>
     </v-card-text>
 
     <v-subheader>Experience in years</v-subheader>
@@ -57,11 +67,16 @@ import { Component, Vue, Prop, Watch } from "vue-property-decorator";
 import { namespace } from "vuex-class";
 import { Skill, CreateSkillDto, SkillSubject } from "@/model/skill";
 import { SearchSkillSubjects } from "@/api/skill_subject";
+import NewSkillSubjectForm from "@/views/skill_subject/components/NewSkillSubjectForm.vue";
 
 const CVShowStore = namespace("CVShowStore");
 const DialogStore = namespace("DialogStore");
 
-@Component
+@Component({
+  components: {
+    NewSkillSubjectForm
+  }
+})
 export default class NewSkillDialog extends Vue {
   @Prop({ required: true }) readonly id!: number;
 
@@ -69,6 +84,7 @@ export default class NewSkillDialog extends Vue {
   private search = "";
   private skillSubjects: SkillSubject[] = [];
   private selectedSkillSubject: SkillSubject | null = null;
+  private isCreatingSkillSubject = false;
 
   @CVShowStore.Getter
   public getCVSkills!: (id: number) => Skill[];
@@ -110,6 +126,13 @@ export default class NewSkillDialog extends Vue {
 
   private async onCancel() {
     this.hideDialogAction();
+  }
+
+  private async afterSkillSubjectCreate(skillSubject: SkillSubject) {
+    this.skillSubjects = [...this.skillSubjects, skillSubject];
+    this.selectedSkillSubject = skillSubject;
+
+    this.isCreatingSkillSubject = false;
   }
 }
 </script>

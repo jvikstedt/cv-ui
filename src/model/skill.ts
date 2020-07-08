@@ -40,3 +40,7 @@ export class CreateSkillDto {
 
   experienceInYears!: number;
 }
+
+export class CreateSkillSubjectDto {
+  name!: string;
+}
