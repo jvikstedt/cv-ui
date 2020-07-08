@@ -43,8 +43,8 @@ export default class EditJsonDialog extends Vue {
 
   private editor?: JSONEditor;
 
-  @DialogStore.Action
-  public hideDialogAction!: () => void;
+  @DialogStore.Mutation
+  public popDialogComponent!: () => void;
 
   private mounted() {
     const element = document.getElementById("jsoneditor");
@@ -62,11 +62,11 @@ export default class EditJsonDialog extends Vue {
       await this.use(this.editor.get());
     }
 
-    this.hideDialogAction();
+    this.popDialogComponent();
   }
 
   private async onCancel() {
-    this.hideDialogAction();
+    this.popDialogComponent();
   }
 }
 </script>

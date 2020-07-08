@@ -70,8 +70,8 @@ export default class EditTemplateDialog extends Vue {
 
   private template: Template | null = null;
 
-  @DialogStore.Action
-  public hideDialogAction!: () => void;
+  @DialogStore.Mutation
+  public popDialogComponent!: () => void;
 
   private async created(): Promise<void> {
     if (this.initialTemplate) {
@@ -102,11 +102,11 @@ export default class EditTemplateDialog extends Vue {
     if (this.template) {
       await this.use(this.template);
     }
-    this.hideDialogAction();
+    this.popDialogComponent();
   }
 
   private async onCancel() {
-    this.hideDialogAction();
+    this.popDialogComponent();
   }
 
   private async createTemplate() {

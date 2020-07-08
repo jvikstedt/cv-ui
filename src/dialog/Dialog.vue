@@ -1,16 +1,17 @@
 <template>
-  <v-dialog v-model="dialog" max-width="600" v-if="showDialogDto">
-    <component
-      v-bind="showDialogDto.props"
-      :is="showDialogDto.component"
-    ></component>
-  </v-dialog>
+  <div>
+    <template v-for="dc in dialogComponents">
+      <v-dialog :key="dc.component.name" v-model="dialog" max-width="600">
+        <component v-bind="dc.props" :is="dc.component"></component>
+      </v-dialog>
+    </template>
+  </div>
 </template>
 
 <script lang="ts">
 import { Component, Vue } from "vue-property-decorator";
 import { namespace } from "vuex-class";
-import { ShowDialogDto } from "./store";
+import { DialogComponent } from "./store";
 
 const DialogStore = namespace("DialogStore");
 
@@ -20,18 +21,18 @@ export default class Dialog extends Vue {
   public isOpen!: boolean;
 
   @DialogStore.State
-  public showDialogDto!: ShowDialogDto | null;
+  public dialogComponents!: DialogComponent[];
 
-  @DialogStore.Action
-  public hideDialogAction!: () => void;
+  @DialogStore.Mutation
+  public popDialogComponent!: () => void;
 
   get dialog(): boolean {
-    return this.isOpen;
+    return true;
   }
 
   set dialog(dialog: boolean) {
     if (!dialog) {
-      this.hideDialogAction();
+      this.popDialogComponent();
     }
   }
 }

@@ -1,6 +1,7 @@
-import { VuexModule, Module, Mutation, Action } from "vuex-module-decorators";
+import * as R from "ramda";
+import { VuexModule, Module, Mutation } from "vuex-module-decorators";
 
-export class ShowDialogDto {
+export class DialogComponent {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   component!: any;
 
@@ -10,28 +11,23 @@ export class ShowDialogDto {
 
 @Module({ namespaced: true })
 export class DialogStore extends VuexModule {
-  public isOpen = false;
-  public showDialogDto: ShowDialogDto | null = null;
+  public dialogComponents: DialogComponent[] = [];
 
-  @Mutation
-  public showDialog(showDialogDto: ShowDialogDto): void {
-    this.isOpen = true;
-    this.showDialogDto = showDialogDto;
+  get currentDialogComponent(): DialogComponent | null {
+    return R.last(this.dialogComponents) || null;
   }
 
   @Mutation
-  public hideDialog(): void {
-    this.isOpen = false;
-    this.showDialogDto = null;
+  public pushDialogComponent(dialogComponent: DialogComponent): void {
+    this.dialogComponents = [...this.dialogComponents, dialogComponent];
   }
 
-  @Action
-  public showDialogAction(showDialogDto: ShowDialogDto): void {
-    this.context.commit("showDialog", showDialogDto);
-  }
-
-  @Action
-  public hideDialogAction(): void {
-    this.context.commit("hideDialog");
+  @Mutation
+  public popDialogComponent(): void {
+    this.dialogComponents = R.remove(
+      this.dialogComponents.length - 1,
+      1,
+      this.dialogComponents
+    );
   }
 }

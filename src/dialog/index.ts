@@ -1,4 +1,4 @@
 import Dialog from "./Dialog.vue";
-import { DialogStore, ShowDialogDto } from "./store";
+import { DialogStore, DialogComponent } from "./store";
 
-export { Dialog, DialogStore, ShowDialogDto };
+export { Dialog, DialogStore, DialogComponent };

@@ -92,8 +92,8 @@ export default class NewSkillDialog extends Vue {
   @CVShowStore.Action
   public createSkill!: (createSkillDto: CreateSkillDto) => Promise<void>;
 
-  @DialogStore.Action
-  public hideDialogAction!: () => void;
+  @DialogStore.Mutation
+  public popDialogComponent!: () => void;
 
   @Watch("search")
   async searchChanged(keyword: string) {
@@ -120,12 +120,12 @@ export default class NewSkillDialog extends Vue {
       };
       await this.createSkill(createSkillDto);
 
-      this.hideDialogAction();
+      this.popDialogComponent();
     }
   }
 
   private async onCancel() {
-    this.hideDialogAction();
+    this.popDialogComponent();
   }
 
   private async afterSkillSubjectCreate(skillSubject: SkillSubject) {
