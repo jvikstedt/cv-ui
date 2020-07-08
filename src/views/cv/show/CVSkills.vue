@@ -26,7 +26,7 @@
 import { Component, Vue, Prop } from "vue-property-decorator";
 import { namespace } from "vuex-class";
 import { Skill } from "@/model/skill";
-import { ShowDialogDto } from "@/dialog";
+import { DialogComponent } from "@/dialog";
 import EditSkillDialog from "./components/EditSkillDialog.vue";
 import NewSkillDialog from "./components/NewSkillDialog.vue";
 
@@ -40,22 +40,22 @@ export default class CVSkills extends Vue {
   @CVShowStore.Getter
   public getCVSkills!: (id: number) => Skill[];
 
-  @DialogStore.Action
-  public showDialogAction!: (showDialogDto: ShowDialogDto) => Promise<void>;
+  @DialogStore.Mutation
+  public pushDialogComponent!: (dialogComponent: DialogComponent) => void;
 
   get skills(): Skill[] {
     return this.getCVSkills(this.id);
   }
 
   private async onSkillClick(skill: Skill) {
-    this.showDialogAction({
+    this.pushDialogComponent({
       component: EditSkillDialog,
       props: { id: skill.id }
     });
   }
 
   private async newSkill() {
-    this.showDialogAction({
+    this.pushDialogComponent({
       component: NewSkillDialog,
       props: { id: this.id }
     });

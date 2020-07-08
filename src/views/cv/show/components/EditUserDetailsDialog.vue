@@ -52,8 +52,8 @@ export default class EditUserNamesDialog extends Vue {
   @CVShowStore.Action
   public patchUser!: (patchUserDto: PatchUserDto) => Promise<void>;
 
-  @DialogStore.Action
-  public hideDialogAction!: () => void;
+  @DialogStore.Mutation
+  public popDialogComponent!: () => void;
 
   private firstName = "";
   private lastName = "";
@@ -95,11 +95,11 @@ export default class EditUserNamesDialog extends Vue {
 
     await this.patchUser(patchUserDto);
 
-    this.hideDialogAction();
+    this.popDialogComponent();
   }
 
   private async onCancel() {
-    this.hideDialogAction();
+    this.popDialogComponent();
   }
 }
 </script>

@@ -62,8 +62,8 @@ export default class EditSkillDialog extends Vue {
   @CVShowStore.Action
   public patchCV!: (patchCVDto: PatchCVDto) => Promise<void>;
 
-  @DialogStore.Action
-  public hideDialogAction!: () => void;
+  @DialogStore.Mutation
+  public popDialogComponent!: () => void;
 
   @CVShowStore.Getter
   public getSkill!: (id: number) => Skill;
@@ -80,7 +80,7 @@ export default class EditSkillDialog extends Vue {
   }
 
   private async onSkillDelete() {
-    this.hideDialogAction();
+    this.popDialogComponent();
     await this.deleteSkill(this.id);
   }
 
@@ -93,11 +93,11 @@ export default class EditSkillDialog extends Vue {
     };
     await this.patchSkill(patchSkillDto);
 
-    this.hideDialogAction();
+    this.popDialogComponent();
   }
 
   private async onCancel() {
-    this.hideDialogAction();
+    this.popDialogComponent();
   }
 }
 </script>

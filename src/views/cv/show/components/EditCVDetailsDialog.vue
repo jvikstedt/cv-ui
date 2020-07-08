@@ -40,8 +40,8 @@ export default class EditCVDetailsDialog extends Vue {
   @CVShowStore.Action
   public patchCV!: (patchCVDto: PatchCVDto) => Promise<void>;
 
-  @DialogStore.Action
-  public hideDialogAction!: () => void;
+  @DialogStore.Mutation
+  public popDialogComponent!: () => void;
 
   private description = "";
 
@@ -63,11 +63,11 @@ export default class EditCVDetailsDialog extends Vue {
 
     await this.patchCV(patchCVDto);
 
-    this.hideDialogAction();
+    this.popDialogComponent();
   }
 
   private async onCancel() {
-    this.hideDialogAction();
+    this.popDialogComponent();
   }
 }
 </script>

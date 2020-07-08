@@ -26,7 +26,7 @@ import * as handlebars from "handlebars";
 import { Template } from "@/model/template";
 import { CVExportData } from "@/model/cv";
 import { ExportPdfDto } from "@/model/exporter";
-import { ShowDialogDto } from "@/dialog";
+import { DialogComponent } from "@/dialog";
 import TemplatePdfForm from "./components/TemplatePdfForm.vue";
 import EditTemplateDialog from "./components/EditTemplateDialog.vue";
 import EditJsonDialog from "./components/EditJsonDialog.vue";
@@ -74,8 +74,8 @@ export default class CVPDFView extends Vue {
   @CVPDFStore.Action
   public exportPDF!: (exportPdfDto: ExportPdfDto) => Promise<void>;
 
-  @DialogStore.Action
-  public showDialogAction!: (showDialogDto: ShowDialogDto) => Promise<void>;
+  @DialogStore.Mutation
+  public pushDialogComponent!: (dialogComponent: DialogComponent) => void;
 
   get pdfUrl() {
     if (this.blob) {
@@ -114,14 +114,14 @@ export default class CVPDFView extends Vue {
   }
 
   private openEditJsonDialog() {
-    this.showDialogAction({
+    this.pushDialogComponent({
       component: EditJsonDialog,
       props: { data: this.cvData, use: this.onJsonUse }
     });
   }
 
   private openEditTemplateDialog() {
-    this.showDialogAction({
+    this.pushDialogComponent({
       component: EditTemplateDialog,
       props: {
         initialTemplate: this.selectedTemplate,

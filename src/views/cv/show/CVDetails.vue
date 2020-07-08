@@ -39,7 +39,7 @@ import EditUserDetailsDialog from "./components/EditUserDetailsDialog.vue";
 import EditCVDetailsDialog from "./components/EditCVDetailsDialog.vue";
 import { CV, PatchCVDto } from "@/model/cv";
 import { PatchUserDto } from "@/model/user";
-import { ShowDialogDto } from "@/dialog";
+import { DialogComponent } from "@/dialog";
 
 const CVShowStore = namespace("CVShowStore");
 const DialogStore = namespace("DialogStore");
@@ -62,18 +62,18 @@ export default class CVDetails extends Vue {
   @CVShowStore.Action
   public patchCV!: (patchCVDto: PatchCVDto) => Promise<void>;
 
-  @DialogStore.Action
-  public showDialogAction!: (showDialogDto: ShowDialogDto) => Promise<void>;
+  @DialogStore.Mutation
+  public pushDialogComponent!: (dialogComponent: DialogComponent) => void;
 
   public openEditCVDetailsDialog() {
-    this.showDialogAction({
+    this.pushDialogComponent({
       component: EditCVDetailsDialog,
       props: { id: this.id }
     });
   }
 
   public openEditUserDetailsDialog() {
-    this.showDialogAction({
+    this.pushDialogComponent({
       component: EditUserDetailsDialog,
       props: { id: this.id }
     });
