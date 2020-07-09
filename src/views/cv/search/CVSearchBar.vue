@@ -6,13 +6,14 @@
     item-text="fullName"
     return-object
     single-line
-    prepend-icon="mdi-magnify"
+    append-outer-icon="mdi-magnify"
     dense
     hide-details
     filled
     :loading="searching"
     :search-input.sync="searchInput"
     @change="onSelect"
+    @click:append-outer="advancedSearch"
   >
     <template v-slot:item="data">
       <v-list-item-avatar>
@@ -32,8 +33,11 @@
 import { Component, Vue, Watch } from "vue-property-decorator";
 import { namespace } from "vuex-class";
 import { CV, CVSearchResult, CVSearchDto } from "@/model/cv";
+import { DialogComponent } from "@/dialog";
+import { CVSearchView } from "@/views/cv/search";
 
 const CVSearchStore = namespace("CVSearchStore");
+const DialogStore = namespace("DialogStore");
 
 @Component
 export default class CVSearchBar extends Vue {
@@ -49,6 +53,9 @@ export default class CVSearchBar extends Vue {
 
   @CVSearchStore.Action
   public searchCVs!: (cvSearchDto: CVSearchDto) => Promise<void>;
+
+  @DialogStore.Mutation
+  public pushDialogComponent!: (dialogComponent: DialogComponent) => void;
 
   @Watch("searchInput")
   async searchInputChanged(input: string) {
@@ -68,6 +75,13 @@ export default class CVSearchBar extends Vue {
     if (this.$route.path !== route) {
       this.$router.push(route);
     }
+  }
+
+  public advancedSearch() {
+    this.pushDialogComponent({
+      component: CVSearchView,
+      props: {}
+    });
   }
 }
 </script>

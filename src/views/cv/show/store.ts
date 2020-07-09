@@ -28,6 +28,14 @@ export class CVShowStore extends VuexModule {
       );
   }
 
+  get getCVSkillsGrouped() {
+    return (id: number): { [key: string]: Skill[] } =>
+      R.groupBy(
+        (skill: Skill) => skill.skillSubject.skillGroup.name,
+        this.getCVSkills(id)
+      );
+  }
+
   @Mutation
   public addCV(cv: CV): void {
     Vue.set(this.cvs, cv.id, cv);

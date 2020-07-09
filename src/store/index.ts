@@ -8,6 +8,7 @@ import { CVPDFStore } from "@/views/cv/pdf";
 import { DialogStore } from "@/dialog";
 
 import { SkillSubjectStore } from "@/views/skill_subject";
+import { SkillGroupStore } from "@/views/skill_group";
 
 Vue.use(Vuex);
 
@@ -17,7 +18,8 @@ const store = new Vuex.Store({
     CVSearchStore,
     CVPDFStore,
     DialogStore,
-    SkillSubjectStore
+    SkillSubjectStore,
+    SkillGroupStore
   }
 });
 export default store;
