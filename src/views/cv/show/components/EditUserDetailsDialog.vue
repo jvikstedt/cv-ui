@@ -6,8 +6,9 @@
 
     <v-card-text>
       <p class="text-center">
-        <v-avatar size="146.6" tile>
-          <v-img :src="avatarSrc"></v-img>
+        <v-avatar size="146.6" tile color="indigo">
+          <v-img v-if="avatarSrc" :src="avatarSrc"></v-img>
+          <span v-else class="white--text headline">{{ initials }}</span>
         </v-avatar>
       </p>
       <v-file-input label="File input" @change="onFileChange" />
@@ -69,11 +70,15 @@ export default class EditUserNamesDialog extends Vue {
     this.avatarId = this.user.avatarId;
   }
 
-  get avatarSrc(): string {
-    if (!R.isEmpty(this.avatarId)) {
+  get avatarSrc(): string | null {
+    if (this.avatarId) {
       return `/api/files/${this.avatarId}`;
     }
-    return "";
+    return null;
+  }
+
+  get initials(): string {
+    return R.toUpper(`${this.user.firstName[0]}${this.user.lastName[0]}`);
   }
 
   private async onFileChange(file: File) {

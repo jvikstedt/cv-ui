@@ -16,8 +16,11 @@
     @click:append-outer="advancedSearch"
   >
     <template v-slot:item="data">
-      <v-list-item-avatar>
-        <img :src="'/api/files/' + data.item.avatarId" />
+      <v-list-item-avatar tile size="50" color="indigo">
+        <v-img v-if="avatarSrc(data.item)" :src="avatarSrc(data.item)"></v-img>
+        <span v-else class="white--text headline">{{
+          initials(data.item)
+        }}</span>
       </v-list-item-avatar>
       <v-list-item-content>
         <v-list-item-title v-html="data.item.fullName"></v-list-item-title>
@@ -30,6 +33,7 @@
 </template>
 
 <script lang="ts">
+import * as R from "ramda";
 import { Component, Vue, Watch } from "vue-property-decorator";
 import { namespace } from "vuex-class";
 import { CV, CVSearchResult, CVSearchDto } from "@/model/cv";
@@ -82,6 +86,22 @@ export default class CVSearchBar extends Vue {
       component: CVSearchView,
       props: {}
     });
+  }
+
+  avatarSrc(cvSearchResult: CVSearchResult): string | null {
+    if (cvSearchResult.avatarId) {
+      return `/api/files/${cvSearchResult.avatarId}`;
+    }
+    return null;
+  }
+
+  initials(cvSearchResult: CVSearchResult): string {
+    return R.toUpper(
+      R.join(
+        "",
+        R.map((name: string) => name[0], R.split(" ", cvSearchResult.fullName))
+      )
+    );
   }
 }
 </script>
