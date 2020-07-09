@@ -14,15 +14,9 @@
         return-object
       >
         <template v-slot:append-outer>
-          <v-btn @click="isCreatingSkillSubject = !isCreatingSkillSubject">
-            {{ isCreatingSkillSubject ? "Cancel" : "New" }}
-          </v-btn>
+          <v-btn @click="newSkillSubject">New</v-btn>
         </template>
       </v-autocomplete>
-
-      <template v-if="isCreatingSkillSubject">
-        <NewSkillSubjectForm :afterCreate="afterSkillSubjectCreate" />
-      </template>
     </v-card-text>
 
     <v-subheader>Experience in years</v-subheader>
@@ -67,14 +61,15 @@ import { Component, Vue, Prop, Watch } from "vue-property-decorator";
 import { namespace } from "vuex-class";
 import { Skill, CreateSkillDto, SkillSubject } from "@/model/skill";
 import { SearchSkillSubjects } from "@/api/skill_subject";
-import NewSkillSubjectForm from "@/views/skill_subject/components/NewSkillSubjectForm.vue";
+import NewSkillSubjectDialog from "@/views/skill_subject/components/NewSkillSubjectDialog.vue";
+import { DialogComponent } from "@/dialog";
 
 const CVShowStore = namespace("CVShowStore");
 const DialogStore = namespace("DialogStore");
 
 @Component({
   components: {
-    NewSkillSubjectForm
+    NewSkillSubjectDialog
   }
 })
 export default class NewSkillDialog extends Vue {
@@ -94,6 +89,9 @@ export default class NewSkillDialog extends Vue {
 
   @DialogStore.Mutation
   public popDialogComponent!: () => void;
+
+  @DialogStore.Mutation
+  public pushDialogComponent!: (dialogComponent: DialogComponent) => void;
 
   @Watch("search")
   async searchChanged(keyword: string) {
@@ -128,11 +126,16 @@ export default class NewSkillDialog extends Vue {
     this.popDialogComponent();
   }
 
+  private async newSkillSubject() {
+    this.pushDialogComponent({
+      component: NewSkillSubjectDialog,
+      props: { afterCreate: this.afterSkillSubjectCreate }
+    });
+  }
+
   private async afterSkillSubjectCreate(skillSubject: SkillSubject) {
     this.skillSubjects = [...this.skillSubjects, skillSubject];
     this.selectedSkillSubject = skillSubject;
-
-    this.isCreatingSkillSubject = false;
   }
 }
 </script>

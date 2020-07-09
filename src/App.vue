@@ -17,9 +17,14 @@
     <v-app-bar app clipped-left>
       <v-app-bar-nav-icon @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
       <v-toolbar-title>Application</v-toolbar-title>
-      <v-toolbar-title class="ml-2">
+      <v-toolbar-title class="ml-2 d-none d-sm-flex">
+        <v-divider class="mx-4" vertical></v-divider>
         <CVSearchBar />
       </v-toolbar-title>
+      <v-spacer></v-spacer>
+      <v-btn icon @click="search" class="d-flex d-sm-none">
+        <v-icon>mdi-magnify</v-icon>
+      </v-btn>
     </v-app-bar>
 
     <v-main>
@@ -38,8 +43,11 @@
 
 <script lang="ts">
 import { Component, Vue } from "vue-property-decorator";
-import { CVSearchBar } from "@/views/cv/search";
-import { Dialog } from "@/dialog";
+import { namespace } from "vuex-class";
+import { Dialog, DialogComponent } from "@/dialog";
+import { CVSearchView, CVSearchBar } from "@/views/cv/search";
+
+const DialogStore = namespace("DialogStore");
 
 @Component({
   components: {
@@ -50,8 +58,18 @@ import { Dialog } from "@/dialog";
 export default class App extends Vue {
   private drawer = null;
 
+  @DialogStore.Mutation
+  public pushDialogComponent!: (dialogComponent: DialogComponent) => void;
+
   private created() {
     this.$vuetify.theme.dark = false;
+  }
+
+  public search() {
+    this.pushDialogComponent({
+      component: CVSearchView,
+      props: {}
+    });
   }
 }
 </script>
