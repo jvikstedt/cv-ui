@@ -54,8 +54,11 @@
         <template v-else-if="results.length">
           <template v-for="item in results">
             <v-list-item :key="item.id" @click="onResultClick(item)">
-              <v-list-item-avatar>
-                <img :src="'/api/files/' + item.avatarId" />
+              <v-list-item-avatar tile size="50" color="indigo">
+                <v-img v-if="avatarSrc(item)" :src="avatarSrc(item)"></v-img>
+                <span v-else class="white--text headline">{{
+                  initials(item)
+                }}</span>
               </v-list-item-avatar>
 
               <v-list-item-content>
@@ -157,7 +160,10 @@ export default class CVSearchView extends Vue {
 
   private onResultClick(cvSearchResult: CVSearchResult) {
     this.popDialogComponent();
-    this.$router.push(`/cv/${cvSearchResult.id}`);
+    const route = `/cv/${cvSearchResult.id}`;
+    if (this.$route.path !== route) {
+      this.$router.push(route);
+    }
   }
 
   private async onSearch() {
@@ -192,6 +198,22 @@ export default class CVSearchView extends Vue {
 
   private async onCancel() {
     this.popDialogComponent();
+  }
+
+  avatarSrc(cvSearchResult: CVSearchResult): string | null {
+    if (cvSearchResult.avatarId) {
+      return `/api/files/${cvSearchResult.avatarId}`;
+    }
+    return null;
+  }
+
+  initials(cvSearchResult: CVSearchResult): string {
+    return R.toUpper(
+      R.join(
+        "",
+        R.map((name: string) => name[0], R.split(" ", cvSearchResult.fullName))
+      )
+    );
   }
 }
 </script>

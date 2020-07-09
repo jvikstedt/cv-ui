@@ -4,8 +4,9 @@
       <v-row no-gutters>
         <v-col cols="12">
           <p class="text-center">
-            <v-avatar size="146.6" tile>
-              <v-img :src="avatarSrc"></v-img>
+            <v-avatar size="146.6" tile color="indigo">
+              <v-img v-if="avatarSrc" :src="avatarSrc"></v-img>
+              <span v-else class="white--text headline">{{ initials }}</span>
             </v-avatar>
           </p>
         </v-col>
@@ -33,6 +34,7 @@
 </template>
 
 <script lang="ts">
+import * as R from "ramda";
 import { Component, Vue, Prop } from "vue-property-decorator";
 import { namespace } from "vuex-class";
 import EditUserDetailsDialog from "./components/EditUserDetailsDialog.vue";
@@ -83,8 +85,16 @@ export default class CVDetails extends Vue {
     return this.getCV(this.id);
   }
 
-  get avatarSrc(): string {
-    return `/api/files/${this.getCV(this.id).user.avatarId}`;
+  get avatarSrc(): string | null {
+    if (this.getCV(this.id).user.avatarId) {
+      return `/api/files/${this.getCV(this.id).user.avatarId}`;
+    }
+    return null;
+  }
+
+  get initials(): string {
+    const user = this.cv.user;
+    return R.toUpper(`${user.firstName[0]}${user.lastName[0]}`);
   }
 }
 </script>
