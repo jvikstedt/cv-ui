@@ -1,6 +1,8 @@
 import Vue from "vue";
 import Vuex from "vuex";
 
+import { AuthStore } from "@/views/auth";
+
 import { CVShowStore } from "@/views/cv/show";
 import { CVSearchStore } from "@/views/cv/search";
 import { CVPDFStore } from "@/views/cv/pdf";
@@ -14,6 +16,7 @@ Vue.use(Vuex);
 
 const store = new Vuex.Store({
   modules: {
+    AuthStore,
     CVShowStore,
     CVSearchStore,
     CVPDFStore,

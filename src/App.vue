@@ -1,7 +1,7 @@
 <template>
   <v-app id="inspire">
     <Dialog />
-    <v-navigation-drawer v-model="drawer" app clipped>
+    <v-navigation-drawer v-model="drawer" app clipped v-if="isLoggedIn">
       <v-list dense>
         <v-list-item link router to="/skill_subjects">
           <v-list-item-action>
@@ -15,14 +15,17 @@
     </v-navigation-drawer>
 
     <v-app-bar app clipped-left>
-      <v-app-bar-nav-icon @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
+      <v-app-bar-nav-icon
+        @click.stop="drawer = !drawer"
+        v-if="isLoggedIn"
+      ></v-app-bar-nav-icon>
       <v-toolbar-title>Application</v-toolbar-title>
-      <v-toolbar-title class="ml-2 d-none d-sm-flex">
+      <v-toolbar-title class="ml-2 d-none d-sm-flex" v-if="isLoggedIn">
         <v-divider class="mx-4" vertical></v-divider>
         <CVSearchBar />
       </v-toolbar-title>
       <v-spacer></v-spacer>
-      <v-btn icon @click="search" class="d-flex d-sm-none">
+      <v-btn icon @click="search" class="d-flex d-sm-none" v-if="isLoggedIn">
         <v-icon>mdi-magnify</v-icon>
       </v-btn>
     </v-app-bar>
@@ -42,12 +45,14 @@
 </template>
 
 <script lang="ts">
+import axios from "axios";
 import { Component, Vue } from "vue-property-decorator";
 import { namespace } from "vuex-class";
 import { Dialog, DialogComponent } from "@/dialog";
 import { CVSearchView, CVSearchBar } from "@/views/cv/search";
 
 const DialogStore = namespace("DialogStore");
+const AuthStore = namespace("AuthStore");
 
 @Component({
   components: {
@@ -61,8 +66,25 @@ export default class App extends Vue {
   @DialogStore.Mutation
   public pushDialogComponent!: (dialogComponent: DialogComponent) => void;
 
-  private created() {
+  @AuthStore.Action
+  public logoutAction!: () => Promise<void>;
+
+  @AuthStore.Getter
+  public isLoggedIn!: boolean;
+
+  private async created() {
     this.$vuetify.theme.dark = false;
+
+    axios.interceptors.response.use(
+      response => response,
+      async error => {
+        if (error.response.status === 401) {
+          await this.logoutAction();
+          this.$router.push("/login");
+        }
+        return error;
+      }
+    );
   }
 
   public search() {
