@@ -45,14 +45,14 @@
 import { Component, Vue, Prop } from "vue-property-decorator";
 import { namespace } from "vuex-class";
 import { PatchCVDto } from "@/model/cv";
-import { Skill, PatchSkillDto } from "@/model/skill";
+import { Skill, PatchSkillDto, DeleteSkillDto } from "@/model/skill";
 
 const CVShowStore = namespace("CVShowStore");
 const DialogStore = namespace("DialogStore");
 
 @Component
 export default class EditSkillDialog extends Vue {
-  @Prop({ required: true }) readonly id!: number;
+  @Prop({ required: true }) readonly skillId!: number;
 
   private experienceInYears = 1;
 
@@ -66,13 +66,13 @@ export default class EditSkillDialog extends Vue {
   public popDialogComponent!: () => void;
 
   @CVShowStore.Getter
-  public getSkill!: (id: number) => Skill;
+  public getSkill!: (skillId: number) => Skill;
 
   @CVShowStore.Action
-  public deleteSkill!: (id: number) => Promise<void>;
+  public deleteSkill!: (deleteSkillDto: DeleteSkillDto) => Promise<void>;
 
   get skill(): Skill {
-    return this.getSkill(this.id);
+    return this.getSkill(this.skillId);
   }
 
   private created() {
@@ -81,12 +81,23 @@ export default class EditSkillDialog extends Vue {
 
   private async onSkillDelete() {
     this.popDialogComponent();
-    await this.deleteSkill(this.id);
+
+    const skill = this.getSkill(this.skillId);
+
+    const deleteSkillDto = {
+      cvId: skill.cvId,
+      skillId: skill.id
+    };
+
+    await this.deleteSkill(deleteSkillDto);
   }
 
   private async onSave() {
+    const skill = this.getSkill(this.skillId);
+
     const patchSkillDto: PatchSkillDto = {
-      id: this.id,
+      cvId: skill.cvId,
+      skillId: skill.id,
       data: {
         experienceInYears: this.experienceInYears
       }

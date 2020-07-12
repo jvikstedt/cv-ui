@@ -43,8 +43,14 @@ export class PatchSkillDtoData {
 }
 
 export class PatchSkillDto {
-  id!: number;
+  cvId!: number;
+  skillId!: number;
   data!: PatchSkillDtoData;
+}
+
+export class DeleteSkillDto {
+  cvId!: number;
+  skillId!: number;
 }
 
 export class CreateSkillDto {

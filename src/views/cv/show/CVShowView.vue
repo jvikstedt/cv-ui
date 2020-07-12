@@ -7,8 +7,8 @@
       <v-btn color="primary darken-1" text @click="onExport">
         Export
       </v-btn>
-      <CVDetails :id="id" />
-      <CVSkills :id="id" />
+      <CVDetails :id="id" :canEdit="canEditCV(id)" />
+      <CVSkills :id="id" :canEdit="canEditCV(id)" />
     </template>
     <template v-else>
       <p>Something went wrong</p>
@@ -24,6 +24,7 @@ import CVDetails from "./CVDetails.vue";
 import CVSkills from "./CVSkills.vue";
 
 const CVShowStore = namespace("CVShowStore");
+const AuthStore = namespace("AuthStore");
 
 @Component({
   components: {
@@ -42,6 +43,9 @@ export default class CVShowView extends Vue {
 
   @CVShowStore.Getter
   public getCV!: (id: number) => CV;
+
+  @AuthStore.Getter
+  public canEditCV!: (cvId: number) => boolean;
 
   private onExport() {
     this.$router.push(`/cv/${this.id}/pdf`);

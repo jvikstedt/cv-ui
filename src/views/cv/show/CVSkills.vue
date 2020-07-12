@@ -10,7 +10,7 @@
           text-color="white"
           v-for="skill in skillsBySkillGroup(skillGroupName)"
           :key="skill.id"
-          @click="onSkillClick(skill)"
+          v-on="canEdit ? { click: () => onSkillClick(skill) } : {}"
         >
           <v-avatar left class="green darken-4">
             {{ skill.experienceInYears }}
@@ -19,7 +19,7 @@
         </v-chip>
       </div>
     </v-col>
-    <v-col cols="12">
+    <v-col cols="12" v-if="canEdit">
       <v-btn color="primary" dark @click="newSkill">New Skill</v-btn>
     </v-col>
   </v-row>
@@ -40,6 +40,7 @@ const DialogStore = namespace("DialogStore");
 @Component
 export default class CVSkills extends Vue {
   @Prop({ required: true }) readonly id!: number;
+  @Prop({ required: true }) readonly canEdit!: boolean;
 
   @CVShowStore.Getter
   public getCVSkillsGrouped!: (id: number) => { [key: string]: Skill[] };
@@ -61,7 +62,7 @@ export default class CVSkills extends Vue {
   private async onSkillClick(skill: Skill) {
     this.pushDialogComponent({
       component: EditSkillDialog,
-      props: { id: skill.id }
+      props: { skillId: skill.id }
     });
   }
 
