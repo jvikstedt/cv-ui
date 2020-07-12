@@ -26,3 +26,12 @@ export class PatchUserDto {
   id!: number;
   data!: PatchUserDtoData;
 }
+
+export class TokenData {
+  cvIds!: number[];
+  firstName!: string;
+  lastName!: string;
+  userId!: number;
+  templateIds!: number[];
+  username!: string;
+}

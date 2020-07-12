@@ -1,19 +1,21 @@
+import * as R from "ramda";
 import { VuexModule, Module, Mutation, Action } from "vuex-module-decorators";
 import jwt from "jwt-decode";
 import Api from "@/api/api";
+import { TokenData } from "@/model/user";
 
-const getUserFromLocalStorage = () => {
+const getUserFromLocalStorage = (): TokenData => {
   const accessToken = localStorage.getItem("accessToken");
   if (accessToken) {
     return jwt(accessToken);
   }
-  return {};
+  return new TokenData();
 };
 
 @Module({ namespaced: true })
 export class AuthStore extends VuexModule {
   public accessToken = localStorage.getItem("accessToken") || "";
-  public user = getUserFromLocalStorage();
+  public tokenData = getUserFromLocalStorage();
   public status = "";
 
   get isLoggedIn(): boolean {
@@ -24,11 +26,19 @@ export class AuthStore extends VuexModule {
     return this.status;
   }
 
+  get user(): TokenData {
+    return this.tokenData;
+  }
+
+  get canEditCV() {
+    return (cvId: number): boolean => R.includes(cvId, this.user.cvIds);
+  }
+
   @Mutation
   public authSuccess(accessToken: string): void {
     this.accessToken = accessToken;
     this.status = "success";
-    this.user = jwt(accessToken);
+    this.tokenData = jwt(accessToken);
   }
 
   @Mutation
@@ -39,7 +49,7 @@ export class AuthStore extends VuexModule {
   @Mutation
   public logout(): void {
     this.accessToken = "";
-    this.user = {};
+    this.tokenData = new TokenData();
     this.status = "";
   }
 

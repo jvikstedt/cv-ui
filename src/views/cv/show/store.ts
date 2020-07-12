@@ -2,7 +2,12 @@ import * as R from "ramda";
 import Vue from "vue";
 import { VuexModule, Module, Mutation, Action } from "vuex-module-decorators";
 import Api from "@/api/api";
-import { Skill, PatchSkillDto, CreateSkillDto } from "@/model/skill";
+import {
+  Skill,
+  PatchSkillDto,
+  DeleteSkillDto,
+  CreateSkillDto
+} from "@/model/skill";
 import { CV, PatchCVDto } from "@/model/cv";
 import { User, PatchUserDto } from "@/model/user";
 
@@ -90,21 +95,33 @@ export class CVShowStore extends VuexModule {
   }
 
   @Action
-  public async patchSkill({ id, data }: PatchSkillDto): Promise<void> {
-    const savedSkill: Skill = await Api.patch(`/skills/${id}`, data);
+  public async patchSkill({
+    cvId,
+    skillId,
+    data
+  }: PatchSkillDto): Promise<void> {
+    const savedSkill: Skill = await Api.patch(
+      `/cv/${cvId}/skills/${skillId}`,
+      data
+    );
     this.context.commit("addSkills", [savedSkill]);
   }
 
   @Action
   public async createSkill(createSkillDto: CreateSkillDto): Promise<void> {
-    const savedSkill: Skill = await Api.post("/skills", createSkillDto);
+    const savedSkill: Skill = await Api.post(
+      `/cv/${createSkillDto.cvId}/skills`,
+      createSkillDto
+    );
     this.context.commit("addSkills", [savedSkill]);
   }
 
   @Action
-  public async deleteSkill(id: number): Promise<void> {
-    await Api.delete(`/skills/${id}`);
-    this.context.commit("deleteSkills", [id]);
+  public async deleteSkill(deleteSkillDto: DeleteSkillDto): Promise<void> {
+    await Api.delete(
+      `/cv/${deleteSkillDto.cvId}/skills/${deleteSkillDto.skillId}`
+    );
+    this.context.commit("deleteSkills", [deleteSkillDto.skillId]);
   }
 
   @Action
