@@ -12,6 +12,7 @@
       >
         <template v-slot:append>
           <v-text-field
+            name="experienceInYears"
             v-model="experienceInYears"
             class="mt-0 pt-0"
             hide-details

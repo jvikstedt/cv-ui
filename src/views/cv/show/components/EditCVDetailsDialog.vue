@@ -1,11 +1,15 @@
 <template>
   <v-card>
     <v-card-title class="headline">
-      {{ cv.id }}
+      Edit CV
     </v-card-title>
 
     <v-card-text>
-      <v-textarea v-model="description" label="Description" />
+      <v-textarea
+        name="description"
+        v-model="description"
+        label="Description"
+      />
     </v-card-text>
 
     <v-card-actions>

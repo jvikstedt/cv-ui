@@ -13,9 +13,17 @@
       </p>
       <v-file-input label="File input" @change="onFileChange" />
 
-      <v-text-field v-model="firstName" label="First name"></v-text-field>
+      <v-text-field
+        name="firstName"
+        v-model="firstName"
+        label="First name"
+      ></v-text-field>
 
-      <v-text-field v-model="lastName" label="Last name"></v-text-field>
+      <v-text-field
+        name="lastName"
+        v-model="lastName"
+        label="Last name"
+      ></v-text-field>
     </v-card-text>
 
     <v-card-actions>

@@ -4,7 +4,8 @@
 
     <v-card-text>
       <v-autocomplete
-        v-model="selectedSkillSubject"
+        name="skillSubject"
+        v-model="skillSubject"
         :items="skillSubjects"
         :search-input.sync="search"
         item-text="name"
@@ -30,6 +31,7 @@
       >
         <template v-slot:append>
           <v-text-field
+            name="experienceInYears"
             v-model="experienceInYears"
             class="mt-0 pt-0"
             hide-details
@@ -78,7 +80,7 @@ export default class NewSkillDialog extends Vue {
   private experienceInYears = 1;
   private search = "";
   private skillSubjects: SkillSubject[] = [];
-  private selectedSkillSubject: SkillSubject | null = null;
+  private skillSubject: SkillSubject | null = null;
   private isCreatingSkillSubject = false;
 
   @CVShowStore.Getter
@@ -110,11 +112,11 @@ export default class NewSkillDialog extends Vue {
   }
 
   private async onSave() {
-    if (this.selectedSkillSubject) {
+    if (this.skillSubject) {
       const createSkillDto: CreateSkillDto = {
         cvId: this.id,
         experienceInYears: this.experienceInYears,
-        skillSubjectId: this.selectedSkillSubject.id
+        skillSubjectId: this.skillSubject.id
       };
       await this.createSkill(createSkillDto);
 
@@ -135,7 +137,7 @@ export default class NewSkillDialog extends Vue {
 
   private async afterSkillSubjectCreate(skillSubject: SkillSubject) {
     this.skillSubjects = [...this.skillSubjects, skillSubject];
-    this.selectedSkillSubject = skillSubject;
+    this.skillSubject = skillSubject;
   }
 }
 </script>
