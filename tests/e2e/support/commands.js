@@ -23,3 +23,126 @@
 //
 // -- This is will overwrite an existing command --
 // Cypress.Commands.overwrite("visit", (originalFn, url, options) => { ... })
+
+import jwt from "jwt-decode";
+import * as R from "ramda";
+
+Cypress.Commands.add(
+  "login",
+  (username = Cypress.env("USERNAME"), password = Cypress.env("PASSWORD")) => {
+    cy.request({
+      method: "POST",
+      url: `${Cypress.env("EXTERNAL_API")}/auth/signin`,
+      body: {
+        username: username,
+        password: password
+      }
+    })
+      .its("body")
+      .then(body => {
+        window.localStorage.setItem("accessToken", body.accessToken);
+      });
+  }
+);
+
+Cypress.Commands.add(
+  "createSkill",
+  (skillSubjectName = "Ruby", experienceInYears = 1) => {
+    const accessToken = window.localStorage.getItem("accessToken");
+    const tokenData = jwt(accessToken);
+
+    const cvId = tokenData.cvIds[0];
+
+    cy.request({
+      method: "GET",
+      url: `${Cypress.env("EXTERNAL_API")}/skill_subjects`,
+      headers: {
+        Authorization: `Bearer ${accessToken}`
+      }
+    })
+      .its("body")
+      .then(body => {
+        const skillSubject = R.find(
+          s => R.equals(s.name, skillSubjectName),
+          body
+        );
+
+        cy.request({
+          method: "POST",
+          url: `${Cypress.env("EXTERNAL_API")}/cv/${cvId}/skills`,
+          headers: {
+            Authorization: `Bearer ${accessToken}`
+          },
+          body: {
+            skillSubjectId: skillSubject.id,
+            experienceInYears
+          }
+        });
+      });
+  }
+);
+
+Cypress.Commands.add("resetSkills", () => {
+  const accessToken = window.localStorage.getItem("accessToken");
+  const tokenData = jwt(accessToken);
+  const cvId = tokenData.cvIds[0];
+
+  cy.request({
+    method: "GET",
+    url: `${Cypress.env("EXTERNAL_API")}/cv/${cvId}/skills`,
+    headers: {
+      Authorization: `Bearer ${accessToken}`
+    }
+  })
+    .its("body")
+    .then(body => {
+      for (const skill of body) {
+        cy.request({
+          method: "DELETE",
+          url: `${Cypress.env("EXTERNAL_API")}/cv/${cvId}/skills/${skill.id}`,
+          headers: {
+            Authorization: `Bearer ${accessToken}`
+          }
+        });
+      }
+    });
+});
+
+Cypress.Commands.add("getUser", () => {
+  const accessToken = window.localStorage.getItem("accessToken");
+  const user = jwt(accessToken);
+  return user;
+});
+
+Cypress.Commands.add("resetUserInformation", () => {
+  const accessToken = window.localStorage.getItem("accessToken");
+  const user = jwt(accessToken);
+
+  cy.request({
+    method: "PATCH",
+    url: `${Cypress.env("EXTERNAL_API")}/users/${user.userId}`,
+    headers: {
+      Authorization: `Bearer ${accessToken}`
+    },
+    body: {
+      firstName: user.firstName,
+      lastName: user.lastName
+    }
+  });
+});
+
+Cypress.Commands.add("resetCVInformation", () => {
+  const accessToken = window.localStorage.getItem("accessToken");
+  const user = jwt(accessToken);
+
+  cy.request({
+    method: "PATCH",
+    url: `${Cypress.env("EXTERNAL_API")}/cv/${user.cvIds[0]}`,
+    headers: {
+      Authorization: `Bearer ${accessToken}`
+    },
+    body: {
+      description: ""
+    }
+  });
+});

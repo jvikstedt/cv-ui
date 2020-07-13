@@ -13,7 +13,13 @@
         <v-col cols="12">
           <p class="text-center ma-0">
             {{ cv.user.firstName }} {{ cv.user.lastName }}
-            <v-btn icon small @click="openEditUserDetailsDialog" v-if="canEdit">
+            <v-btn
+              id="edit-user-details-btn"
+              icon
+              small
+              @click="openEditUserDetailsDialog"
+              v-if="canEdit"
+            >
               <v-icon>mdi-pencil</v-icon>
             </v-btn>
           </p>
@@ -25,7 +31,13 @@
       <h3>Description</h3>
       <p>
         {{ cv.description }}
-        <v-btn icon small @click="openEditCVDetailsDialog" v-if="canEdit">
+        <v-btn
+          id="edit-cv-details-btn"
+          icon
+          small
+          @click="openEditCVDetailsDialog"
+          v-if="canEdit"
+        >
           <v-icon>mdi-pencil</v-icon>
         </v-btn>
       </p>

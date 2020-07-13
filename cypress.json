@@ -1,3 +1,8 @@
 {
-  "pluginsFile": "tests/e2e/plugins/index.js"
+  "pluginsFile": "tests/e2e/plugins/index.js",
+  "env": {
+    "EXTERNAL_API": "http://localhost:8080/api",
+    "USERNAME": "bobtest",
+    "PASSWORD": "BobTest123"
+  }
 }
