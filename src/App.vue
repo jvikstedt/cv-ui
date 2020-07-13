@@ -82,8 +82,8 @@ export default class App extends Vue {
       response => response,
       async error => {
         if (error.response.status === 401) {
-          await this.logoutAction();
           this.$router.push("/login");
+          await this.logoutAction();
         }
         return error;
       }
@@ -91,8 +91,8 @@ export default class App extends Vue {
   }
 
   private async logout() {
-    await this.logoutAction();
     this.$router.push("/login");
+    await this.logoutAction();
   }
 
   public search() {
