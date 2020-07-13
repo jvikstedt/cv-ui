@@ -35,3 +35,8 @@ export class TokenData {
   templateIds!: number[];
   username!: string;
 }
+
+export class AuthCredentialsDto {
+  username!: string;
+  password!: string;
+}

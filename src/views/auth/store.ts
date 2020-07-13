@@ -2,7 +2,7 @@ import * as R from "ramda";
 import { VuexModule, Module, Mutation, Action } from "vuex-module-decorators";
 import jwt from "jwt-decode";
 import Api from "@/api/api";
-import { TokenData } from "@/model/user";
+import { TokenData, AuthCredentialsDto } from "@/model/user";
 
 const getUserFromLocalStorage = (): TokenData => {
   const accessToken = localStorage.getItem("accessToken");
@@ -56,6 +56,25 @@ export class AuthStore extends VuexModule {
   @Mutation
   public setStatus(status: string): void {
     this.status = status;
+  }
+
+  @Action
+  public async signIn({
+    username,
+    password
+  }: AuthCredentialsDto): Promise<void> {
+    this.context.commit("setStatus", "loading");
+    try {
+      const { accessToken } = await Api.post("/auth/signin", {
+        username,
+        password
+      });
+      localStorage.setItem("accessToken", accessToken);
+      this.context.commit("authSuccess", accessToken);
+    } catch (err) {
+      localStorage.removeItem("accessToken");
+      this.context.commit("authFailed");
+    }
   }
 
   @Action
