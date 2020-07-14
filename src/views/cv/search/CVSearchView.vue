@@ -8,7 +8,7 @@
       <v-autocomplete
         v-model="selectedSkillSubject"
         :items="skillSubjects"
-        :search-input.sync="search"
+        :search-input.sync="searchInput"
         item-text="name"
         item-value="id"
         label="Skill subject"
@@ -111,7 +111,7 @@ const DialogStore = namespace("DialogStore");
 export default class CVSearchView extends Vue {
   private fullName = "";
 
-  private search = "";
+  private searchInput = null;
   private selectedSkillSubject: SkillSubject | null = null;
   private skillSubjects: SkillSubject[] = [];
 
@@ -129,10 +129,10 @@ export default class CVSearchView extends Vue {
   @DialogStore.Mutation
   public popDialogComponent!: () => void;
 
-  @Watch("search")
-  async searchChanged(keyword: string) {
+  @Watch("searchInput")
+  async searchInputChanged(input: string) {
     const skillSubjects = await SearchSkillSubjects({
-      name: keyword || "",
+      name: input || "",
       limit: 10
     });
 
@@ -145,6 +145,10 @@ export default class CVSearchView extends Vue {
         ),
       skillSubjects
     );
+  }
+
+  public async created() {
+    await this.searchInputChanged("");
   }
 
   private commonSkills(cvSearchResult: CVSearchResult) {

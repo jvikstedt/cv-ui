@@ -12,6 +12,7 @@
     filled
     :loading="searching"
     :search-input.sync="searchInput"
+    @focus="search('', 0)"
     @change="onSelect"
     @click:append-outer="advancedSearch"
   >
@@ -46,7 +47,7 @@ const DialogStore = namespace("DialogStore");
 @Component
 export default class CVSearchBar extends Vue {
   private cv: CV | null = null;
-  private searchInput = "";
+  private searchInput = null;
   private debounce = 0;
 
   @CVSearchStore.State
@@ -63,12 +64,16 @@ export default class CVSearchBar extends Vue {
 
   @Watch("searchInput")
   async searchInputChanged(input: string) {
+    await this.search(input, 500);
+  }
+
+  async search(input: string, debounce: number) {
     clearTimeout(this.debounce);
 
     this.debounce = window.setTimeout(async () => {
       const cvSearchDto = new CVSearchDto({ fullName: input || "" });
       await this.searchCVs(cvSearchDto);
-    }, 500);
+    }, debounce);
   }
 
   private async onSelect(cv: CV) {
