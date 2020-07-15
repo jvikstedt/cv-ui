@@ -1,11 +1,27 @@
 <template>
   <div>
-    <v-text-field v-model="username" label="Username" />
-    <v-text-field v-model="password" label="Password" type="password" />
-    <v-btn color="green darken-1" text @click="onSignIn">
-      Login
-    </v-btn>
-    <GoogleSignInButton />
+    <v-form
+      ref="form"
+      v-model="valid"
+      lazy-validation
+      @submit.prevent="onSignIn"
+    >
+      <v-text-field
+        v-model="username"
+        label="Username"
+        :rules="usernameRules"
+      />
+      <v-text-field
+        v-model="password"
+        label="Password"
+        :rules="passwordRules"
+        type="password"
+      />
+      <v-btn color="green darken-1" text type="login">
+        Login
+      </v-btn>
+      <GoogleSignInButton />
+    </v-form>
   </div>
 </template>
 
@@ -14,6 +30,7 @@ import { Component, Vue } from "vue-property-decorator";
 import { namespace } from "vuex-class";
 import GoogleSignInButton from "@/views/auth/GoogleSignInButton.vue";
 import { AuthCredentialsDto } from "@/model/user";
+import { VForm } from "@/types";
 
 const AuthStore = namespace("AuthStore");
 
@@ -23,20 +40,29 @@ const AuthStore = namespace("AuthStore");
   }
 })
 export default class LoginView extends Vue {
+  valid = false;
   username = "";
+  usernameRules = [(v: string) => !!v || "Username is required"];
   password = "";
+  passwordRules = [(v: string) => !!v || "Password is required"];
 
   @AuthStore.Action
   signIn!: (authCredentialsDto: AuthCredentialsDto) => Promise<void>;
 
-  async onSignIn() {
-    const authCredentialsDto: AuthCredentialsDto = {
-      username: this.username,
-      password: this.password
-    };
+  get form(): VForm {
+    return this.$refs.form as VForm;
+  }
 
-    await this.signIn(authCredentialsDto);
-    this.$router.push("/");
+  async onSignIn() {
+    if (this.form.validate()) {
+      const authCredentialsDto: AuthCredentialsDto = {
+        username: this.username,
+        password: this.password
+      };
+
+      await this.signIn(authCredentialsDto);
+      this.$router.push("/");
+    }
   }
 }
 </script>
