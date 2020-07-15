@@ -2,11 +2,40 @@
   <v-row>
     <v-col cols="12">
       <h2>Educations</h2>
-      <div v-for="education in educations" :key="education.id">
-        <h4 @click="onEducationClick(education)">
-          {{ education.school.name }}
-        </h4>
-      </div>
+      <v-row>
+        <v-col
+          v-for="education in educations"
+          :key="education.id"
+          cols="12"
+          sm="6"
+        >
+          <v-card class="mx-auto" outlined>
+            <v-list-item three-line>
+              <v-list-item-content>
+                <v-list-item-title class="headline mb-1"
+                  >{{ education.school.name }} ({{ education.startYear }} -
+                  {{ education.endYear }})</v-list-item-title
+                >
+                <div class="overline">
+                  {{ education.degree }} / {{ education.fieldOfStudy }}
+                </div>
+                <v-list-item-subtitle>{{
+                  education.description
+                }}</v-list-item-subtitle>
+              </v-list-item-content>
+            </v-list-item>
+
+            <v-card-actions>
+              <v-btn
+                v-if="canEdit"
+                color="primary"
+                @click="onEducationClick(education)"
+                >Edit</v-btn
+              >
+            </v-card-actions>
+          </v-card>
+        </v-col>
+      </v-row>
     </v-col>
     <v-col cols="12" v-if="canEdit">
       <v-btn color="primary" dark @click="newEducation">New Education</v-btn>
