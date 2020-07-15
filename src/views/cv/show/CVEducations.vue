@@ -12,11 +12,11 @@
           <v-card class="mx-auto" outlined>
             <v-list-item three-line>
               <v-list-item-content>
-                <v-list-item-title class="headline mb-1"
+                <v-list-item-title class="headline mb-2"
                   >{{ education.school.name }} ({{ education.startYear }} -
                   {{ education.endYear }})</v-list-item-title
                 >
-                <div class="overline">
+                <div class="mb-2">
                   {{ education.degree }} / {{ education.fieldOfStudy }}
                 </div>
                 <v-list-item-subtitle>{{
