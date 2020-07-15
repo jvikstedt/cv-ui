@@ -2,17 +2,17 @@
   <v-card>
     <v-card-title class="headline">New skill subject</v-card-title>
 
-    <v-form v-model="valid">
+    <v-form ref="form" v-model="valid" lazy-validation>
       <v-card-text>
         <v-autocomplete
-          v-model="selectedSkillGroup"
+          v-model="skillGroup"
           :items="skillGroups"
           :search-input.sync="search"
           item-text="name"
           item-value="id"
           label="Skill group"
           placeholder="Start typing to search"
-          @change="onSelect"
+          :rules="skillGroupRules"
           return-object
         >
           <template v-slot:append-outer>
@@ -36,7 +36,7 @@
           Cancel
         </v-btn>
 
-        <v-btn :disabled="!valid" color="green darken-1" text @click="onSave">
+        <v-btn color="green darken-1" text @click="onSave">
           Save
         </v-btn>
       </v-card-actions>
@@ -51,6 +51,7 @@ import { DialogComponent } from "@/dialog";
 import { SkillSubject, CreateSkillSubjectDto, SkillGroup } from "@/model/skill";
 import NewSkillGroupDialog from "@/views/skill_group/components/NewSkillGroupDialog.vue";
 import { SearchSkillGroups } from "@/api/skill_group";
+import { VForm } from "@/types";
 
 const SkillSubjectStore = namespace("SkillSubjectStore");
 const DialogStore = namespace("DialogStore");
@@ -60,9 +61,6 @@ export default class NewSkillSubjectDialog extends Vue {
   @Prop({ required: true }) readonly afterCreate!: (
     skillSubject: SkillSubject
   ) => Promise<void>;
-
-  public name = "";
-  public skillGroupId!: number;
 
   @SkillSubjectStore.Action
   public createSkillSubject!: (
@@ -75,55 +73,56 @@ export default class NewSkillSubjectDialog extends Vue {
   @DialogStore.Mutation
   public pushDialogComponent!: (dialogComponent: DialogComponent) => void;
 
-  private valid = false;
+  get form(): VForm {
+    return this.$refs.form as VForm;
+  }
 
-  private search = "";
-  private skillGroups: SkillGroup[] = [];
-  private selectedSkillGroup: SkillGroup | null = null;
+  public valid = false;
+
+  public search = "";
+  public name = "";
+  public nameRules = [(name: string) => !!name || "Name is required"];
+
+  public skillGroups: SkillGroup[] = [];
+  public skillGroup: SkillGroup | null = null;
+  public skillGroupRules = [
+    (skillGroup: SkillGroup) => !!skillGroup || "Skill group is required"
+  ];
 
   @Watch("search")
-  async searchChanged(keyword: string) {
+  public async searchChanged(input: string) {
     this.skillGroups = await SearchSkillGroups({
-      name: keyword || "",
+      name: input || "",
       limit: 10
     });
   }
 
-  private nameRules = [
-    (v: string) => !!v || "Name is required",
-    (v: string) =>
-      (v && v.length <= 255) || "Name must be less than 10 characters"
-  ];
+  public async onSave(): Promise<void> {
+    if (this.form.validate() && this.skillGroup) {
+      const skillSubject = await this.createSkillSubject({
+        name: this.name,
+        skillGroupId: this.skillGroup.id
+      });
 
-  private async onSelect(skillGroup: SkillGroup) {
-    this.skillGroupId = skillGroup.id;
+      await this.afterCreate(skillSubject);
+      this.popDialogComponent();
+    }
   }
 
-  private async onSave(): Promise<void> {
-    const skillSubject = await this.createSkillSubject({
-      name: this.name,
-      skillGroupId: this.skillGroupId
-    });
-
-    await this.afterCreate(skillSubject);
+  public async onCancel() {
     this.popDialogComponent();
   }
 
-  private async onCancel() {
-    this.popDialogComponent();
-  }
-
-  private async newSkillSubject() {
+  public async newSkillSubject() {
     this.pushDialogComponent({
       component: NewSkillGroupDialog,
       props: { afterCreate: this.afterSkillGroupCreate }
     });
   }
 
-  private async afterSkillGroupCreate(skillGroup: SkillGroup) {
+  public async afterSkillGroupCreate(skillGroup: SkillGroup) {
     this.skillGroups = [...this.skillGroups, skillGroup];
-    this.selectedSkillGroup = skillGroup;
-    this.skillGroupId = skillGroup.id;
+    this.skillGroup = skillGroup;
   }
 }
 </script>
