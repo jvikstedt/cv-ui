@@ -69,25 +69,25 @@ export default class CVDetails extends Vue {
   @Prop({ required: true }) readonly canEdit!: boolean;
 
   @CVShowStore.Getter
-  public getCV!: (id: number) => CV;
+  getCV!: (id: number) => CV;
 
   @CVShowStore.Action
-  public patchUser!: (patchUserDto: PatchUserDto) => Promise<void>;
+  patchUser!: (patchUserDto: PatchUserDto) => Promise<void>;
 
   @CVShowStore.Action
-  public patchCV!: (patchCVDto: PatchCVDto) => Promise<void>;
+  patchCV!: (patchCVDto: PatchCVDto) => Promise<void>;
 
   @DialogStore.Mutation
-  public pushDialogComponent!: (dialogComponent: DialogComponent) => void;
+  pushDialogComponent!: (dialogComponent: DialogComponent) => void;
 
-  public openEditCVDetailsDialog() {
+  openEditCVDetailsDialog() {
     this.pushDialogComponent({
       component: EditCVDetailsDialog,
       props: { id: this.id }
     });
   }
 
-  public openEditUserDetailsDialog() {
+  openEditUserDetailsDialog() {
     this.pushDialogComponent({
       component: EditUserDetailsDialog,
       props: { id: this.id }

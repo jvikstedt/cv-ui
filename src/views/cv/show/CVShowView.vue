@@ -36,21 +36,21 @@ const AuthStore = namespace("AuthStore");
   }
 })
 export default class CVShowView extends Vue {
-  public id: number | null = null;
+  id: number | null = null;
 
   @CVShowStore.State
-  public fetching!: boolean;
+  fetching!: boolean;
 
   @CVShowStore.Action
-  public fetchCV!: (id: number) => Promise<CV>;
+  fetchCV!: (id: number) => Promise<CV>;
 
   @CVShowStore.Getter
-  public getCV!: (id: number) => CV;
+  getCV!: (id: number) => CV;
 
   @AuthStore.Getter
-  public canEditCV!: (cvId: number) => boolean;
+  canEditCV!: (cvId: number) => boolean;
 
-  private onExport() {
+  onExport() {
     this.$router.push(`/cv/${this.id}/pdf`);
   }
 
@@ -61,7 +61,7 @@ export default class CVShowView extends Vue {
     await this.fetchCV(this.id);
   }
 
-  private async created() {
+  async created() {
     const idStr = this.$route.params.id;
     this.id = parseInt(idStr, 10);
 

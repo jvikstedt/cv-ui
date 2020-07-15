@@ -4,25 +4,28 @@
       Edit CV
     </v-card-title>
 
-    <v-card-text>
-      <v-textarea
-        name="description"
-        v-model="description"
-        label="Description"
-      />
-    </v-card-text>
+    <v-form ref="form" v-model="valid" lazy-validation @submit.prevent="onSave">
+      <v-card-text>
+        <v-textarea
+          name="description"
+          v-model="description"
+          label="Description"
+          :rules="descriptionRules"
+        />
+      </v-card-text>
 
-    <v-card-actions>
-      <v-spacer></v-spacer>
+      <v-card-actions>
+        <v-spacer></v-spacer>
 
-      <v-btn color="green darken-1" text @click="onCancel">
-        Cancel
-      </v-btn>
+        <v-btn color="green darken-1" text @click="onCancel">
+          Cancel
+        </v-btn>
 
-      <v-btn color="green darken-1" text @click="onSave">
-        Save
-      </v-btn>
-    </v-card-actions>
+        <v-btn color="green darken-1" text type="submit">
+          Save
+        </v-btn>
+      </v-card-actions>
+    </v-form>
   </v-card>
 </template>
 
@@ -30,6 +33,7 @@
 import { Component, Vue, Prop } from "vue-property-decorator";
 import { namespace } from "vuex-class";
 import { CV, PatchCVDto } from "@/model/cv";
+import { VForm } from "@/types";
 
 const CVShowStore = namespace("CVShowStore");
 const DialogStore = namespace("DialogStore");
@@ -39,38 +43,46 @@ export default class EditCVDetailsDialog extends Vue {
   @Prop({ required: true }) readonly id!: number;
 
   @CVShowStore.Getter
-  public getCV!: (id: number) => CV;
+  getCV!: (id: number) => CV;
 
   @CVShowStore.Action
-  public patchCV!: (patchCVDto: PatchCVDto) => Promise<void>;
+  patchCV!: (patchCVDto: PatchCVDto) => Promise<void>;
 
   @DialogStore.Mutation
-  public popDialogComponent!: () => void;
+  popDialogComponent!: () => void;
 
-  private description = "";
+  valid = false;
+  description = "";
+  descriptionRules = [(v: string) => !!v || "Description is required"];
 
   get cv(): CV {
     return this.getCV(this.id);
   }
 
-  private created() {
+  get form(): VForm {
+    return this.$refs.form as VForm;
+  }
+
+  created() {
     this.description = this.cv.description;
   }
 
-  private async onSave() {
-    const patchCVDto: PatchCVDto = {
-      id: this.cv.id,
-      data: {
-        description: this.description
-      }
-    };
+  async onSave() {
+    if (this.form.validate()) {
+      const patchCVDto: PatchCVDto = {
+        id: this.cv.id,
+        data: {
+          description: this.description
+        }
+      };
 
-    await this.patchCV(patchCVDto);
+      await this.patchCV(patchCVDto);
 
-    this.popDialogComponent();
+      this.popDialogComponent();
+    }
   }
 
-  private async onCancel() {
+  async onCancel() {
     this.popDialogComponent();
   }
 }

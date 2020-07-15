@@ -69,21 +69,21 @@ const AlertStore = namespace("AlertStore");
   }
 })
 export default class App extends Vue {
-  private drawer = null;
+  drawer = null;
 
   @AlertStore.Mutation
-  public setAlert!: (alert: AlertInfo) => void;
+  setAlert!: (alert: AlertInfo) => void;
 
   @DialogStore.Mutation
-  public pushDialogComponent!: (dialogComponent: DialogComponent) => void;
+  pushDialogComponent!: (dialogComponent: DialogComponent) => void;
 
   @AuthStore.Action
-  public logoutAction!: () => Promise<void>;
+  logoutAction!: () => Promise<void>;
 
   @AuthStore.Getter
-  public isLoggedIn!: boolean;
+  isLoggedIn!: boolean;
 
-  private async created() {
+  async created() {
     this.$vuetify.theme.dark = false;
 
     axios.interceptors.response.use(
@@ -94,7 +94,7 @@ export default class App extends Vue {
             new AlertInfo({
               message: error.toString(),
               color: "error",
-              details: JSON.stringify(error.response.data)
+              details: JSON.stringify(error.response.data, null, 2)
             })
           );
           if (error.response.status === 401) {
@@ -107,12 +107,12 @@ export default class App extends Vue {
     );
   }
 
-  private async logout() {
+  async logout() {
     this.$router.push("/login");
     await this.logoutAction();
   }
 
-  public search() {
+  search() {
     this.pushDialogComponent({
       component: CVSearchView,
       props: {}

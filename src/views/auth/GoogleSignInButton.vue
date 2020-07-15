@@ -16,21 +16,21 @@ const AuthStore = namespace("AuthStore");
 
 @Component
 export default class GoogleSignInButton extends Vue {
-  private googleSignInParams = {
+  googleSignInParams = {
     ["client_id"]:
       "433163468571-bqv3tk03pq1044qvir0qqkp3qunb3niu.apps.googleusercontent.com"
   };
 
   @AuthStore.Action
-  public googleSignIn!: (idToken: string) => Promise<void>;
+  googleSignIn!: (idToken: string) => Promise<void>;
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  private async onSignInSuccess(authData: any) {
+  async onSignInSuccess(authData: any) {
     await this.googleSignIn(authData.wc.id_token);
     this.$router.push("/");
   }
 
-  private async onSignInError(err: Error) {
+  async onSignInError(err: Error) {
     console.log("error", err);
   }
 }

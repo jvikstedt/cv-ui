@@ -127,7 +127,7 @@ import { Template } from "@/model/template";
 export default class TemplatePdfForm extends Vue {
   @Prop({ required: true }) readonly initialTemplate!: Template;
 
-  private readonly allowedFormats = [
+  readonly allowedFormats = [
     "",
     "Letter",
     "Legal",
@@ -142,8 +142,8 @@ export default class TemplatePdfForm extends Vue {
     "A6"
   ];
 
-  private valid = false;
-  private template: Template = R.clone(this.initialTemplate);
+  valid = false;
+  template: Template = R.clone(this.initialTemplate);
 
   @Watch("template", {
     deep: true

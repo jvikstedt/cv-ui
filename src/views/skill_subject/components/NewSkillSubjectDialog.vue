@@ -2,7 +2,7 @@
   <v-card>
     <v-card-title class="headline">New skill subject</v-card-title>
 
-    <v-form ref="form" v-model="valid" lazy-validation>
+    <v-form ref="form" v-model="valid" lazy-validation @submit.prevent="onSave">
       <v-card-text>
         <v-autocomplete
           v-model="skillGroup"
@@ -36,7 +36,7 @@
           Cancel
         </v-btn>
 
-        <v-btn color="green darken-1" text @click="onSave">
+        <v-btn color="green darken-1" text type="submit">
           Save
         </v-btn>
       </v-card-actions>
@@ -63,41 +63,41 @@ export default class NewSkillSubjectDialog extends Vue {
   ) => Promise<void>;
 
   @SkillSubjectStore.Action
-  public createSkillSubject!: (
+  createSkillSubject!: (
     createSkillSubjectDto: CreateSkillSubjectDto
   ) => Promise<SkillSubject>;
 
   @DialogStore.Mutation
-  public popDialogComponent!: () => void;
+  popDialogComponent!: () => void;
 
   @DialogStore.Mutation
-  public pushDialogComponent!: (dialogComponent: DialogComponent) => void;
+  pushDialogComponent!: (dialogComponent: DialogComponent) => void;
 
   get form(): VForm {
     return this.$refs.form as VForm;
   }
 
-  public valid = false;
+  valid = false;
 
-  public search = "";
-  public name = "";
-  public nameRules = [(name: string) => !!name || "Name is required"];
+  search = "";
+  name = "";
+  nameRules = [(name: string) => !!name || "Name is required"];
 
-  public skillGroups: SkillGroup[] = [];
-  public skillGroup: SkillGroup | null = null;
-  public skillGroupRules = [
+  skillGroups: SkillGroup[] = [];
+  skillGroup: SkillGroup | null = null;
+  skillGroupRules = [
     (skillGroup: SkillGroup) => !!skillGroup || "Skill group is required"
   ];
 
   @Watch("search")
-  public async searchChanged(input: string) {
+  async searchChanged(input: string) {
     this.skillGroups = await SearchSkillGroups({
       name: input || "",
       limit: 10
     });
   }
 
-  public async onSave(): Promise<void> {
+  async onSave(): Promise<void> {
     if (this.form.validate() && this.skillGroup) {
       const skillSubject = await this.createSkillSubject({
         name: this.name,
@@ -109,18 +109,18 @@ export default class NewSkillSubjectDialog extends Vue {
     }
   }
 
-  public async onCancel() {
+  async onCancel() {
     this.popDialogComponent();
   }
 
-  public async newSkillSubject() {
+  async newSkillSubject() {
     this.pushDialogComponent({
       component: NewSkillGroupDialog,
       props: { afterCreate: this.afterSkillGroupCreate }
     });
   }
 
-  public async afterSkillGroupCreate(skillGroup: SkillGroup) {
+  async afterSkillGroupCreate(skillGroup: SkillGroup) {
     this.skillGroups = [...this.skillGroups, skillGroup];
     this.skillGroup = skillGroup;
   }

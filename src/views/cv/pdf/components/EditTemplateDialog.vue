@@ -68,22 +68,22 @@ export default class EditTemplateDialog extends Vue {
     template: Template
   ) => Promise<void>;
 
-  private template: Template | null = null;
+  template: Template | null = null;
 
   @DialogStore.Mutation
-  public popDialogComponent!: () => void;
+  popDialogComponent!: () => void;
 
-  private async created(): Promise<void> {
+  async created(): Promise<void> {
     if (this.initialTemplate) {
       this.template = R.clone(this.initialTemplate);
     }
   }
 
-  private async onChange(template: Template): Promise<void> {
+  async onChange(template: Template): Promise<void> {
     this.template = template;
   }
 
-  private async onSave() {
+  async onSave() {
     if (this.template && !this.template.id) {
       this.template = await CreateTemplate({
         name: this.template.name,
@@ -98,18 +98,18 @@ export default class EditTemplateDialog extends Vue {
     }
   }
 
-  private async onUse() {
+  async onUse() {
     if (this.template) {
       await this.use(this.template);
     }
     this.popDialogComponent();
   }
 
-  private async onCancel() {
+  async onCancel() {
     this.popDialogComponent();
   }
 
-  private async createTemplate() {
+  async createTemplate() {
     this.template = R.merge(new Template(), {
       name: "",
       exporter: "pdf",
