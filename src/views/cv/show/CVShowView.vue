@@ -9,6 +9,7 @@
       </v-btn>
       <CVDetails :id="id" :canEdit="canEditCV(id)" />
       <CVSkills :id="id" :canEdit="canEditCV(id)" />
+      <CVEducations :id="id" :canEdit="canEditCV(id)" />
     </template>
     <template v-else>
       <p>Something went wrong</p>
@@ -22,6 +23,7 @@ import { namespace } from "vuex-class";
 import { CV } from "@/model/cv";
 import CVDetails from "./CVDetails.vue";
 import CVSkills from "./CVSkills.vue";
+import CVEducations from "./CVEducations.vue";
 
 const CVShowStore = namespace("CVShowStore");
 const AuthStore = namespace("AuthStore");
@@ -29,7 +31,8 @@ const AuthStore = namespace("AuthStore");
 @Component({
   components: {
     CVDetails,
-    CVSkills
+    CVSkills,
+    CVEducations
   }
 })
 export default class CVShowView extends Vue {

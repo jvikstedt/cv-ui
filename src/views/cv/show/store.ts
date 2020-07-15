@@ -8,6 +8,12 @@ import {
   DeleteSkillDto,
   CreateSkillDto
 } from "@/model/skill";
+import {
+  Education,
+  PatchEducationDto,
+  DeleteEducationDto,
+  CreateEducationDto
+} from "@/model/education";
 import { CV, PatchCVDto } from "@/model/cv";
 import { User, PatchUserDto } from "@/model/user";
 
@@ -15,6 +21,7 @@ import { User, PatchUserDto } from "@/model/user";
 export class CVShowStore extends VuexModule {
   public cvs: { [key: number]: CV } = {};
   public skills: { [key: number]: Skill } = {};
+  public educations: { [key: number]: Education } = {};
   public fetching = false;
 
   get getCV() {
@@ -41,6 +48,18 @@ export class CVShowStore extends VuexModule {
       );
   }
 
+  get getEducation() {
+    return (id: number): Education => this.educations[id];
+  }
+
+  get getCVEducations() {
+    return (id: number): Education[] =>
+      R.filter(
+        (education: Education) => R.equals(education.cvId, id),
+        Object.values(this.educations)
+      );
+  }
+
   @Mutation
   public addCV(cv: CV): void {
     Vue.set(this.cvs, cv.id, cv);
@@ -57,6 +76,20 @@ export class CVShowStore extends VuexModule {
   public addSkills(skills: Skill[]): void {
     for (const skill of skills) {
       Vue.set(this.skills, skill.id, skill);
+    }
+  }
+
+  @Mutation
+  public deleteEducations(ids: number[]): void {
+    for (const id of ids) {
+      Vue.delete(this.educations, id);
+    }
+  }
+
+  @Mutation
+  public addEducations(educations: Education[]): void {
+    for (const education of educations) {
+      Vue.set(this.educations, education.id, education);
     }
   }
 
@@ -84,6 +117,9 @@ export class CVShowStore extends VuexModule {
 
     const skills: Skill[] = await Api.get(`/cv/${id}/skills`);
     this.context.commit("addSkills", skills);
+
+    const educations: Education[] = await Api.get(`/cv/${id}/educations`);
+    this.context.commit("addEducations", educations);
 
     this.context.commit("setFetching", false);
   }
@@ -128,5 +164,39 @@ export class CVShowStore extends VuexModule {
   public async patchCV({ id, data }: PatchCVDto): Promise<void> {
     const savedCV: CV = await Api.patch(`/cv/${id}`, data);
     this.context.commit("addCV", savedCV);
+  }
+
+  @Action
+  public async patchEducation({
+    cvId,
+    educationId,
+    data
+  }: PatchEducationDto): Promise<void> {
+    const savedEducation: Education = await Api.patch(
+      `/cv/${cvId}/educations/${educationId}`,
+      data
+    );
+    this.context.commit("addEducations", [savedEducation]);
+  }
+
+  @Action
+  public async createEducation(
+    createEducationDto: CreateEducationDto
+  ): Promise<void> {
+    const savedEducation: Education = await Api.post(
+      `/cv/${createEducationDto.cvId}/educations`,
+      createEducationDto
+    );
+    this.context.commit("addEducations", [savedEducation]);
+  }
+
+  @Action
+  public async deleteEducation(
+    deleteEducationDto: DeleteEducationDto
+  ): Promise<void> {
+    await Api.delete(
+      `/cv/${deleteEducationDto.cvId}/educations/${deleteEducationDto.educationId}`
+    );
+    this.context.commit("deleteEducations", [deleteEducationDto.educationId]);
   }
 }

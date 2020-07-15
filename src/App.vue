@@ -36,6 +36,7 @@
     <v-main>
       <v-container fluid>
         <v-row align="center" justify="center">
+          <Alert />
           <router-view />
         </v-row>
       </v-container>
@@ -53,18 +54,25 @@ import { Component, Vue } from "vue-property-decorator";
 import { namespace } from "vuex-class";
 import { Dialog, DialogComponent } from "@/dialog";
 import { CVSearchView, CVSearchBar } from "@/views/cv/search";
+import { Alert } from "@/alert";
+import { AlertInfo } from "@/alert/store";
 
 const DialogStore = namespace("DialogStore");
 const AuthStore = namespace("AuthStore");
+const AlertStore = namespace("AlertStore");
 
 @Component({
   components: {
     CVSearchBar,
-    Dialog
+    Dialog,
+    Alert
   }
 })
 export default class App extends Vue {
   private drawer = null;
+
+  @AlertStore.Mutation
+  public setAlert!: (alert: AlertInfo) => void;
 
   @DialogStore.Mutation
   public pushDialogComponent!: (dialogComponent: DialogComponent) => void;
@@ -80,12 +88,21 @@ export default class App extends Vue {
 
     axios.interceptors.response.use(
       response => response,
-      async error => {
-        if (error.response.status === 401) {
-          this.$router.push("/login");
-          await this.logoutAction();
-        }
-        return error;
+      error => {
+        return new Promise((resolve, reject) => {
+          this.setAlert(
+            new AlertInfo({
+              message: error.toString(),
+              color: "error",
+              details: JSON.stringify(error.response.data)
+            })
+          );
+          if (error.response.status === 401) {
+            this.$router.push("/login");
+            resolve(this.logoutAction());
+          }
+          reject(error);
+        });
       }
     );
   }
