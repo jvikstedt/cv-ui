@@ -42,40 +42,40 @@ const DialogStore = namespace("DialogStore");
   }
 })
 export default class CVPDFView extends Vue {
-  public id: number | null = null;
+  id: number | null = null;
 
   @CVPDFStore.State
-  public selectedTemplate!: Template | null;
+  selectedTemplate!: Template | null;
 
   @CVPDFStore.State
-  public cvData!: CVExportData;
+  cvData!: CVExportData;
 
   @CVPDFStore.State
-  public fetching!: boolean;
+  fetching!: boolean;
 
   @CVPDFStore.Getter
-  public getTemplates!: Template[];
+  getTemplates!: Template[];
 
   @CVPDFStore.State
-  public blob!: Blob | null;
+  blob!: Blob | null;
 
   @CVPDFStore.Action
-  public fetchCV!: (id: number) => Promise<void>;
+  fetchCV!: (id: number) => Promise<void>;
 
   @CVPDFStore.Action
-  public fetchTemplates!: () => Promise<void>;
+  fetchTemplates!: () => Promise<void>;
 
   @CVPDFStore.Action
-  public setCVDataAction!: (cvData: CVExportData) => Promise<void>;
+  setCVDataAction!: (cvData: CVExportData) => Promise<void>;
 
   @CVPDFStore.Action
-  public setSelectedTemplateAction!: (template: Template) => Promise<void>;
+  setSelectedTemplateAction!: (template: Template) => Promise<void>;
 
   @CVPDFStore.Action
-  public exportPDF!: (exportPdfDto: ExportPdfDto) => Promise<void>;
+  exportPDF!: (exportPdfDto: ExportPdfDto) => Promise<void>;
 
   @DialogStore.Mutation
-  public pushDialogComponent!: (dialogComponent: DialogComponent) => void;
+  pushDialogComponent!: (dialogComponent: DialogComponent) => void;
 
   get pdfUrl() {
     if (this.blob) {
@@ -85,7 +85,7 @@ export default class CVPDFView extends Vue {
     return null;
   }
 
-  private async created(): Promise<void> {
+  async created(): Promise<void> {
     const idStr = this.$route.params.id;
     this.id = parseInt(idStr, 10);
 
@@ -93,17 +93,17 @@ export default class CVPDFView extends Vue {
     await this.fetchTemplates();
   }
 
-  private async onTemplateUse(template: Template): Promise<void> {
+  async onTemplateUse(template: Template): Promise<void> {
     await this.setSelectedTemplateAction(template);
     await this.print();
   }
 
-  private async onJsonUse(cvData: CVExportData): Promise<void> {
+  async onJsonUse(cvData: CVExportData): Promise<void> {
     await this.setCVDataAction(cvData);
     await this.print();
   }
 
-  private async print(): Promise<void> {
+  async print(): Promise<void> {
     if (this.selectedTemplate) {
       const content = handlebars.compile(this.selectedTemplate.data.content)(
         this.cvData
@@ -113,14 +113,14 @@ export default class CVPDFView extends Vue {
     }
   }
 
-  private openEditJsonDialog() {
+  openEditJsonDialog() {
     this.pushDialogComponent({
       component: EditJsonDialog,
       props: { data: this.cvData, use: this.onJsonUse }
     });
   }
 
-  private openEditTemplateDialog() {
+  openEditTemplateDialog() {
     this.pushDialogComponent({
       component: EditTemplateDialog,
       props: {

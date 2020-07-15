@@ -2,58 +2,62 @@
   <v-card>
     <v-card-title class="headline">New Skill</v-card-title>
 
-    <v-card-text>
-      <v-autocomplete
-        name="skillSubject"
-        v-model="skillSubject"
-        :items="skillSubjects"
-        :search-input.sync="search"
-        item-text="name"
-        item-value="id"
-        label="Skill subject"
-        placeholder="Start typing to search"
-        return-object
-      >
-        <template v-slot:append-outer>
-          <v-btn @click="newSkillSubject">New</v-btn>
-        </template>
-      </v-autocomplete>
-    </v-card-text>
+    <v-form ref="form" v-model="valid" lazy-validation @submit.prevent="onSave">
+      <v-card-text>
+        <v-autocomplete
+          name="skillSubject"
+          v-model="skillSubject"
+          :items="skillSubjects"
+          :search-input.sync="search"
+          :rules="skillSubjectRules"
+          item-text="name"
+          item-value="id"
+          label="Skill subject"
+          placeholder="Start typing to search"
+          return-object
+        >
+          <template v-slot:append-outer>
+            <v-btn @click="newSkillSubject">New</v-btn>
+          </template>
+        </v-autocomplete>
+      </v-card-text>
 
-    <v-subheader>Experience in years</v-subheader>
-    <v-card-text>
-      <v-slider
-        v-model="experienceInYears"
-        class="align-center"
-        :max="10"
-        :min="1"
-        hide-details
-      >
-        <template v-slot:append>
-          <v-text-field
-            name="experienceInYears"
-            v-model="experienceInYears"
-            class="mt-0 pt-0"
-            hide-details
-            single-line
-            type="number"
-            style="width: 60px"
-          ></v-text-field>
-        </template>
-      </v-slider>
-    </v-card-text>
+      <v-subheader>Experience in years</v-subheader>
+      <v-card-text>
+        <v-slider
+          v-model="experienceInYears"
+          class="align-center"
+          :max="10"
+          :min="1"
+          hide-details
+        >
+          <template v-slot:append>
+            <v-text-field
+              name="experienceInYears"
+              v-model="experienceInYears"
+              :rules="experienceInYearsRules"
+              class="mt-0 pt-0"
+              hide-details
+              single-line
+              type="number"
+              style="width: 60px"
+            ></v-text-field>
+          </template>
+        </v-slider>
+      </v-card-text>
 
-    <v-card-actions>
-      <v-spacer></v-spacer>
+      <v-card-actions>
+        <v-spacer></v-spacer>
 
-      <v-btn color="green darken-1" text @click="onCancel">
-        Cancel
-      </v-btn>
+        <v-btn color="green darken-1" text @click="onCancel">
+          Cancel
+        </v-btn>
 
-      <v-btn color="green darken-1" text @click="onSave">
-        Save
-      </v-btn>
-    </v-card-actions>
+        <v-btn color="green darken-1" text type="submit">
+          Save
+        </v-btn>
+      </v-card-actions>
+    </v-form>
   </v-card>
 </template>
 
@@ -65,6 +69,7 @@ import { Skill, CreateSkillDto, SkillSubject } from "@/model/skill";
 import { SearchSkillSubjects } from "@/api/skill_subject";
 import NewSkillSubjectDialog from "@/views/skill_subject/components/NewSkillSubjectDialog.vue";
 import { DialogComponent } from "@/dialog";
+import { VForm } from "@/types";
 
 const CVShowStore = namespace("CVShowStore");
 const DialogStore = namespace("DialogStore");
@@ -77,23 +82,31 @@ const DialogStore = namespace("DialogStore");
 export default class NewSkillDialog extends Vue {
   @Prop({ required: true }) readonly id!: number;
 
-  private experienceInYears = 1;
-  private search = "";
-  private skillSubjects: SkillSubject[] = [];
-  private skillSubject: SkillSubject | null = null;
-  private isCreatingSkillSubject = false;
+  valid = false;
+  experienceInYears = 1;
+  experienceInYearsRules = [
+    (experienceInYears: number) =>
+      !!experienceInYears || "Experience in years is required"
+  ];
+  search = "";
+  skillSubjects: SkillSubject[] = [];
+  skillSubject: SkillSubject | null = null;
+  skillSubjectRules = [
+    (skillSubject: SkillSubject) =>
+      !!skillSubject || "Skill subject is required"
+  ];
 
   @CVShowStore.Getter
-  public getCVSkills!: (id: number) => Skill[];
+  getCVSkills!: (id: number) => Skill[];
 
   @CVShowStore.Action
-  public createSkill!: (createSkillDto: CreateSkillDto) => Promise<void>;
+  createSkill!: (createSkillDto: CreateSkillDto) => Promise<void>;
 
   @DialogStore.Mutation
-  public popDialogComponent!: () => void;
+  popDialogComponent!: () => void;
 
   @DialogStore.Mutation
-  public pushDialogComponent!: (dialogComponent: DialogComponent) => void;
+  pushDialogComponent!: (dialogComponent: DialogComponent) => void;
 
   @Watch("search")
   async searchChanged(keyword: string) {
@@ -111,8 +124,12 @@ export default class NewSkillDialog extends Vue {
     );
   }
 
-  private async onSave() {
-    if (this.skillSubject) {
+  get form(): VForm {
+    return this.$refs.form as VForm;
+  }
+
+  async onSave() {
+    if (this.form.validate() && this.skillSubject) {
       const createSkillDto: CreateSkillDto = {
         cvId: this.id,
         experienceInYears: this.experienceInYears,
@@ -124,18 +141,18 @@ export default class NewSkillDialog extends Vue {
     }
   }
 
-  private async onCancel() {
+  async onCancel() {
     this.popDialogComponent();
   }
 
-  private async newSkillSubject() {
+  async newSkillSubject() {
     this.pushDialogComponent({
       component: NewSkillSubjectDialog,
       props: { afterCreate: this.afterSkillSubjectCreate }
     });
   }
 
-  private async afterSkillSubjectCreate(skillSubject: SkillSubject) {
+  async afterSkillSubjectCreate(skillSubject: SkillSubject) {
     this.skillSubjects = [...this.skillSubjects, skillSubject];
     this.skillSubject = skillSubject;
   }

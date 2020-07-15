@@ -1,8 +1,8 @@
 <template>
   <v-card>
-    <v-card-title class="headline">New Skill group</v-card-title>
+    <v-card-title class="headline">New skill group</v-card-title>
 
-    <v-form v-model="valid">
+    <v-form ref="form" v-model="valid" lazy-validation @submit.prevent="onSave">
       <v-card-text>
         <v-text-field
           v-model="createSkillGroupDto.name"
@@ -20,7 +20,7 @@
           Cancel
         </v-btn>
 
-        <v-btn :disabled="!valid" color="green darken-1" text @click="onSave">
+        <v-btn color="green darken-1" text type="submit">
           Save
         </v-btn>
       </v-card-actions>
@@ -32,6 +32,7 @@
 import { Component, Vue, Prop } from "vue-property-decorator";
 import { namespace } from "vuex-class";
 import { SkillGroup, CreateSkillGroupDto } from "@/model/skill";
+import { VForm } from "@/types";
 
 const SkillGroupStore = namespace("SkillGroupStore");
 const DialogStore = namespace("DialogStore");
@@ -43,30 +44,32 @@ export default class NewSkillGroupDialog extends Vue {
   ) => Promise<void>;
 
   @SkillGroupStore.Action
-  public createSkillGroup!: (
+  createSkillGroup!: (
     createSkillGroupDto: CreateSkillGroupDto
   ) => Promise<SkillGroup>;
 
   @DialogStore.Mutation
-  public popDialogComponent!: () => void;
+  popDialogComponent!: () => void;
 
-  private valid = false;
-  private createSkillGroupDto = new CreateSkillGroupDto();
-
-  private nameRules = [
-    (v: string) => !!v || "Name is required",
-    (v: string) =>
-      (v && v.length <= 255) || "Name must be less than 10 characters"
-  ];
-
-  private async onSave(): Promise<void> {
-    const skillGroup = await this.createSkillGroup(this.createSkillGroupDto);
-
-    await this.afterCreate(skillGroup);
-    this.popDialogComponent();
+  get form(): VForm {
+    return this.$refs.form as VForm;
   }
 
-  private async onCancel() {
+  valid = false;
+  createSkillGroupDto = new CreateSkillGroupDto();
+
+  nameRules = [(v: string) => !!v || "Name is required"];
+
+  async onSave(): Promise<void> {
+    if (this.form.validate()) {
+      const skillGroup = await this.createSkillGroup(this.createSkillGroupDto);
+
+      await this.afterCreate(skillGroup);
+      this.popDialogComponent();
+    }
+  }
+
+  async onCancel() {
     this.popDialogComponent();
   }
 }

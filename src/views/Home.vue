@@ -23,9 +23,9 @@ const AuthStore = namespace("AuthStore");
 })
 export default class Home extends Vue {
   @AuthStore.Getter
-  public user!: TokenData;
+  user!: TokenData;
 
-  public async openMyCV() {
+  async openMyCV() {
     const cvId = this.user.cvIds[0];
     this.$router.push(`/cv/${cvId}`);
   }

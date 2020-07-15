@@ -1,44 +1,48 @@
 <template>
   <v-card>
     <v-card-title class="headline">{{ skill.skillSubject.name }}</v-card-title>
-    <v-subheader>Experience in years</v-subheader>
-    <v-card-text>
-      <v-slider
-        v-model="experienceInYears"
-        class="align-center"
-        :max="10"
-        :min="1"
-        hide-details
-      >
-        <template v-slot:append>
-          <v-text-field
-            name="experienceInYears"
-            v-model="experienceInYears"
-            class="mt-0 pt-0"
-            hide-details
-            single-line
-            type="number"
-            style="width: 60px"
-          ></v-text-field>
-        </template>
-      </v-slider>
-    </v-card-text>
 
-    <v-card-actions>
-      <v-spacer></v-spacer>
+    <v-form ref="form" v-model="valid" lazy-validation @submit.prevent="onSave">
+      <v-subheader>Experience in years</v-subheader>
+      <v-card-text>
+        <v-slider
+          v-model="experienceInYears"
+          class="align-center"
+          :max="10"
+          :min="1"
+          hide-details
+        >
+          <template v-slot:append>
+            <v-text-field
+              name="experienceInYears"
+              v-model="experienceInYears"
+              :rules="experienceInYearsRules"
+              class="mt-0 pt-0"
+              hide-details
+              single-line
+              type="number"
+              style="width: 60px"
+            ></v-text-field>
+          </template>
+        </v-slider>
+      </v-card-text>
 
-      <v-btn color="red darken-1" text @click="onSkillDelete">
-        Delete
-      </v-btn>
+      <v-card-actions>
+        <v-spacer></v-spacer>
 
-      <v-btn color="green darken-1" text @click="onCancel">
-        Cancel
-      </v-btn>
+        <v-btn color="red darken-1" text @click="onSkillDelete">
+          Delete
+        </v-btn>
 
-      <v-btn color="green darken-1" text @click="onSave">
-        Save
-      </v-btn>
-    </v-card-actions>
+        <v-btn color="green darken-1" text @click="onCancel">
+          Cancel
+        </v-btn>
+
+        <v-btn color="green darken-1" text type="submit">
+          Save
+        </v-btn>
+      </v-card-actions>
+    </v-form>
   </v-card>
 </template>
 
@@ -47,6 +51,7 @@ import { Component, Vue, Prop } from "vue-property-decorator";
 import { namespace } from "vuex-class";
 import { PatchCVDto } from "@/model/cv";
 import { Skill, PatchSkillDto, DeleteSkillDto } from "@/model/skill";
+import { VForm } from "@/types";
 
 const CVShowStore = namespace("CVShowStore");
 const DialogStore = namespace("DialogStore");
@@ -55,32 +60,41 @@ const DialogStore = namespace("DialogStore");
 export default class EditSkillDialog extends Vue {
   @Prop({ required: true }) readonly skillId!: number;
 
-  private experienceInYears = 1;
+  valid = false;
+  experienceInYears = 1;
+  experienceInYearsRules = [
+    (experienceInYears: number) =>
+      !!experienceInYears || "Experience in years is required"
+  ];
 
   @CVShowStore.Action
-  public patchSkill!: (patchSkillDto: PatchSkillDto) => Promise<void>;
+  patchSkill!: (patchSkillDto: PatchSkillDto) => Promise<void>;
 
   @CVShowStore.Action
-  public patchCV!: (patchCVDto: PatchCVDto) => Promise<void>;
+  patchCV!: (patchCVDto: PatchCVDto) => Promise<void>;
 
   @DialogStore.Mutation
-  public popDialogComponent!: () => void;
+  popDialogComponent!: () => void;
 
   @CVShowStore.Getter
-  public getSkill!: (skillId: number) => Skill;
+  getSkill!: (skillId: number) => Skill;
 
   @CVShowStore.Action
-  public deleteSkill!: (deleteSkillDto: DeleteSkillDto) => Promise<void>;
+  deleteSkill!: (deleteSkillDto: DeleteSkillDto) => Promise<void>;
+
+  get form(): VForm {
+    return this.$refs.form as VForm;
+  }
 
   get skill(): Skill {
     return this.getSkill(this.skillId);
   }
 
-  private created() {
+  created() {
     this.experienceInYears = this.skill.experienceInYears;
   }
 
-  private async onSkillDelete() {
+  async onSkillDelete() {
     this.popDialogComponent();
 
     const skill = this.getSkill(this.skillId);
@@ -93,22 +107,24 @@ export default class EditSkillDialog extends Vue {
     await this.deleteSkill(deleteSkillDto);
   }
 
-  private async onSave() {
-    const skill = this.getSkill(this.skillId);
+  async onSave() {
+    if (this.form.validate()) {
+      const skill = this.getSkill(this.skillId);
 
-    const patchSkillDto: PatchSkillDto = {
-      cvId: skill.cvId,
-      skillId: skill.id,
-      data: {
-        experienceInYears: this.experienceInYears
-      }
-    };
-    await this.patchSkill(patchSkillDto);
+      const patchSkillDto: PatchSkillDto = {
+        cvId: skill.cvId,
+        skillId: skill.id,
+        data: {
+          experienceInYears: this.experienceInYears
+        }
+      };
+      await this.patchSkill(patchSkillDto);
 
-    this.popDialogComponent();
+      this.popDialogComponent();
+    }
   }
 
-  private async onCancel() {
+  async onCancel() {
     this.popDialogComponent();
   }
 }

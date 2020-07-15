@@ -4,39 +4,43 @@
       {{ user.firstName }} {{ user.lastName }}
     </v-card-title>
 
-    <v-card-text>
-      <p class="text-center">
-        <v-avatar size="146.6" tile color="indigo">
-          <v-img v-if="avatarSrc" :src="avatarSrc"></v-img>
-          <span v-else class="white--text headline">{{ initials }}</span>
-        </v-avatar>
-      </p>
-      <v-file-input label="File input" @change="onFileChange" />
+    <v-form ref="form" v-model="valid" lazy-validation @submit.prevent="onSave">
+      <v-card-text>
+        <p class="text-center">
+          <v-avatar size="146.6" tile color="indigo">
+            <v-img v-if="avatarSrc" :src="avatarSrc"></v-img>
+            <span v-else class="white--text headline">{{ initials }}</span>
+          </v-avatar>
+        </p>
+        <v-file-input label="File input" @change="onFileChange" />
 
-      <v-text-field
-        name="firstName"
-        v-model="firstName"
-        label="First name"
-      ></v-text-field>
+        <v-text-field
+          name="firstName"
+          v-model="firstName"
+          label="First name"
+          :rules="firstNameRules"
+        ></v-text-field>
 
-      <v-text-field
-        name="lastName"
-        v-model="lastName"
-        label="Last name"
-      ></v-text-field>
-    </v-card-text>
+        <v-text-field
+          name="lastName"
+          v-model="lastName"
+          label="Last name"
+          :rules="lastNameRules"
+        ></v-text-field>
+      </v-card-text>
 
-    <v-card-actions>
-      <v-spacer></v-spacer>
+      <v-card-actions>
+        <v-spacer></v-spacer>
 
-      <v-btn color="green darken-1" text @click="onCancel">
-        Cancel
-      </v-btn>
+        <v-btn color="green darken-1" text @click="onCancel">
+          Cancel
+        </v-btn>
 
-      <v-btn color="green darken-1" text @click="onSave">
-        Save
-      </v-btn>
-    </v-card-actions>
+        <v-btn color="green darken-1" text type="submit">
+          Save
+        </v-btn>
+      </v-card-actions>
+    </v-form>
   </v-card>
 </template>
 
@@ -47,6 +51,7 @@ import { namespace } from "vuex-class";
 import { User, PatchUserDto } from "@/model/user";
 import { CreateFile } from "@/api/file";
 import { CV } from "@/model/cv";
+import { VForm } from "@/types";
 
 const CVShowStore = namespace("CVShowStore");
 const DialogStore = namespace("DialogStore");
@@ -56,26 +61,33 @@ export default class EditUserNamesDialog extends Vue {
   @Prop({ required: true }) readonly id!: number;
 
   @CVShowStore.Getter
-  public getCV!: (id: number) => CV;
+  getCV!: (id: number) => CV;
 
   @CVShowStore.Action
-  public patchUser!: (patchUserDto: PatchUserDto) => Promise<void>;
+  patchUser!: (patchUserDto: PatchUserDto) => Promise<void>;
 
   @DialogStore.Mutation
-  public popDialogComponent!: () => void;
+  popDialogComponent!: () => void;
 
-  private firstName = "";
-  private lastName = "";
-  private avatarId = "";
+  valid = false;
+  firstName = "";
+  firstNameRules = [(v: string) => !!v || "First name is required"];
+  lastName = "";
+  lastNameRules = [(v: string) => !!v || "Last name is required"];
+  avatarId = "";
 
   get user(): User {
     return this.getCV(this.id).user;
   }
 
-  private created() {
+  created() {
     this.firstName = this.user.firstName;
     this.lastName = this.user.lastName;
     this.avatarId = this.user.avatarId;
+  }
+
+  get form(): VForm {
+    return this.$refs.form as VForm;
   }
 
   get avatarSrc(): string | null {
@@ -89,29 +101,31 @@ export default class EditUserNamesDialog extends Vue {
     return R.toUpper(`${this.user.firstName[0]}${this.user.lastName[0]}`);
   }
 
-  private async onFileChange(file: File) {
+  async onFileChange(file: File) {
     if (file) {
       const createdFile = await CreateFile({ file });
       this.avatarId = createdFile.id;
     }
   }
 
-  private async onSave() {
-    const patchUserDto: PatchUserDto = {
-      id: this.user.id,
-      data: {
-        firstName: this.firstName,
-        lastName: this.lastName,
-        avatarId: this.avatarId
-      }
-    };
+  async onSave() {
+    if (this.form.validate()) {
+      const patchUserDto: PatchUserDto = {
+        id: this.user.id,
+        data: {
+          firstName: this.firstName,
+          lastName: this.lastName,
+          avatarId: this.avatarId
+        }
+      };
 
-    await this.patchUser(patchUserDto);
+      await this.patchUser(patchUserDto);
 
-    this.popDialogComponent();
+      this.popDialogComponent();
+    }
   }
 
-  private async onCancel() {
+  async onCancel() {
     this.popDialogComponent();
   }
 }

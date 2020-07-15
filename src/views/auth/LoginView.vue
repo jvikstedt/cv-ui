@@ -23,13 +23,13 @@ const AuthStore = namespace("AuthStore");
   }
 })
 export default class LoginView extends Vue {
-  public username = "";
-  public password = "";
+  username = "";
+  password = "";
 
   @AuthStore.Action
-  public signIn!: (authCredentialsDto: AuthCredentialsDto) => Promise<void>;
+  signIn!: (authCredentialsDto: AuthCredentialsDto) => Promise<void>;
 
-  public async onSignIn() {
+  async onSignIn() {
     const authCredentialsDto: AuthCredentialsDto = {
       username: this.username,
       password: this.password

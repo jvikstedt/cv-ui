@@ -46,21 +46,21 @@ const DialogStore = namespace("DialogStore");
 
 @Component
 export default class CVSearchBar extends Vue {
-  private cv: CV | null = null;
-  private searchInput = null;
-  private debounce = 0;
+  cv: CV | null = null;
+  searchInput = null;
+  debounce = 0;
 
   @CVSearchStore.State
-  public searching!: boolean;
+  searching!: boolean;
 
   @CVSearchStore.State
-  public results!: CVSearchResult[];
+  results!: CVSearchResult[];
 
   @CVSearchStore.Action
-  public searchCVs!: (cvSearchDto: CVSearchDto) => Promise<void>;
+  searchCVs!: (cvSearchDto: CVSearchDto) => Promise<void>;
 
   @DialogStore.Mutation
-  public pushDialogComponent!: (dialogComponent: DialogComponent) => void;
+  pushDialogComponent!: (dialogComponent: DialogComponent) => void;
 
   @Watch("searchInput")
   async searchInputChanged(input: string) {
@@ -76,7 +76,7 @@ export default class CVSearchBar extends Vue {
     }, debounce);
   }
 
-  private async onSelect(cv: CV) {
+  async onSelect(cv: CV) {
     this.$nextTick(() => {
       this.cv = null;
     });
@@ -86,7 +86,7 @@ export default class CVSearchBar extends Vue {
     }
   }
 
-  public advancedSearch() {
+  advancedSearch() {
     this.pushDialogComponent({
       component: CVSearchView,
       props: {}

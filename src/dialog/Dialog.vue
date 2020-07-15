@@ -18,13 +18,13 @@ const DialogStore = namespace("DialogStore");
 @Component
 export default class Dialog extends Vue {
   @DialogStore.State
-  public isOpen!: boolean;
+  isOpen!: boolean;
 
   @DialogStore.State
-  public dialogComponents!: DialogComponent[];
+  dialogComponents!: DialogComponent[];
 
   @DialogStore.Mutation
-  public popDialogComponent!: () => void;
+  popDialogComponent!: () => void;
 
   get dialog(): boolean {
     return true;

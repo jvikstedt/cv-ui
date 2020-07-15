@@ -109,25 +109,25 @@ const DialogStore = namespace("DialogStore");
 
 @Component
 export default class CVSearchView extends Vue {
-  private fullName = "";
+  fullName = "";
 
-  private searchInput = null;
-  private selectedSkillSubject: SkillSubject | null = null;
-  private skillSubjects: SkillSubject[] = [];
+  searchInput = null;
+  selectedSkillSubject: SkillSubject | null = null;
+  skillSubjects: SkillSubject[] = [];
 
-  private skillSearchOptions: SkillSearchOption[] = [];
-
-  @CVSearchStore.State
-  public searching!: boolean;
+  skillSearchOptions: SkillSearchOption[] = [];
 
   @CVSearchStore.State
-  public results!: CVSearchResult[];
+  searching!: boolean;
+
+  @CVSearchStore.State
+  results!: CVSearchResult[];
 
   @CVSearchStore.Action
-  public searchCVs!: (cvSearchDto: CVSearchDto) => Promise<void>;
+  searchCVs!: (cvSearchDto: CVSearchDto) => Promise<void>;
 
   @DialogStore.Mutation
-  public popDialogComponent!: () => void;
+  popDialogComponent!: () => void;
 
   @Watch("searchInput")
   async searchInputChanged(input: string) {
@@ -147,11 +147,11 @@ export default class CVSearchView extends Vue {
     );
   }
 
-  public async created() {
+  async created() {
     await this.searchInputChanged("");
   }
 
-  private commonSkills(cvSearchResult: CVSearchResult) {
+  commonSkills(cvSearchResult: CVSearchResult) {
     return R.filter(
       skill =>
         !!R.find(
@@ -162,7 +162,7 @@ export default class CVSearchView extends Vue {
     );
   }
 
-  private onResultClick(cvSearchResult: CVSearchResult) {
+  onResultClick(cvSearchResult: CVSearchResult) {
     this.popDialogComponent();
     const route = `/cv/${cvSearchResult.id}`;
     if (this.$route.path !== route) {
@@ -170,7 +170,7 @@ export default class CVSearchView extends Vue {
     }
   }
 
-  private async onSearch() {
+  async onSearch() {
     const cvSearchDto = new CVSearchDto({
       fullName: this.fullName,
       skills: this.skillSearchOptions
@@ -178,9 +178,7 @@ export default class CVSearchView extends Vue {
     await this.searchCVs(cvSearchDto);
   }
 
-  private async removeSelectedSkillSubject(
-    skillSearchOption: SkillSearchOption
-  ) {
+  async removeSelectedSkillSubject(skillSearchOption: SkillSearchOption) {
     this.skillSearchOptions = R.reject(
       option =>
         R.equals(option.skillSubjectId, skillSearchOption.skillSubjectId),
@@ -188,7 +186,7 @@ export default class CVSearchView extends Vue {
     );
   }
 
-  private async onSelect(skillSubject: SkillSubject) {
+  async onSelect(skillSubject: SkillSubject) {
     this.$nextTick(() => {
       this.selectedSkillSubject = null;
     });
@@ -200,7 +198,7 @@ export default class CVSearchView extends Vue {
     this.skillSearchOptions = [...this.skillSearchOptions, skillSearchOption];
   }
 
-  private async onCancel() {
+  async onCancel() {
     this.popDialogComponent();
   }
 

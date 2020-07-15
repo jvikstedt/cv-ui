@@ -43,30 +43,30 @@ export default class CVSkills extends Vue {
   @Prop({ required: true }) readonly canEdit!: boolean;
 
   @CVShowStore.Getter
-  public getCVSkillsGrouped!: (id: number) => { [key: string]: Skill[] };
+  getCVSkillsGrouped!: (id: number) => { [key: string]: Skill[] };
 
   @DialogStore.Mutation
-  public pushDialogComponent!: (dialogComponent: DialogComponent) => void;
+  pushDialogComponent!: (dialogComponent: DialogComponent) => void;
 
-  public skillGroups(): string[] {
+  skillGroups(): string[] {
     return R.sort(
       (a, b) => a.localeCompare(b),
       Object.keys(this.getCVSkillsGrouped(this.id))
     );
   }
 
-  public skillsBySkillGroup(skillGroupName: string): Skill[] {
+  skillsBySkillGroup(skillGroupName: string): Skill[] {
     return this.getCVSkillsGrouped(this.id)[skillGroupName] || [];
   }
 
-  private async onSkillClick(skill: Skill) {
+  async onSkillClick(skill: Skill) {
     this.pushDialogComponent({
       component: EditSkillDialog,
       props: { skillId: skill.id }
     });
   }
 
-  private async newSkill() {
+  async newSkill() {
     this.pushDialogComponent({
       component: NewSkillDialog,
       props: { id: this.id }

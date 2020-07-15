@@ -17,7 +17,7 @@
     </v-btn>
 
     <div v-if="showMore">
-      {{ details }}
+      <pre style="white-space: pre-wrap;">{{ details }}</pre>
     </div>
 
     <template v-slot:action="{ attrs }">
@@ -37,21 +37,21 @@ const AlertStore = namespace("AlertStore");
 
 @Component
 export default class Alert extends Vue {
-  private show = false;
-  private showMore = false;
-  private x = "";
-  private y = "";
-  private message = "";
-  private color = "";
-  private timeout = 5000;
-  private mode = "";
-  private details: string | null = null;
+  show = false;
+  showMore = false;
+  x = "";
+  y = "";
+  message = "";
+  color = "";
+  timeout = 5000;
+  mode = "";
+  details: string | null = null;
 
   @AlertStore.Getter
-  public newAlert!: AlertInfo | null;
+  newAlert!: AlertInfo | null;
 
   @AlertStore.Mutation
-  public resetAlert!: () => void;
+  resetAlert!: () => void;
 
   @Watch("newAlert")
   async alertChanged(alert: AlertInfo | null) {
@@ -69,7 +69,7 @@ export default class Alert extends Vue {
     }
   }
 
-  public onShowMore() {
+  onShowMore() {
     this.showMore = !this.showMore;
     if (this.showMore) {
       this.timeout = -1;

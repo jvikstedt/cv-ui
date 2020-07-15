@@ -1,57 +1,65 @@
 <template>
   <v-card>
     <v-card-title class="headline">{{ education.school.name }}</v-card-title>
-    <v-card-text>
-      <v-text-field
-        v-model="degree"
-        :counter="255"
-        label="Degree"
-        required
-      ></v-text-field>
 
-      <v-text-field
-        v-model="fieldOfStudy"
-        :counter="255"
-        label="Field of study"
-        required
-      ></v-text-field>
+    <v-form ref="form" v-model="valid" lazy-validation @submit.prevent="onSave">
+      <v-card-text>
+        <v-text-field
+          v-model="degree"
+          :counter="255"
+          :rules="degreeRules"
+          label="Degree"
+          required
+        ></v-text-field>
 
-      <v-text-field
-        v-model="description"
-        :counter="255"
-        label="Description"
-        required
-      ></v-text-field>
+        <v-text-field
+          v-model="fieldOfStudy"
+          :counter="255"
+          :rules="fieldOfStudyRules"
+          label="Field of study"
+          required
+        ></v-text-field>
 
-      <v-text-field
-        v-model.number="startYear"
-        label="Start year"
-        type="number"
-        required
-      ></v-text-field>
+        <v-text-field
+          v-model="description"
+          :counter="255"
+          :rules="descriptionRules"
+          label="Description"
+          required
+        ></v-text-field>
 
-      <v-text-field
-        v-model.number="endYear"
-        label="End year"
-        type="number"
-      ></v-text-field>
-    </v-card-text>
+        <v-text-field
+          v-model.number="startYear"
+          label="Start year"
+          :rules="startYearRules"
+          type="number"
+          required
+        ></v-text-field>
 
-    <v-card-actions>
-      <v-spacer></v-spacer>
+        <v-text-field
+          v-model.number="endYear"
+          label="End year"
+          :rules="endYearRules"
+          type="number"
+        ></v-text-field>
+      </v-card-text>
 
-      <v-btn color="red darken-1" text @click="onEducationDelete">
-        Delete
-      </v-btn>
+      <v-card-actions>
+        <v-spacer></v-spacer>
 
-      <v-btn color="green darken-1" text @click="onCancel">
-        Cancel
-      </v-btn>
+        <v-btn color="red darken-1" text @click="onEducationDelete">
+          Delete
+        </v-btn>
 
-      <v-btn color="green darken-1" text @click="onSave">
-        Save
-      </v-btn>
-    </v-card-actions>
+        <v-btn color="green darken-1" text @click="onCancel">
+          Cancel
+        </v-btn>
+
+        <v-btn color="green darken-1" text type="submit">
+          Save
+        </v-btn>
+      </v-card-actions>
+    </v-form>
   </v-card>
 </template>
 
@@ -64,6 +72,7 @@ import {
   PatchEducationDto,
   DeleteEducationDto
 } from "@/model/education";
+import { VForm } from "@/types";
 
 const CVShowStore = namespace("CVShowStore");
 const DialogStore = namespace("DialogStore");
@@ -72,36 +81,42 @@ const DialogStore = namespace("DialogStore");
 export default class EditEducationDialog extends Vue {
   @Prop({ required: true }) readonly educationId!: number;
 
-  private degree = "";
-  private fieldOfStudy = "";
-  private description = "";
-  private startYear = 2010;
-  private endYear = 2014;
+  valid = false;
+  degree = "";
+  degreeRules = [(v: string) => !!v || "Degree is required"];
+  fieldOfStudy = "";
+  fieldOfStudyRules = [(v: string) => !!v || "Field of study is required"];
+  description = "";
+  descriptionRules = [(v: string) => !!v || "Description is required"];
+  startYear = 2010;
+  startYearRules = [(v: number) => !!v || "Start year is required"];
+  endYear = 2014;
+  endYearRules = [(v: number) => !!v || "End year is required"];
 
   @CVShowStore.Action
-  public patchEducation!: (
-    patchEducationDto: PatchEducationDto
-  ) => Promise<void>;
+  patchEducation!: (patchEducationDto: PatchEducationDto) => Promise<void>;
 
   @CVShowStore.Action
-  public patchCV!: (patchCVDto: PatchCVDto) => Promise<void>;
+  patchCV!: (patchCVDto: PatchCVDto) => Promise<void>;
 
   @DialogStore.Mutation
-  public popDialogComponent!: () => void;
+  popDialogComponent!: () => void;
 
   @CVShowStore.Getter
-  public getEducation!: (educationId: number) => Education;
+  getEducation!: (educationId: number) => Education;
 
   @CVShowStore.Action
-  public deleteEducation!: (
-    deleteEducationDto: DeleteEducationDto
-  ) => Promise<void>;
+  deleteEducation!: (deleteEducationDto: DeleteEducationDto) => Promise<void>;
 
   get education(): Education {
     return this.getEducation(this.educationId);
   }
 
-  private created() {
+  get form(): VForm {
+    return this.$refs.form as VForm;
+  }
+
+  created() {
     this.degree = this.education.degree;
     this.fieldOfStudy = this.education.fieldOfStudy;
     this.description = this.education.description;
@@ -109,7 +124,7 @@ export default class EditEducationDialog extends Vue {
     this.endYear = this.education.endYear;
   }
 
-  private async onEducationDelete() {
+  async onEducationDelete() {
     this.popDialogComponent();
 
     const education = this.getEducation(this.educationId);
@@ -122,26 +137,28 @@ export default class EditEducationDialog extends Vue {
     await this.deleteEducation(deleteEducationDto);
   }
 
-  private async onSave() {
-    const education = this.getEducation(this.educationId);
+  async onSave() {
+    if (this.form.validate()) {
+      const education = this.getEducation(this.educationId);
 
-    const patchEducationDto: PatchEducationDto = {
-      cvId: education.cvId,
-      educationId: education.id,
-      data: {
-        degree: this.degree,
-        fieldOfStudy: this.fieldOfStudy,
-        description: this.description,
-        startYear: this.startYear,
-        endYear: this.endYear
-      }
-    };
-    await this.patchEducation(patchEducationDto);
+      const patchEducationDto: PatchEducationDto = {
+        cvId: education.cvId,
+        educationId: education.id,
+        data: {
+          degree: this.degree,
+          fieldOfStudy: this.fieldOfStudy,
+          description: this.description,
+          startYear: this.startYear,
+          endYear: this.endYear
+        }
+      };
+      await this.patchEducation(patchEducationDto);
 
-    this.popDialogComponent();
+      this.popDialogComponent();
+    }
   }
 
-  private async onCancel() {
+  async onCancel() {
     this.popDialogComponent();
   }
 }

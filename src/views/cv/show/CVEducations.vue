@@ -31,23 +31,23 @@ export default class CVEducations extends Vue {
   @Prop({ required: true }) readonly canEdit!: boolean;
 
   @CVShowStore.Getter
-  public getCVEducations!: (id: number) => Education[];
+  getCVEducations!: (id: number) => Education[];
 
   get educations(): Education[] {
     return this.getCVEducations(this.id);
   }
 
   @DialogStore.Mutation
-  public pushDialogComponent!: (dialogComponent: DialogComponent) => void;
+  pushDialogComponent!: (dialogComponent: DialogComponent) => void;
 
-  private async onEducationClick(education: Education) {
+  async onEducationClick(education: Education) {
     this.pushDialogComponent({
       component: EditEducationDialog,
       props: { educationId: education.id }
     });
   }
 
-  private async newEducation() {
+  async newEducation() {
     this.pushDialogComponent({
       component: NewEducationDialog,
       props: { id: this.id }
