@@ -24,6 +24,9 @@
             </v-btn>
           </p>
           <p class="text-center ma-0">{{ cv.user.jobTitle }}</p>
+          <p class="text-center ma-0">{{ cv.user.phone }}</p>
+          <p class="text-center ma-0">{{ cv.user.location }}</p>
+          <p class="text-center ma-0">{{ cv.user.email }}</p>
         </v-col>
       </v-row>
     </v-col>
