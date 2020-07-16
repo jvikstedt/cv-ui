@@ -30,12 +30,30 @@ export class CVSearchDtoSkill {
   skillSubjectId!: number;
 }
 
-export class CVSearchDto {
+export class Sort {
+  field!: string;
+
+  order?: string;
+}
+
+export class CVSearchDtoData {
   fullName?: string = "";
 
   limit?: number = 10;
 
   skills?: CVSearchDtoSkill[] = [];
+
+  sorts?: Sort[];
+
+  public constructor(init?: Partial<CVSearchDto>) {
+    Object.assign(this, init);
+  }
+}
+
+export class CVSearchDto {
+  key!: string;
+
+  data!: CVSearchDtoData;
 
   public constructor(init?: Partial<CVSearchDto>) {
     Object.assign(this, init);

@@ -1,6 +1,6 @@
 import Vue from "vue";
 import VueRouter, { RouteConfig } from "vue-router";
-import Home from "@/views/Home.vue";
+import Dashboard from "@/views/Dashboard.vue";
 import store from "@/store";
 
 import { CVShowView } from "@/views/cv/show";
@@ -20,8 +20,8 @@ const routes: Array<RouteConfig> = [
   },
   {
     path: "/",
-    name: "Home",
-    component: Home,
+    name: "Dashboard",
+    component: Dashboard,
     meta: {
       requiresAuth: true
     }

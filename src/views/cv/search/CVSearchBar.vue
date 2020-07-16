@@ -50,11 +50,11 @@ export default class CVSearchBar extends Vue {
   searchInput = null;
   debounce = 0;
 
-  @CVSearchStore.State
-  searching!: boolean;
+  @CVSearchStore.Getter
+  searchingByKey!: (key: string) => boolean;
 
-  @CVSearchStore.State
-  results!: CVSearchResult[];
+  @CVSearchStore.Getter
+  resultsByKey!: (key: string) => CVSearchResult[];
 
   @CVSearchStore.Action
   searchCVs!: (cvSearchDto: CVSearchDto) => Promise<void>;
@@ -67,11 +67,22 @@ export default class CVSearchBar extends Vue {
     await this.search(input, 500);
   }
 
+  get results(): CVSearchResult[] {
+    return this.resultsByKey("CVSearchBar");
+  }
+
+  get searching(): boolean {
+    return this.searchingByKey("CVSearchBar");
+  }
+
   async search(input: string, debounce: number) {
     clearTimeout(this.debounce);
 
     this.debounce = window.setTimeout(async () => {
-      const cvSearchDto = new CVSearchDto({ fullName: input || "" });
+      const cvSearchDto = new CVSearchDto({
+        key: "CVSearchBar",
+        data: { fullName: input || "" }
+      });
       await this.searchCVs(cvSearchDto);
     }, debounce);
   }
