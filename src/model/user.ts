@@ -7,6 +7,14 @@ export class User {
 
   lastName!: string;
 
+  jobTitle!: string;
+
+  phone!: string;
+
+  location!: string;
+
+  email!: string;
+
   avatarId!: string;
 
   createdAt!: Date;
@@ -15,11 +23,19 @@ export class User {
 }
 
 export class PatchUserDtoData {
-  firstName!: string;
+  firstName?: string;
 
-  lastName!: string;
+  lastName?: string;
 
-  avatarId!: string;
+  jobTitle?: string;
+
+  phone?: string;
+
+  location?: string;
+
+  email?: string;
+
+  avatarId?: string;
 }
 
 export class PatchUserDto {

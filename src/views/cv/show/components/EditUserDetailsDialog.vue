@@ -27,6 +27,34 @@
           label="Last name"
           :rules="lastNameRules"
         ></v-text-field>
+
+        <v-text-field
+          name="jobTitle"
+          v-model="jobTitle"
+          label="Job title"
+          :rules="jobTitleRules"
+        ></v-text-field>
+
+        <v-text-field
+          name="phone"
+          v-model="phone"
+          label="Phone"
+          :rules="phoneRules"
+        ></v-text-field>
+
+        <v-text-field
+          name="location"
+          v-model="location"
+          label="Location"
+          :rules="locationRules"
+        ></v-text-field>
+
+        <v-text-field
+          name="email"
+          v-model="email"
+          label="Email"
+          :rules="emailRules"
+        ></v-text-field>
       </v-card-text>
 
       <v-card-actions>
@@ -74,6 +102,14 @@ export default class EditUserNamesDialog extends Vue {
   firstNameRules = [(v: string) => !!v || "First name is required"];
   lastName = "";
   lastNameRules = [(v: string) => !!v || "Last name is required"];
+  jobTitle = "";
+  jobTitleRules = [(v: string) => !!v || "Job title is required"];
+  phone = "";
+  phoneRules = [(v: string) => !!v || "Phone is required"];
+  location = "";
+  locationRules = [(v: string) => !!v || "Location is required"];
+  email = "";
+  emailRules = [(v: string) => !!v || "Email is required"];
   avatarId = "";
 
   get user(): User {
@@ -83,6 +119,10 @@ export default class EditUserNamesDialog extends Vue {
   created() {
     this.firstName = this.user.firstName;
     this.lastName = this.user.lastName;
+    this.jobTitle = this.user.jobTitle;
+    this.phone = this.user.phone;
+    this.location = this.user.location;
+    this.email = this.user.email;
     this.avatarId = this.user.avatarId;
   }
 
@@ -115,6 +155,10 @@ export default class EditUserNamesDialog extends Vue {
         data: {
           firstName: this.firstName,
           lastName: this.lastName,
+          jobTitle: this.jobTitle,
+          phone: this.phone,
+          location: this.location,
+          email: this.email,
           avatarId: this.avatarId
         }
       };
