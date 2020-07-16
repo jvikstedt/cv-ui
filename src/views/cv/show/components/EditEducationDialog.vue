@@ -66,7 +66,6 @@
 <script lang="ts">
 import { Component, Vue, Prop } from "vue-property-decorator";
 import { namespace } from "vuex-class";
-import { PatchCVDto } from "@/model/cv";
 import {
   Education,
   PatchEducationDto,
@@ -95,9 +94,6 @@ export default class EditEducationDialog extends Vue {
 
   @CVShowStore.Action
   patchEducation!: (patchEducationDto: PatchEducationDto) => Promise<void>;
-
-  @CVShowStore.Action
-  patchCV!: (patchCVDto: PatchCVDto) => Promise<void>;
 
   @DialogStore.Mutation
   popDialogComponent!: () => void;

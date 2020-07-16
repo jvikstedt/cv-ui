@@ -16,12 +16,19 @@ import {
 } from "@/model/education";
 import { CV, PatchCVDto } from "@/model/cv";
 import { User, PatchUserDto } from "@/model/user";
+import {
+  WorkExperience,
+  PatchWorkExperienceDto,
+  CreateWorkExperienceDto,
+  DeleteWorkExperienceDto
+} from "@/model/work_experience";
 
 @Module({ namespaced: true })
 export class CVShowStore extends VuexModule {
   public cvs: { [key: number]: CV } = {};
   public skills: { [key: number]: Skill } = {};
   public educations: { [key: number]: Education } = {};
+  public workExperiences: { [key: number]: WorkExperience } = {};
   public fetching = false;
 
   get getCV() {
@@ -60,6 +67,18 @@ export class CVShowStore extends VuexModule {
       );
   }
 
+  get getWorkExperience() {
+    return (id: number): WorkExperience => this.workExperiences[id];
+  }
+
+  get getCVWorkExperiences() {
+    return (id: number): WorkExperience[] =>
+      R.filter(
+        (workExperience: WorkExperience) => R.equals(workExperience.cvId, id),
+        Object.values(this.workExperiences)
+      );
+  }
+
   @Mutation
   public addCV(cv: CV): void {
     Vue.set(this.cvs, cv.id, cv);
@@ -94,6 +113,20 @@ export class CVShowStore extends VuexModule {
   }
 
   @Mutation
+  public deleteWorkExperiences(ids: number[]): void {
+    for (const id of ids) {
+      Vue.delete(this.workExperiences, id);
+    }
+  }
+
+  @Mutation
+  public addWorkExperiences(workExperiences: WorkExperience[]): void {
+    for (const workExperience of workExperiences) {
+      Vue.set(this.workExperiences, workExperience.id, workExperience);
+    }
+  }
+
+  @Mutation
   public setFetching(fetching: boolean): void {
     this.fetching = fetching;
   }
@@ -112,14 +145,18 @@ export class CVShowStore extends VuexModule {
   public async fetchCV(id: number): Promise<void> {
     this.context.commit("setFetching", true);
 
-    const cv: CV = await Api.get(`/cv/${id}`);
-    this.context.commit("addCV", cv);
-
-    const skills: Skill[] = await Api.get(`/cv/${id}/skills`);
-    this.context.commit("addSkills", skills);
-
-    const educations: Education[] = await Api.get(`/cv/${id}/educations`);
-    this.context.commit("addEducations", educations);
+    await Promise.all([
+      Api.get(`/cv/${id}`),
+      Api.get(`/cv/${id}/skills`),
+      Api.get(`/cv/${id}/educations`),
+      Api.get(`/cv/${id}/work_experience`)
+    ]).then(responses => {
+      const [cv, skills, educations, workExperiences] = responses;
+      this.context.commit("addCV", cv);
+      this.context.commit("addSkills", skills);
+      this.context.commit("addEducations", educations);
+      this.context.commit("addWorkExperiences", workExperiences);
+    });
 
     this.context.commit("setFetching", false);
   }
@@ -198,5 +235,41 @@ export class CVShowStore extends VuexModule {
       `/cv/${deleteEducationDto.cvId}/educations/${deleteEducationDto.educationId}`
     );
     this.context.commit("deleteEducations", [deleteEducationDto.educationId]);
+  }
+
+  @Action
+  public async patchWorkExperience({
+    cvId,
+    workExperienceId,
+    data
+  }: PatchWorkExperienceDto): Promise<void> {
+    const savedWorkExperience: WorkExperience = await Api.patch(
+      `/cv/${cvId}/work_experience/${workExperienceId}`,
+      data
+    );
+    this.context.commit("addWorkExperiences", [savedWorkExperience]);
+  }
+
+  @Action
+  public async createWorkExperience(
+    createWorkExperienceDto: CreateWorkExperienceDto
+  ): Promise<void> {
+    const savedWorkExperience: WorkExperience = await Api.post(
+      `/cv/${createWorkExperienceDto.cvId}/work_experience`,
+      createWorkExperienceDto
+    );
+    this.context.commit("addWorkExperiences", [savedWorkExperience]);
+  }
+
+  @Action
+  public async deleteWorkExperience(
+    deleteWorkExperienceDto: DeleteWorkExperienceDto
+  ): Promise<void> {
+    await Api.delete(
+      `/cv/${deleteWorkExperienceDto.cvId}/work_experience/${deleteWorkExperienceDto.workExperienceId}`
+    );
+    this.context.commit("deleteWorkExperiences", [
+      deleteWorkExperienceDto.workExperienceId
+    ]);
   }
 }
