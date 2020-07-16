@@ -8,7 +8,7 @@
             <v-icon>mdi-settings</v-icon>
           </v-list-item-action>
           <v-list-item-content>
-            <v-list-item-title>Skill subjects</v-list-item-title>
+            <!-- <v-list-item-title>Skill subjects</v-list-item-title> -->
           </v-list-item-content>
         </v-list-item>
       </v-list>
@@ -19,7 +19,9 @@
         @click.stop="drawer = !drawer"
         v-if="isLoggedIn"
       ></v-app-bar-nav-icon>
-      <v-toolbar-title>Application</v-toolbar-title>
+      <v-toolbar-title @click="onLogoClick" style="cursor: pointer;"
+        >Application</v-toolbar-title
+      >
       <v-toolbar-title class="ml-2 d-none d-sm-flex" v-if="isLoggedIn">
         <v-divider class="mx-4" vertical></v-divider>
         <CVSearchBar />
@@ -110,6 +112,10 @@ export default class App extends Vue {
   async logout() {
     this.$router.push("/login");
     await this.logoutAction();
+  }
+
+  onLogoClick() {
+    this.$router.push("/");
   }
 
   search() {

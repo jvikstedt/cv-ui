@@ -117,11 +117,11 @@ export default class CVSearchView extends Vue {
 
   skillSearchOptions: SkillSearchOption[] = [];
 
-  @CVSearchStore.State
-  searching!: boolean;
+  @CVSearchStore.Getter
+  searchingByKey!: (key: string) => boolean;
 
-  @CVSearchStore.State
-  results!: CVSearchResult[];
+  @CVSearchStore.Getter
+  resultsByKey!: (key: string) => CVSearchResult[];
 
   @CVSearchStore.Action
   searchCVs!: (cvSearchDto: CVSearchDto) => Promise<void>;
@@ -151,6 +151,14 @@ export default class CVSearchView extends Vue {
     await this.searchInputChanged("");
   }
 
+  get results(): CVSearchResult[] {
+    return this.resultsByKey("CVSearchView");
+  }
+
+  get searching(): boolean {
+    return this.searchingByKey("CVSearchView");
+  }
+
   commonSkills(cvSearchResult: CVSearchResult) {
     return R.filter(
       skill =>
@@ -172,8 +180,11 @@ export default class CVSearchView extends Vue {
 
   async onSearch() {
     const cvSearchDto = new CVSearchDto({
-      fullName: this.fullName,
-      skills: this.skillSearchOptions
+      key: "CVSearchView",
+      data: {
+        fullName: this.fullName,
+        skills: this.skillSearchOptions
+      }
     });
     await this.searchCVs(cvSearchDto);
   }
