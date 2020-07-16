@@ -23,7 +23,7 @@
               <v-icon>mdi-pencil</v-icon>
             </v-btn>
           </p>
-          <p class="text-center ma-0">{{ cv.user.workTitle }}</p>
+          <p class="text-center ma-0">{{ cv.user.jobTitle }}</p>
         </v-col>
       </v-row>
     </v-col>

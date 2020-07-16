@@ -1,26 +1,25 @@
 <template>
   <v-row>
     <v-col cols="12">
-      <h2>Educations</h2>
+      <h2>Work experiences</h2>
       <v-row>
         <v-col
-          v-for="education in educations"
-          :key="education.id"
+          v-for="workExperience in workExperiences"
+          :key="workExperience.id"
           cols="12"
           md="6"
         >
           <v-card class="mx-auto" outlined>
             <v-list-item three-line>
               <v-list-item-content>
-                <v-list-item-title class="headline mb-2"
-                  >{{ education.school.name }} ({{ education.startYear }} -
-                  {{ education.endYear }})</v-list-item-title
-                >
+                <v-list-item-title class="headline mb-2">
+                  {{ workExperience.company.name }}
+                </v-list-item-title>
                 <div class="mb-2">
-                  {{ education.degree }} / {{ education.fieldOfStudy }}
+                  {{ workExperience.jobTitle }}
                 </div>
                 <v-list-item-subtitle>{{
-                  education.description
+                  workExperience.description
                 }}</v-list-item-subtitle>
               </v-list-item-content>
             </v-list-item>
@@ -29,7 +28,7 @@
               <v-btn
                 v-if="canEdit"
                 color="primary"
-                @click="onEducationClick(education)"
+                @click="onWorkExperienceClick(workExperience)"
                 >Edit</v-btn
               >
             </v-card-actions>
@@ -38,7 +37,9 @@
       </v-row>
     </v-col>
     <v-col cols="12" v-if="canEdit">
-      <v-btn color="primary" dark @click="newEducation">New Education</v-btn>
+      <v-btn color="primary" dark @click="newWorkExperience"
+        >New work experience</v-btn
+      >
     </v-col>
   </v-row>
 </template>
@@ -46,39 +47,39 @@
 <script lang="ts">
 import { Component, Vue, Prop } from "vue-property-decorator";
 import { namespace } from "vuex-class";
-import { Education } from "@/model/education";
+import { WorkExperience } from "@/model/work_experience";
 import { DialogComponent } from "@/dialog";
-import NewEducationDialog from "./components/NewEducationDialog.vue";
-import EditEducationDialog from "./components/EditEducationDialog.vue";
+import NewWorkExperienceDialog from "./components/NewWorkExperienceDialog.vue";
+import EditWorkExperienceDialog from "./components/EditWorkExperienceDialog.vue";
 
 const CVShowStore = namespace("CVShowStore");
 const DialogStore = namespace("DialogStore");
 
 @Component
-export default class CVEducations extends Vue {
+export default class CVWorkExperiences extends Vue {
   @Prop({ required: true }) readonly id!: number;
   @Prop({ required: true }) readonly canEdit!: boolean;
 
   @CVShowStore.Getter
-  getCVEducations!: (id: number) => Education[];
+  getCVWorkExperiences!: (id: number) => WorkExperience[];
 
-  get educations(): Education[] {
-    return this.getCVEducations(this.id);
+  get workExperiences(): WorkExperience[] {
+    return this.getCVWorkExperiences(this.id);
   }
 
   @DialogStore.Mutation
   pushDialogComponent!: (dialogComponent: DialogComponent) => void;
 
-  async onEducationClick(education: Education) {
+  async onWorkExperienceClick(workExperience: WorkExperience) {
     this.pushDialogComponent({
-      component: EditEducationDialog,
-      props: { educationId: education.id }
+      component: EditWorkExperienceDialog,
+      props: { workExperienceId: workExperience.id }
     });
   }
 
-  async newEducation() {
+  async newWorkExperience() {
     this.pushDialogComponent({
-      component: NewEducationDialog,
+      component: NewWorkExperienceDialog,
       props: { id: this.id }
     });
   }

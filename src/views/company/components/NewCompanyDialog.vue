@@ -1,6 +1,6 @@
 <template>
   <v-card>
-    <v-card-title class="headline">New school</v-card-title>
+    <v-card-title class="headline">New company</v-card-title>
 
     <v-form ref="form" v-model="valid" lazy-validation @submit.prevent="onSave">
       <v-card-text>
@@ -32,24 +32,24 @@
 import { Component, Vue, Prop } from "vue-property-decorator";
 import { namespace } from "vuex-class";
 import { DialogComponent } from "@/dialog";
-import { School, CreateSchoolDto } from "@/model/education";
+import { Company, CreateCompanyDto } from "@/model/work_experience";
 import { VForm } from "@/types";
 
-const SchoolStore = namespace("SchoolStore");
+const CompanyStore = namespace("CompanyStore");
 const DialogStore = namespace("DialogStore");
 
 @Component
-export default class NewSchoolDialog extends Vue {
+export default class NewCompanyDialog extends Vue {
   @Prop({ required: true }) readonly afterCreate!: (
-    school: School
+    company: Company
   ) => Promise<void>;
 
   valid = false;
   name = "";
   nameRules = [(v: string) => !!v || "Name is required"];
 
-  @SchoolStore.Action
-  createSchool!: (createSchoolDto: CreateSchoolDto) => Promise<School>;
+  @CompanyStore.Action
+  createCompany!: (createCompanyDto: CreateCompanyDto) => Promise<Company>;
 
   @DialogStore.Mutation
   popDialogComponent!: () => void;
@@ -63,11 +63,11 @@ export default class NewSchoolDialog extends Vue {
 
   async onSave(): Promise<void> {
     if (this.form.validate()) {
-      const school = await this.createSchool({
+      const company = await this.createCompany({
         name: this.name
       });
 
-      await this.afterCreate(school);
+      await this.afterCreate(company);
       this.popDialogComponent();
     }
   }

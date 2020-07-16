@@ -5,24 +5,24 @@ import { School, CreateSchoolDto } from "@/model/education";
 
 @Module({ namespaced: true })
 export class SchoolStore extends VuexModule {
-  public Schools: { [key: number]: School } = {};
+  public schools: { [key: number]: School } = {};
   public fetching = false;
 
   get getSchools() {
-    return Object.values(this.Schools);
+    return Object.values(this.schools);
   }
 
   @Mutation
-  public addSchools(Schools: School[]): void {
-    for (const School of Schools) {
-      Vue.set(this.Schools, School.id, School);
+  public addSchools(schools: School[]): void {
+    for (const school of schools) {
+      Vue.set(this.schools, school.id, school);
     }
   }
 
   @Mutation
   public deleteSchools(ids: number[]): void {
     for (const id of ids) {
-      Vue.delete(this.Schools, id);
+      Vue.delete(this.schools, id);
     }
   }
 
@@ -35,8 +35,8 @@ export class SchoolStore extends VuexModule {
   public async fetchSchools(): Promise<void> {
     this.context.commit("setFetching", true);
 
-    const Schools: School[] = await Api.get("/schools");
-    this.context.commit("addSchools", Schools);
+    const schools: School[] = await Api.get("/schools");
+    this.context.commit("addSchools", schools);
 
     this.context.commit("setFetching", false);
   }
@@ -49,9 +49,9 @@ export class SchoolStore extends VuexModule {
 
   @Action
   public async createSchool(createSchoolDto: CreateSchoolDto): Promise<School> {
-    const School: School = await Api.post("/schools", createSchoolDto);
-    this.context.commit("addSchools", [School]);
+    const school: School = await Api.post("/schools", createSchoolDto);
+    this.context.commit("addSchools", [school]);
 
-    return School;
+    return school;
   }
 }

@@ -13,6 +13,7 @@ import { DialogStore } from "@/dialog";
 import { SkillSubjectStore } from "@/views/skill_subject";
 import { SkillGroupStore } from "@/views/skill_group";
 import { SchoolStore } from "@/views/school";
+import { CompanyStore } from "@/views/company";
 
 Vue.use(Vuex);
 
@@ -26,7 +27,8 @@ const store = new Vuex.Store({
     DialogStore,
     SkillSubjectStore,
     SkillGroupStore,
-    SchoolStore
+    SchoolStore,
+    CompanyStore
   }
 });
 export default store;
