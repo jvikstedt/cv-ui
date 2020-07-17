@@ -1,51 +1,57 @@
 <template>
-  <v-row>
-    <v-col cols="12" sm="4">
-      <v-row no-gutters>
-        <v-col cols="12">
+  <v-card :loading="fetching">
+    <v-row>
+      <v-col cols="12" sm="4">
+        <template v-if="!fetching">
+          <p class="text-center">
+            <v-btn color="primary darken-1" text @click="onExport">
+              Export
+            </v-btn>
+          </p>
           <p class="text-center">
             <v-avatar size="146.6" tile color="indigo">
               <v-img v-if="avatarSrc" :src="avatarSrc"></v-img>
               <span v-else class="white--text headline">{{ initials }}</span>
             </v-avatar>
           </p>
-        </v-col>
-        <v-col cols="12">
           <p class="text-center ma-0">
             {{ cv.user.firstName }} {{ cv.user.lastName }}
+          </p>
+          <p class="text-center ma-0">{{ cv.user.jobTitle }}</p>
+          <p class="text-center ma-0">{{ cv.user.location }}</p>
+          <p v-if="canEdit" class="text-center ma-0">
             <v-btn
               id="edit-user-details-btn"
               icon
               small
               @click="openEditUserDetailsDialog"
-              v-if="canEdit"
             >
               <v-icon>mdi-pencil</v-icon>
             </v-btn>
           </p>
-          <p class="text-center ma-0">{{ cv.user.jobTitle }}</p>
-          <p class="text-center ma-0">{{ cv.user.phone }}</p>
-          <p class="text-center ma-0">{{ cv.user.location }}</p>
-          <p class="text-center ma-0">{{ cv.user.email }}</p>
-        </v-col>
-      </v-row>
-    </v-col>
-    <v-col cols="12" sm="8">
-      <h3>Description</h3>
-      <p>
-        {{ cv.description }}
-        <v-btn
-          id="edit-cv-details-btn"
-          icon
-          small
-          @click="openEditCVDetailsDialog"
-          v-if="canEdit"
-        >
-          <v-icon>mdi-pencil</v-icon>
-        </v-btn>
-      </p>
-    </v-col>
-  </v-row>
+        </template>
+      </v-col>
+      <v-col cols="12" sm="8">
+        <template v-if="!fetching">
+          <h3>
+            Description
+            <v-btn
+              id="edit-cv-details-btn"
+              icon
+              small
+              @click="openEditCVDetailsDialog"
+              v-if="canEdit"
+            >
+              <v-icon>mdi-pencil</v-icon>
+            </v-btn>
+          </h3>
+          <p style="white-space: pre-line;">
+            {{ cv.description }}
+          </p>
+        </template>
+      </v-col>
+    </v-row>
+  </v-card>
 </template>
 
 <script lang="ts">
@@ -73,6 +79,9 @@ export default class CVDetails extends Vue {
 
   @CVShowStore.Getter
   getCV!: (id: number) => CV;
+
+  @CVShowStore.State
+  fetching!: boolean;
 
   @CVShowStore.Action
   patchUser!: (patchUserDto: PatchUserDto) => Promise<void>;
@@ -111,6 +120,10 @@ export default class CVDetails extends Vue {
   get initials(): string {
     const user = this.cv.user;
     return R.toUpper(`${user.firstName[0]}${user.lastName[0]}`);
+  }
+
+  onExport() {
+    this.$router.push(`/cv/${this.id}/pdf`);
   }
 }
 </script>

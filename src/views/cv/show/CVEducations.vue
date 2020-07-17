@@ -1,46 +1,38 @@
 <template>
-  <v-row>
-    <v-col cols="12">
-      <h2>Educations</h2>
-      <v-row>
-        <v-col
-          v-for="education in educations"
-          :key="education.id"
-          cols="12"
-          md="6"
-        >
-          <v-card class="mx-auto" outlined>
-            <v-list-item three-line>
-              <v-list-item-content>
-                <v-list-item-title class="headline mb-2"
-                  >{{ education.school.name }} ({{ education.startYear }} -
-                  {{ education.endYear }})</v-list-item-title
-                >
-                <div class="mb-2">
-                  {{ education.degree }} / {{ education.fieldOfStudy }}
-                </div>
-                <v-list-item-subtitle>{{
-                  education.description
-                }}</v-list-item-subtitle>
-              </v-list-item-content>
-            </v-list-item>
-
-            <v-card-actions>
+  <v-card class="mt-5">
+    <v-card-title class="headline">Educations</v-card-title>
+    <v-card-text>
+      <div v-for="education in educations" :key="education.id">
+        <v-list-item three-line>
+          <v-list-item-content>
+            <v-list-item-title class="headline mb-2">
+              {{ education.school.name }}
               <v-btn
                 v-if="canEdit"
-                color="primary"
+                icon
+                small
                 @click="onEducationClick(education)"
-                >Edit</v-btn
               >
-            </v-card-actions>
-          </v-card>
-        </v-col>
-      </v-row>
-    </v-col>
-    <v-col cols="12" v-if="canEdit">
-      <v-btn color="primary" dark @click="newEducation">New Education</v-btn>
-    </v-col>
-  </v-row>
+                <v-icon>mdi-pencil</v-icon>
+              </v-btn>
+            </v-list-item-title>
+            <div class="mb-2">
+              {{ education.degree }} / {{ education.fieldOfStudy }}
+            </div>
+            <v-list-item-subtitle>
+              {{ education.startYear }} - {{ education.endYear }}
+            </v-list-item-subtitle>
+          </v-list-item-content>
+        </v-list-item>
+        <v-divider></v-divider>
+      </div>
+    </v-card-text>
+    <v-card-actions>
+      <v-btn v-if="canEdit" color="primary" dark @click="newEducation">
+        New Education
+      </v-btn>
+    </v-card-actions>
+  </v-card>
 </template>
 
 <script lang="ts">

@@ -1,15 +1,15 @@
 <template>
-  <v-row>
-    <v-col cols="12">
-      <h2>Skills</h2>
+  <v-card class="mt-5">
+    <v-card-title class="headline">Skills</v-card-title>
+    <v-card-text>
       <div v-for="skillGroupName in skillGroups()" :key="skillGroupName">
-        <h4>{{ skillGroupName }}</h4>
+        <v-subheader>{{ skillGroupName }}</v-subheader>
         <v-chip
+          :key="skill.id"
           class="ma-2"
           color="green"
           text-color="white"
           v-for="skill in skillsBySkillGroup(skillGroupName)"
-          :key="skill.id"
           v-on="canEdit ? { click: () => onSkillClick(skill) } : {}"
         >
           <v-avatar left class="green darken-4">
@@ -18,11 +18,13 @@
           {{ skill.skillSubject.name }}
         </v-chip>
       </div>
-    </v-col>
-    <v-col cols="12" v-if="canEdit">
-      <v-btn color="primary" dark @click="newSkill">New Skill</v-btn>
-    </v-col>
-  </v-row>
+    </v-card-text>
+    <v-card-actions>
+      <v-btn v-if="canEdit" color="primary" dark @click="newSkill"
+        >New Skill</v-btn
+      >
+    </v-card-actions>
+  </v-card>
 </template>
 
 <script lang="ts">

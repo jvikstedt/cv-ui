@@ -1,47 +1,42 @@
 <template>
-  <v-row>
-    <v-col cols="12">
-      <h2>Projects</h2>
-      <v-row>
-        <v-col
-          v-for="projectMembership in projectMemberships"
-          :key="projectMembership.id"
-          cols="12"
-          md="6"
-        >
-          <v-card class="mx-auto" outlined>
-            <v-list-item three-line>
-              <v-list-item-content>
-                <v-list-item-title class="headline mb-2">
-                  {{ projectMembership.project.name }}
-                </v-list-item-title>
-                <div class="mb-2">
-                  {{ projectMembership.startYear }}
-                </div>
-                <v-list-item-subtitle>{{
-                  projectMembership.description
-                }}</v-list-item-subtitle>
-              </v-list-item-content>
-            </v-list-item>
-
-            <v-card-actions>
+  <v-card class="mt-5">
+    <v-card-title class="headline">Projects</v-card-title>
+    <v-card-text>
+      <div
+        v-for="projectMembership in projectMemberships"
+        :key="projectMembership.id"
+      >
+        <v-list-item three-line>
+          <v-list-item-content>
+            <v-list-item-title class="headline mb-2">
+              {{ projectMembership.project.company.name }} /
+              {{ projectMembership.project.name }}
               <v-btn
                 v-if="canEdit"
-                color="primary"
+                icon
+                small
                 @click="onProjectMembershipClick(projectMembership)"
-                >Edit</v-btn
               >
-            </v-card-actions>
-          </v-card>
-        </v-col>
-      </v-row>
-    </v-col>
-    <v-col cols="12" v-if="canEdit">
-      <v-btn color="primary" dark @click="newProjectMembership"
-        >New project</v-btn
-      >
-    </v-col>
-  </v-row>
+                <v-icon>mdi-pencil</v-icon>
+              </v-btn>
+            </v-list-item-title>
+            <v-list-item-subtitle>
+              {{ projectMembership.startMonth }}.{{
+                projectMembership.startYear
+              }}
+              - {{ projectMembership.endMonth }}.{{ projectMembership.endYear }}
+            </v-list-item-subtitle>
+          </v-list-item-content>
+        </v-list-item>
+        <v-divider></v-divider>
+      </div>
+    </v-card-text>
+    <v-card-actions>
+      <v-btn v-if="canEdit" color="primary" dark @click="newProjectMembership">
+        New project
+      </v-btn>
+    </v-card-actions>
+  </v-card>
 </template>
 
 <script lang="ts">
