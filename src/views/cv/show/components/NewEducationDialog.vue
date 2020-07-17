@@ -9,7 +9,7 @@
           v-model="school"
           :items="schools"
           :search-input.sync="search"
-          :rules="schoolRules"
+          :rules="isRequiredRule"
           item-text="name"
           item-value="id"
           label="School"
@@ -26,7 +26,7 @@
         <v-text-field
           v-model="degree"
           :counter="255"
-          :rules="degreeRules"
+          :rules="isRequiredRule"
           label="Degree"
           required
         ></v-text-field>
@@ -34,7 +34,7 @@
         <v-text-field
           v-model="fieldOfStudy"
           :counter="255"
-          :rules="fieldOfStudyRules"
+          :rules="isRequiredRule"
           label="Field of study"
           required
         ></v-text-field>
@@ -42,7 +42,7 @@
         <v-text-field
           v-model="description"
           :counter="255"
-          :rules="descriptionRules"
+          :rules="isRequiredRule"
           label="Description"
           required
         ></v-text-field>
@@ -50,7 +50,7 @@
         <v-text-field
           v-model.number="startYear"
           label="Start year"
-          :rules="startYearRules"
+          :rules="isRequiredRule"
           type="number"
           required
         ></v-text-field>
@@ -58,7 +58,7 @@
         <v-text-field
           v-model.number="endYear"
           label="End year"
-          :rules="endYearRules"
+          :rules="isRequiredRule"
           type="number"
         ></v-text-field>
       </v-card-text>
@@ -80,53 +80,38 @@
 
 <script lang="ts">
 import * as R from "ramda";
-import { Component, Vue, Prop, Watch } from "vue-property-decorator";
+import { Component, Prop, Watch, Mixins } from "vue-property-decorator";
 import { namespace } from "vuex-class";
 import { Education, CreateEducationDto, School } from "@/model/education";
 import { SearchSchools } from "@/api/school";
 import NewSchoolDialog from "@/views/school/components/NewSchoolDialog.vue";
-import { DialogComponent } from "@/dialog";
-import { VForm } from "@/types";
+import { DialogFormMixin } from "@/mixins";
 
 const CVShowStore = namespace("CVShowStore");
-const DialogStore = namespace("DialogStore");
 
 @Component({
   components: {
     NewSchoolDialog
   }
 })
-export default class NewEducationDialog extends Vue {
+export default class NewEducationDialog extends Mixins(DialogFormMixin) {
   @Prop({ required: true }) readonly id!: number;
 
-  valid = false;
   search = "";
   schools: School[] = [];
   school: School | null = null;
-  schoolRules = [(school: School) => !!school || "School is required"];
 
   degree = "";
-  degreeRules = [(v: string) => !!v || "Degree is required"];
   fieldOfStudy = "";
-  fieldOfStudyRules = [(v: string) => !!v || "Field of study is required"];
   description = "";
-  descriptionRules = [(v: string) => !!v || "Description is required"];
   startYear = 2010;
-  startYearRules = [(v: number) => !!v || "Start year is required"];
   endYear = 2014;
-  endYearRules = [(v: number) => !!v || "End year is required"];
 
   @CVShowStore.Getter
   getCVEducations!: (id: number) => Education[];
 
   @CVShowStore.Action
   createEducation!: (createEducationDto: CreateEducationDto) => Promise<void>;
-
-  @DialogStore.Mutation
-  popDialogComponent!: () => void;
-
-  @DialogStore.Mutation
-  pushDialogComponent!: (dialogComponent: DialogComponent) => void;
 
   @Watch("search")
   async searchChanged(keyword: string) {
@@ -144,10 +129,6 @@ export default class NewEducationDialog extends Vue {
     );
   }
 
-  get form(): VForm {
-    return this.$refs.form as VForm;
-  }
-
   async onSave() {
     if (this.form.validate() && this.school && this.startYear) {
       const createEducationDto: CreateEducationDto = {
@@ -162,10 +143,6 @@ export default class NewEducationDialog extends Vue {
       await this.createEducation(createEducationDto);
       this.popDialogComponent();
     }
-  }
-
-  async onCancel() {
-    this.popDialogComponent();
   }
 
   async newSchool() {

@@ -38,7 +38,7 @@
     </v-col>
     <v-col cols="12" v-if="canEdit">
       <v-btn color="primary" dark @click="newProjectMembership"
-        >New work experience</v-btn
+        >New project</v-btn
       >
     </v-col>
   </v-row>

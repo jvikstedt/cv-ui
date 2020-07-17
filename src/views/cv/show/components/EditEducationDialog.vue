@@ -7,7 +7,7 @@
         <v-text-field
           v-model="degree"
           :counter="255"
-          :rules="degreeRules"
+          :rules="isRequiredRule"
           label="Degree"
           required
         ></v-text-field>
@@ -15,7 +15,7 @@
         <v-text-field
           v-model="fieldOfStudy"
           :counter="255"
-          :rules="fieldOfStudyRules"
+          :rules="isRequiredRule"
           label="Field of study"
           required
         ></v-text-field>
@@ -23,7 +23,7 @@
         <v-text-field
           v-model="description"
           :counter="255"
-          :rules="descriptionRules"
+          :rules="isRequiredRule"
           label="Description"
           required
         ></v-text-field>
@@ -31,7 +31,7 @@
         <v-text-field
           v-model.number="startYear"
           label="Start year"
-          :rules="startYearRules"
+          :rules="isRequiredRule"
           type="number"
           required
         ></v-text-field>
@@ -39,7 +39,7 @@
         <v-text-field
           v-model.number="endYear"
           label="End year"
-          :rules="endYearRules"
+          :rules="isRequiredRule"
           type="number"
         ></v-text-field>
       </v-card-text>
@@ -64,39 +64,29 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue, Prop } from "vue-property-decorator";
+import { Component, Prop, Mixins } from "vue-property-decorator";
 import { namespace } from "vuex-class";
 import {
   Education,
   PatchEducationDto,
   DeleteEducationDto
 } from "@/model/education";
-import { VForm } from "@/types";
+import { DialogFormMixin } from "@/mixins";
 
 const CVShowStore = namespace("CVShowStore");
-const DialogStore = namespace("DialogStore");
 
 @Component
-export default class EditEducationDialog extends Vue {
+export default class EditEducationDialog extends Mixins(DialogFormMixin) {
   @Prop({ required: true }) readonly educationId!: number;
 
-  valid = false;
   degree = "";
-  degreeRules = [(v: string) => !!v || "Degree is required"];
   fieldOfStudy = "";
-  fieldOfStudyRules = [(v: string) => !!v || "Field of study is required"];
   description = "";
-  descriptionRules = [(v: string) => !!v || "Description is required"];
   startYear = 2010;
-  startYearRules = [(v: number) => !!v || "Start year is required"];
   endYear = 2014;
-  endYearRules = [(v: number) => !!v || "End year is required"];
 
   @CVShowStore.Action
   patchEducation!: (patchEducationDto: PatchEducationDto) => Promise<void>;
-
-  @DialogStore.Mutation
-  popDialogComponent!: () => void;
 
   @CVShowStore.Getter
   getEducation!: (educationId: number) => Education;
@@ -106,10 +96,6 @@ export default class EditEducationDialog extends Vue {
 
   get education(): Education {
     return this.getEducation(this.educationId);
-  }
-
-  get form(): VForm {
-    return this.$refs.form as VForm;
   }
 
   created() {
@@ -152,10 +138,6 @@ export default class EditEducationDialog extends Vue {
 
       this.popDialogComponent();
     }
-  }
-
-  async onCancel() {
-    this.popDialogComponent();
   }
 }
 </script>

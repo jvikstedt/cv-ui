@@ -12,7 +12,7 @@
           item-value="id"
           label="Skill group"
           placeholder="Start typing to search"
-          :rules="skillGroupRules"
+          :rules="isRequiredRule"
           return-object
         >
           <template v-slot:append-outer>
@@ -23,7 +23,7 @@
         <v-text-field
           v-model="name"
           :counter="255"
-          :rules="nameRules"
+          :rules="isRequiredRule"
           label="Name"
           required
         ></v-text-field>
@@ -45,19 +45,17 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue, Prop, Watch } from "vue-property-decorator";
+import { Component, Prop, Watch, Mixins } from "vue-property-decorator";
 import { namespace } from "vuex-class";
-import { DialogComponent } from "@/dialog";
 import { SkillSubject, CreateSkillSubjectDto, SkillGroup } from "@/model/skill";
 import NewSkillGroupDialog from "@/views/skill_group/components/NewSkillGroupDialog.vue";
 import { SearchSkillGroups } from "@/api/skill_group";
-import { VForm } from "@/types";
+import { DialogFormMixin } from "@/mixins";
 
 const SkillSubjectStore = namespace("SkillSubjectStore");
-const DialogStore = namespace("DialogStore");
 
 @Component
-export default class NewSkillSubjectDialog extends Vue {
+export default class NewSkillSubjectDialog extends Mixins(DialogFormMixin) {
   @Prop({ required: true }) readonly afterCreate!: (
     skillSubject: SkillSubject
   ) => Promise<void>;
@@ -67,27 +65,11 @@ export default class NewSkillSubjectDialog extends Vue {
     createSkillSubjectDto: CreateSkillSubjectDto
   ) => Promise<SkillSubject>;
 
-  @DialogStore.Mutation
-  popDialogComponent!: () => void;
-
-  @DialogStore.Mutation
-  pushDialogComponent!: (dialogComponent: DialogComponent) => void;
-
-  get form(): VForm {
-    return this.$refs.form as VForm;
-  }
-
-  valid = false;
-
   name = "";
-  nameRules = [(name: string) => !!name || "Name is required"];
 
   search = "";
   skillGroups: SkillGroup[] = [];
   skillGroup: SkillGroup | null = null;
-  skillGroupRules = [
-    (skillGroup: SkillGroup) => !!skillGroup || "Skill group is required"
-  ];
 
   @Watch("search")
   async searchChanged(input: string) {
@@ -107,10 +89,6 @@ export default class NewSkillSubjectDialog extends Vue {
       await this.afterCreate(skillSubject);
       this.popDialogComponent();
     }
-  }
-
-  async onCancel() {
-    this.popDialogComponent();
   }
 
   async newSkillGroup() {

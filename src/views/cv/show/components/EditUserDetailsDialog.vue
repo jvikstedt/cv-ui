@@ -18,42 +18,42 @@
           name="firstName"
           v-model="firstName"
           label="First name"
-          :rules="firstNameRules"
+          :rules="isRequiredRule"
         ></v-text-field>
 
         <v-text-field
           name="lastName"
           v-model="lastName"
           label="Last name"
-          :rules="lastNameRules"
+          :rules="isRequiredRule"
         ></v-text-field>
 
         <v-text-field
           name="jobTitle"
           v-model="jobTitle"
           label="Job title"
-          :rules="jobTitleRules"
+          :rules="isRequiredRule"
         ></v-text-field>
 
         <v-text-field
           name="phone"
           v-model="phone"
           label="Phone"
-          :rules="phoneRules"
+          :rules="isRequiredRule"
         ></v-text-field>
 
         <v-text-field
           name="location"
           v-model="location"
           label="Location"
-          :rules="locationRules"
+          :rules="isRequiredRule"
         ></v-text-field>
 
         <v-text-field
           name="email"
           v-model="email"
           label="Email"
-          :rules="emailRules"
+          :rules="isRequiredRule"
         ></v-text-field>
       </v-card-text>
 
@@ -74,18 +74,17 @@
 
 <script lang="ts">
 import * as R from "ramda";
-import { Component, Vue, Prop } from "vue-property-decorator";
+import { Component, Prop, Mixins } from "vue-property-decorator";
 import { namespace } from "vuex-class";
 import { User, PatchUserDto } from "@/model/user";
 import { CreateFile } from "@/api/file";
 import { CV } from "@/model/cv";
-import { VForm } from "@/types";
+import { DialogFormMixin } from "@/mixins";
 
 const CVShowStore = namespace("CVShowStore");
-const DialogStore = namespace("DialogStore");
 
 @Component
-export default class EditUserNamesDialog extends Vue {
+export default class EditUserNamesDialog extends Mixins(DialogFormMixin) {
   @Prop({ required: true }) readonly id!: number;
 
   @CVShowStore.Getter
@@ -94,22 +93,12 @@ export default class EditUserNamesDialog extends Vue {
   @CVShowStore.Action
   patchUser!: (patchUserDto: PatchUserDto) => Promise<void>;
 
-  @DialogStore.Mutation
-  popDialogComponent!: () => void;
-
-  valid = false;
   firstName = "";
-  firstNameRules = [(v: string) => !!v || "First name is required"];
   lastName = "";
-  lastNameRules = [(v: string) => !!v || "Last name is required"];
   jobTitle = "";
-  jobTitleRules = [(v: string) => !!v || "Job title is required"];
   phone = "";
-  phoneRules = [(v: string) => !!v || "Phone is required"];
   location = "";
-  locationRules = [(v: string) => !!v || "Location is required"];
   email = "";
-  emailRules = [(v: string) => !!v || "Email is required"];
   avatarId = "";
 
   get user(): User {
@@ -124,10 +113,6 @@ export default class EditUserNamesDialog extends Vue {
     this.location = this.user.location;
     this.email = this.user.email;
     this.avatarId = this.user.avatarId;
-  }
-
-  get form(): VForm {
-    return this.$refs.form as VForm;
   }
 
   get avatarSrc(): string | null {
@@ -167,10 +152,6 @@ export default class EditUserNamesDialog extends Vue {
 
       this.popDialogComponent();
     }
-  }
-
-  async onCancel() {
-    this.popDialogComponent();
   }
 }
 </script>

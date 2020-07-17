@@ -9,7 +9,7 @@
           v-model="skillSubject"
           :items="skillSubjects"
           :search-input.sync="search"
-          :rules="skillSubjectRules"
+          :rules="isRequiredRule"
           item-text="name"
           item-value="id"
           label="Skill subject"
@@ -35,7 +35,7 @@
             <v-text-field
               name="experienceInYears"
               v-model="experienceInYears"
-              :rules="experienceInYearsRules"
+              :rules="isRequiredRule"
               class="mt-0 pt-0"
               hide-details
               single-line
@@ -63,50 +63,33 @@
 
 <script lang="ts">
 import * as R from "ramda";
-import { Component, Vue, Prop, Watch } from "vue-property-decorator";
+import { Component, Prop, Watch, Mixins } from "vue-property-decorator";
 import { namespace } from "vuex-class";
 import { Skill, CreateSkillDto, SkillSubject } from "@/model/skill";
 import { SearchSkillSubjects } from "@/api/skill_subject";
 import NewSkillSubjectDialog from "@/views/skill_subject/components/NewSkillSubjectDialog.vue";
-import { DialogComponent } from "@/dialog";
-import { VForm } from "@/types";
+import { DialogFormMixin } from "@/mixins";
 
 const CVShowStore = namespace("CVShowStore");
-const DialogStore = namespace("DialogStore");
 
 @Component({
   components: {
     NewSkillSubjectDialog
   }
 })
-export default class NewSkillDialog extends Vue {
+export default class NewSkillDialog extends Mixins(DialogFormMixin) {
   @Prop({ required: true }) readonly id!: number;
 
-  valid = false;
   experienceInYears = 1;
-  experienceInYearsRules = [
-    (experienceInYears: number) =>
-      !!experienceInYears || "Experience in years is required"
-  ];
   search = "";
   skillSubjects: SkillSubject[] = [];
   skillSubject: SkillSubject | null = null;
-  skillSubjectRules = [
-    (skillSubject: SkillSubject) =>
-      !!skillSubject || "Skill subject is required"
-  ];
 
   @CVShowStore.Getter
   getCVSkills!: (id: number) => Skill[];
 
   @CVShowStore.Action
   createSkill!: (createSkillDto: CreateSkillDto) => Promise<void>;
-
-  @DialogStore.Mutation
-  popDialogComponent!: () => void;
-
-  @DialogStore.Mutation
-  pushDialogComponent!: (dialogComponent: DialogComponent) => void;
 
   @Watch("search")
   async searchChanged(keyword: string) {
@@ -124,10 +107,6 @@ export default class NewSkillDialog extends Vue {
     );
   }
 
-  get form(): VForm {
-    return this.$refs.form as VForm;
-  }
-
   async onSave() {
     if (this.form.validate() && this.skillSubject) {
       const createSkillDto: CreateSkillDto = {
@@ -139,10 +118,6 @@ export default class NewSkillDialog extends Vue {
 
       this.popDialogComponent();
     }
-  }
-
-  async onCancel() {
-    this.popDialogComponent();
   }
 
   async newSkillSubject() {

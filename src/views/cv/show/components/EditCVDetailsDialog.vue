@@ -10,7 +10,7 @@
           name="description"
           v-model="description"
           label="Description"
-          :rules="descriptionRules"
+          :rules="isRequiredRule"
         />
       </v-card-text>
 
@@ -30,16 +30,15 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue, Prop } from "vue-property-decorator";
+import { Component, Prop, Mixins } from "vue-property-decorator";
 import { namespace } from "vuex-class";
 import { CV, PatchCVDto } from "@/model/cv";
-import { VForm } from "@/types";
+import { DialogFormMixin } from "@/mixins";
 
 const CVShowStore = namespace("CVShowStore");
-const DialogStore = namespace("DialogStore");
 
 @Component
-export default class EditCVDetailsDialog extends Vue {
+export default class EditCVDetailsDialog extends Mixins(DialogFormMixin) {
   @Prop({ required: true }) readonly id!: number;
 
   @CVShowStore.Getter
@@ -48,19 +47,10 @@ export default class EditCVDetailsDialog extends Vue {
   @CVShowStore.Action
   patchCV!: (patchCVDto: PatchCVDto) => Promise<void>;
 
-  @DialogStore.Mutation
-  popDialogComponent!: () => void;
-
-  valid = false;
   description = "";
-  descriptionRules = [(v: string) => !!v || "Description is required"];
 
   get cv(): CV {
     return this.getCV(this.id);
-  }
-
-  get form(): VForm {
-    return this.$refs.form as VForm;
   }
 
   created() {
@@ -80,10 +70,6 @@ export default class EditCVDetailsDialog extends Vue {
 
       this.popDialogComponent();
     }
-  }
-
-  async onCancel() {
-    this.popDialogComponent();
   }
 }
 </script>

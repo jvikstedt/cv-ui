@@ -9,7 +9,7 @@
           v-model="project"
           :items="projects"
           :search-input.sync="search"
-          :rules="projectRules"
+          :rules="isRequiredRule"
           item-text="name"
           item-value="id"
           label="Project"
@@ -26,7 +26,7 @@
         <v-text-field
           v-model="description"
           :counter="255"
-          :rules="descriptionRules"
+          :rules="isRequiredRule"
           label="Description"
           required
         ></v-text-field>
@@ -34,7 +34,7 @@
         <v-text-field
           v-model.number="startYear"
           label="Start year"
-          :rules="startYearRules"
+          :rules="isRequiredRule"
           type="number"
           required
         ></v-text-field>
@@ -42,7 +42,7 @@
         <v-text-field
           v-model.number="startMonth"
           label="Start month"
-          :rules="startMonthRules"
+          :rules="isRequiredRule"
           type="number"
           required
         ></v-text-field>
@@ -50,14 +50,14 @@
         <v-text-field
           v-model.number="endYear"
           label="End year"
-          :rules="endYearRules"
+          :rules="isRequiredRule"
           type="number"
         ></v-text-field>
 
         <v-text-field
           v-model.number="endMonth"
           label="End month"
-          :rules="endMonthRules"
+          :rules="isRequiredRule"
           type="number"
         ></v-text-field>
       </v-card-text>
@@ -78,10 +78,8 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue, Prop, Watch } from "vue-property-decorator";
+import { Component, Prop, Watch, Mixins } from "vue-property-decorator";
 import { namespace } from "vuex-class";
-import { DialogComponent } from "@/dialog";
-import { VForm } from "@/types";
 import { SearchProjects } from "@/api/project";
 import {
   Project,
@@ -89,30 +87,25 @@ import {
   CreateProjectMembershipDto
 } from "@/model/project";
 import NewProjectDialog from "@/views/project/components/NewProjectDialog.vue";
+import { DialogFormMixin } from "@/mixins";
 
 const CVShowStore = namespace("CVShowStore");
-const DialogStore = namespace("DialogStore");
 
 @Component
-export default class NewProjectMembershipDialog extends Vue {
+export default class NewProjectMembershipDialog extends Mixins(
+  DialogFormMixin
+) {
   @Prop({ required: true }) readonly id!: number;
 
-  valid = false;
   search = "";
   projects: Project[] = [];
   project: Project | null = null;
-  projectRules = [(project: Project) => !!project || "Project is required"];
 
   description = "";
-  descriptionRules = [(v: string) => !!v || "Description is required"];
   startYear = 2010;
-  startYearRules = [(v: number) => !!v || "Start year is required"];
   startMonth = 1;
-  startMonthRules = [(v: number) => !!v || "Start month is required"];
   endYear = 2014;
-  endYearRules = [(v: number) => !!v || "End year is required"];
   endMonth = 12;
-  endMonthRules = [(v: number) => !!v || "End month is required"];
 
   @CVShowStore.Getter
   getCVProjectMemberships!: (id: number) => ProjectMembership[];
@@ -122,22 +115,12 @@ export default class NewProjectMembershipDialog extends Vue {
     createProjectMembershipDto: CreateProjectMembershipDto
   ) => Promise<void>;
 
-  @DialogStore.Mutation
-  popDialogComponent!: () => void;
-
-  @DialogStore.Mutation
-  pushDialogComponent!: (dialogComponent: DialogComponent) => void;
-
   @Watch("search")
   async searchChanged(keyword: string) {
     this.projects = await SearchProjects({
       name: keyword || "",
       limit: 10
     });
-  }
-
-  get form(): VForm {
-    return this.$refs.form as VForm;
   }
 
   async onSave() {
@@ -154,10 +137,6 @@ export default class NewProjectMembershipDialog extends Vue {
       await this.createProjectMembership(createProjectMembershipDto);
       this.popDialogComponent();
     }
-  }
-
-  async onCancel() {
-    this.popDialogComponent();
   }
 
   async newProject() {
