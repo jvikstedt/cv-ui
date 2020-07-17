@@ -14,6 +14,7 @@ import { SkillSubjectStore } from "@/views/skill_subject";
 import { SkillGroupStore } from "@/views/skill_group";
 import { SchoolStore } from "@/views/school";
 import { CompanyStore } from "@/views/company";
+import { ProjectStore } from "@/views/project";
 
 Vue.use(Vuex);
 
@@ -28,7 +29,8 @@ const store = new Vuex.Store({
     SkillSubjectStore,
     SkillGroupStore,
     SchoolStore,
-    CompanyStore
+    CompanyStore,
+    ProjectStore
   }
 });
 export default store;

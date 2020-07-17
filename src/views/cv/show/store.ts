@@ -22,6 +22,12 @@ import {
   CreateWorkExperienceDto,
   DeleteWorkExperienceDto
 } from "@/model/work_experience";
+import {
+  ProjectMembership,
+  PatchProjectMembershipDto,
+  CreateProjectMembershipDto,
+  DeleteProjectMembershipDto
+} from "@/model/project";
 
 @Module({ namespaced: true })
 export class CVShowStore extends VuexModule {
@@ -29,6 +35,7 @@ export class CVShowStore extends VuexModule {
   public skills: { [key: number]: Skill } = {};
   public educations: { [key: number]: Education } = {};
   public workExperiences: { [key: number]: WorkExperience } = {};
+  public projectMemberships: { [key: number]: ProjectMembership } = {};
   public fetching = false;
 
   get getCV() {
@@ -76,6 +83,19 @@ export class CVShowStore extends VuexModule {
       R.filter(
         (workExperience: WorkExperience) => R.equals(workExperience.cvId, id),
         Object.values(this.workExperiences)
+      );
+  }
+
+  get getProjectMembership() {
+    return (id: number): ProjectMembership => this.projectMemberships[id];
+  }
+
+  get getCVProjectMemberships() {
+    return (id: number): ProjectMembership[] =>
+      R.filter(
+        (projectMembership: ProjectMembership) =>
+          R.equals(projectMembership.cvId, id),
+        Object.values(this.projectMemberships)
       );
   }
 
@@ -127,6 +147,20 @@ export class CVShowStore extends VuexModule {
   }
 
   @Mutation
+  public deleteProjectMemberships(ids: number[]): void {
+    for (const id of ids) {
+      Vue.delete(this.projectMemberships, id);
+    }
+  }
+
+  @Mutation
+  public addProjectMemberships(projectMemberships: ProjectMembership[]): void {
+    for (const projectMembership of projectMemberships) {
+      Vue.set(this.projectMemberships, projectMembership.id, projectMembership);
+    }
+  }
+
+  @Mutation
   public setFetching(fetching: boolean): void {
     this.fetching = fetching;
   }
@@ -149,13 +183,21 @@ export class CVShowStore extends VuexModule {
       Api.get(`/cv/${id}`),
       Api.get(`/cv/${id}/skills`),
       Api.get(`/cv/${id}/educations`),
-      Api.get(`/cv/${id}/work_experience`)
+      Api.get(`/cv/${id}/work_experience`),
+      Api.get(`/cv/${id}/project_membership`)
     ]).then(responses => {
-      const [cv, skills, educations, workExperiences] = responses;
+      const [
+        cv,
+        skills,
+        educations,
+        workExperiences,
+        projectMemberships
+      ] = responses;
       this.context.commit("addCV", cv);
       this.context.commit("addSkills", skills);
       this.context.commit("addEducations", educations);
       this.context.commit("addWorkExperiences", workExperiences);
+      this.context.commit("addProjectMemberships", projectMemberships);
     });
 
     this.context.commit("setFetching", false);
@@ -270,6 +312,42 @@ export class CVShowStore extends VuexModule {
     );
     this.context.commit("deleteWorkExperiences", [
       deleteWorkExperienceDto.workExperienceId
+    ]);
+  }
+
+  @Action
+  public async patchProjectMembership({
+    cvId,
+    projectMembershipId,
+    data
+  }: PatchProjectMembershipDto): Promise<void> {
+    const savedProjectMembership: ProjectMembership = await Api.patch(
+      `/cv/${cvId}/project_membership/${projectMembershipId}`,
+      data
+    );
+    this.context.commit("addProjectMemberships", [savedProjectMembership]);
+  }
+
+  @Action
+  public async createProjectMembership(
+    createProjectMembershipDto: CreateProjectMembershipDto
+  ): Promise<void> {
+    const savedProjectMembership: ProjectMembership = await Api.post(
+      `/cv/${createProjectMembershipDto.cvId}/project_membership`,
+      createProjectMembershipDto
+    );
+    this.context.commit("addProjectMemberships", [savedProjectMembership]);
+  }
+
+  @Action
+  public async deleteProjectMembership(
+    deleteProjectMembershipDto: DeleteProjectMembershipDto
+  ): Promise<void> {
+    await Api.delete(
+      `/cv/${deleteProjectMembershipDto.cvId}/project_membership/${deleteProjectMembershipDto.projectMembershipId}`
+    );
+    this.context.commit("deleteProjectMemberships", [
+      deleteProjectMembershipDto.projectMembershipId
     ]);
   }
 }
