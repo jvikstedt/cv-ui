@@ -1,21 +1,10 @@
 <template>
-  <v-container class="grey" style="max-width: 1024px" fluid>
-    <template v-if="fetching">
-      <v-progress-circular indeterminate color="primary"></v-progress-circular>
-    </template>
-    <template v-else-if="getCV(id)">
-      <v-btn color="primary darken-1" text @click="onExport">
-        Export
-      </v-btn>
-      <CVDetails :id="id" :canEdit="canEditCV(id)" />
-      <CVSkills :id="id" :canEdit="canEditCV(id)" />
-      <CVEducations :id="id" :canEdit="canEditCV(id)" />
-      <CVWorkExperiences :id="id" :canEdit="canEditCV(id)" />
-      <CVProjectMemberships :id="id" :canEdit="canEditCV(id)" />
-    </template>
-    <template v-else>
-      <p>Something went wrong</p>
-    </template>
+  <v-container style="max-width: 1024px">
+    <CVDetails :id="id" :canEdit="canEditCV(id)" />
+    <CVSkills :id="id" :canEdit="canEditCV(id)" />
+    <CVEducations :id="id" :canEdit="canEditCV(id)" />
+    <CVWorkExperiences :id="id" :canEdit="canEditCV(id)" />
+    <CVProjectMemberships :id="id" :canEdit="canEditCV(id)" />
   </v-container>
 </template>
 
@@ -44,21 +33,11 @@ const AuthStore = namespace("AuthStore");
 export default class CVShowView extends Vue {
   id: number | null = null;
 
-  @CVShowStore.State
-  fetching!: boolean;
-
   @CVShowStore.Action
   fetchCV!: (id: number) => Promise<CV>;
 
-  @CVShowStore.Getter
-  getCV!: (id: number) => CV;
-
   @AuthStore.Getter
   canEditCV!: (cvId: number) => boolean;
-
-  onExport() {
-    this.$router.push(`/cv/${this.id}/pdf`);
-  }
 
   @Watch("$route.params.id")
   async routerChanged(id: string) {

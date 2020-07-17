@@ -1,6 +1,6 @@
 <template>
   <v-card>
-    <v-card-title class="headline">New work experience</v-card-title>
+    <v-card-title class="headline">New project</v-card-title>
 
     <v-form ref="form" v-model="valid" lazy-validation @submit.prevent="onSave">
       <v-card-text>
