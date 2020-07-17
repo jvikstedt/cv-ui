@@ -1,7 +1,7 @@
 import Vue from "vue";
 import { VuexModule, Module, Mutation, Action } from "vuex-module-decorators";
 import Api from "@/api/api";
-import { School, CreateSchoolDto } from "@/model/education";
+import { School, CreateSchoolDto } from "@/model/school";
 
 @Module({ namespaced: true })
 export class SchoolStore extends VuexModule {

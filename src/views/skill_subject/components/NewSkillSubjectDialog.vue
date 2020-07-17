@@ -47,7 +47,8 @@
 <script lang="ts">
 import { Component, Prop, Watch, Mixins } from "vue-property-decorator";
 import { namespace } from "vuex-class";
-import { SkillSubject, CreateSkillSubjectDto, SkillGroup } from "@/model/skill";
+import { SkillSubject, CreateSkillSubjectDto } from "@/model/skill_subject";
+import { SkillGroup } from "@/model/skill_group";
 import NewSkillGroupDialog from "@/views/skill_group/components/NewSkillGroupDialog.vue";
 import { SearchSkillGroups } from "@/api/skill_group";
 import { DialogFormMixin } from "@/mixins";

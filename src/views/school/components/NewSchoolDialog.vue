@@ -31,7 +31,7 @@
 <script lang="ts">
 import { Component, Prop, Mixins } from "vue-property-decorator";
 import { namespace } from "vuex-class";
-import { School, CreateSchoolDto } from "@/model/education";
+import { School, CreateSchoolDto } from "@/model/school";
 import { DialogFormMixin } from "@/mixins";
 
 const SchoolStore = namespace("SchoolStore");

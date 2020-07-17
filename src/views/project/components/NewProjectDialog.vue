@@ -48,7 +48,7 @@
 import { Component, Prop, Watch, Mixins } from "vue-property-decorator";
 import { namespace } from "vuex-class";
 import { Project, CreateProjectDto } from "@/model/project";
-import { Company } from "@/model/work_experience";
+import { Company } from "@/model/company";
 import NewCompanyDialog from "@/views/company/components/NewCompanyDialog.vue";
 import { SearchCompanies } from "@/api/company";
 import { DialogFormMixin } from "@/mixins";

@@ -31,7 +31,7 @@
 <script lang="ts">
 import { Component, Prop, Mixins } from "vue-property-decorator";
 import { namespace } from "vuex-class";
-import { Company, CreateCompanyDto } from "@/model/work_experience";
+import { Company, CreateCompanyDto } from "@/model/company";
 import { DialogFormMixin } from "@/mixins";
 
 const CompanyStore = namespace("CompanyStore");

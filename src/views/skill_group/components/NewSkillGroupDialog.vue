@@ -31,7 +31,7 @@
 <script lang="ts">
 import { Component, Prop, Mixins } from "vue-property-decorator";
 import { namespace } from "vuex-class";
-import { SkillGroup, CreateSkillGroupDto } from "@/model/skill";
+import { SkillGroup, CreateSkillGroupDto } from "@/model/skill_group";
 import { DialogFormMixin } from "@/mixins";
 
 const SkillGroupStore = namespace("SkillGroupStore");

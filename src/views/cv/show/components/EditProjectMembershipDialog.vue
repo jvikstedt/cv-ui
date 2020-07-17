@@ -71,7 +71,7 @@ import {
   ProjectMembership,
   PatchProjectMembershipDto,
   DeleteProjectMembershipDto
-} from "@/model/project";
+} from "@/model/project_membership";
 import { DialogFormMixin } from "@/mixins";
 
 const CVShowStore = namespace("CVShowStore");
