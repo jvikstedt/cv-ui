@@ -7,7 +7,7 @@
         <v-text-field
           v-model="createSkillGroupDto.name"
           :counter="255"
-          :rules="nameRules"
+          :rules="isRequiredRule"
           label="Name"
           required
         ></v-text-field>
@@ -29,16 +29,15 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue, Prop } from "vue-property-decorator";
+import { Component, Prop, Mixins } from "vue-property-decorator";
 import { namespace } from "vuex-class";
 import { SkillGroup, CreateSkillGroupDto } from "@/model/skill";
-import { VForm } from "@/types";
+import { DialogFormMixin } from "@/mixins";
 
 const SkillGroupStore = namespace("SkillGroupStore");
-const DialogStore = namespace("DialogStore");
 
 @Component
-export default class NewSkillGroupDialog extends Vue {
+export default class NewSkillGroupDialog extends Mixins(DialogFormMixin) {
   @Prop({ required: true }) readonly afterCreate!: (
     skillGroup: SkillGroup
   ) => Promise<void>;
@@ -48,17 +47,7 @@ export default class NewSkillGroupDialog extends Vue {
     createSkillGroupDto: CreateSkillGroupDto
   ) => Promise<SkillGroup>;
 
-  @DialogStore.Mutation
-  popDialogComponent!: () => void;
-
-  get form(): VForm {
-    return this.$refs.form as VForm;
-  }
-
-  valid = false;
   createSkillGroupDto = new CreateSkillGroupDto();
-
-  nameRules = [(v: string) => !!v || "Name is required"];
 
   async onSave(): Promise<void> {
     if (this.form.validate()) {
@@ -67,10 +56,6 @@ export default class NewSkillGroupDialog extends Vue {
       await this.afterCreate(skillGroup);
       this.popDialogComponent();
     }
-  }
-
-  async onCancel() {
-    this.popDialogComponent();
   }
 }
 </script>

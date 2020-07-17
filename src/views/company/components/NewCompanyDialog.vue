@@ -7,7 +7,7 @@
         <v-text-field
           v-model="name"
           :counter="255"
-          :rules="nameRules"
+          :rules="isRequiredRule"
           label="Name"
           required
         ></v-text-field>
@@ -29,37 +29,23 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue, Prop } from "vue-property-decorator";
+import { Component, Prop, Mixins } from "vue-property-decorator";
 import { namespace } from "vuex-class";
-import { DialogComponent } from "@/dialog";
 import { Company, CreateCompanyDto } from "@/model/work_experience";
-import { VForm } from "@/types";
+import { DialogFormMixin } from "@/mixins";
 
 const CompanyStore = namespace("CompanyStore");
-const DialogStore = namespace("DialogStore");
 
 @Component
-export default class NewCompanyDialog extends Vue {
+export default class NewCompanyDialog extends Mixins(DialogFormMixin) {
   @Prop({ required: true }) readonly afterCreate!: (
     company: Company
   ) => Promise<void>;
 
-  valid = false;
   name = "";
-  nameRules = [(v: string) => !!v || "Name is required"];
 
   @CompanyStore.Action
   createCompany!: (createCompanyDto: CreateCompanyDto) => Promise<Company>;
-
-  @DialogStore.Mutation
-  popDialogComponent!: () => void;
-
-  @DialogStore.Mutation
-  pushDialogComponent!: (dialogComponent: DialogComponent) => void;
-
-  get form(): VForm {
-    return this.$refs.form as VForm;
-  }
 
   async onSave(): Promise<void> {
     if (this.form.validate()) {
@@ -70,10 +56,6 @@ export default class NewCompanyDialog extends Vue {
       await this.afterCreate(company);
       this.popDialogComponent();
     }
-  }
-
-  async onCancel() {
-    this.popDialogComponent();
   }
 }
 </script>

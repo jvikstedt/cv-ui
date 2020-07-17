@@ -9,7 +9,7 @@
           v-model="company"
           :items="companies"
           :search-input.sync="search"
-          :rules="companyRules"
+          :rules="isRequiredRule"
           item-text="name"
           item-value="id"
           label="Company"
@@ -26,7 +26,7 @@
         <v-text-field
           v-model="jobTitle"
           :counter="255"
-          :rules="jobTitleRules"
+          :rules="isRequiredRule"
           label="Job title"
           required
         ></v-text-field>
@@ -34,7 +34,7 @@
         <v-text-field
           v-model="description"
           :counter="255"
-          :rules="descriptionRules"
+          :rules="isRequiredRule"
           label="Description"
           required
         ></v-text-field>
@@ -42,7 +42,7 @@
         <v-text-field
           v-model.number="startYear"
           label="Start year"
-          :rules="startYearRules"
+          :rules="isRequiredRule"
           type="number"
           required
         ></v-text-field>
@@ -50,7 +50,7 @@
         <v-text-field
           v-model.number="startMonth"
           label="Start month"
-          :rules="startMonthRules"
+          :rules="isRequiredRule"
           type="number"
           required
         ></v-text-field>
@@ -58,14 +58,14 @@
         <v-text-field
           v-model.number="endYear"
           label="End year"
-          :rules="endYearRules"
+          :rules="isRequiredRule"
           type="number"
         ></v-text-field>
 
         <v-text-field
           v-model.number="endMonth"
           label="End month"
-          :rules="endMonthRules"
+          :rules="isRequiredRule"
           type="number"
         ></v-text-field>
       </v-card-text>
@@ -86,10 +86,8 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue, Prop, Watch } from "vue-property-decorator";
+import { Component, Prop, Watch, Mixins } from "vue-property-decorator";
 import { namespace } from "vuex-class";
-import { DialogComponent } from "@/dialog";
-import { VForm } from "@/types";
 import { SearchCompanies } from "@/api/company";
 import {
   Company,
@@ -97,32 +95,24 @@ import {
   CreateWorkExperienceDto
 } from "@/model/work_experience";
 import NewCompanyDialog from "@/views/company/components/NewCompanyDialog.vue";
+import { DialogFormMixin } from "@/mixins";
 
 const CVShowStore = namespace("CVShowStore");
-const DialogStore = namespace("DialogStore");
 
 @Component
-export default class NewWorkExperienceDialog extends Vue {
+export default class NewWorkExperienceDialog extends Mixins(DialogFormMixin) {
   @Prop({ required: true }) readonly id!: number;
 
-  valid = false;
   search = "";
   companies: Company[] = [];
   company: Company | null = null;
-  companyRules = [(company: Company) => !!company || "Company is required"];
 
   jobTitle = "";
-  jobTitleRules = [(v: string) => !!v || "Job title is required"];
   description = "";
-  descriptionRules = [(v: string) => !!v || "Description is required"];
   startYear = 2010;
-  startYearRules = [(v: number) => !!v || "Start year is required"];
   startMonth = 1;
-  startMonthRules = [(v: number) => !!v || "Start month is required"];
   endYear = 2014;
-  endYearRules = [(v: number) => !!v || "End year is required"];
   endMonth = 12;
-  endMonthRules = [(v: number) => !!v || "End month is required"];
 
   @CVShowStore.Getter
   getCVWorkExperiences!: (id: number) => WorkExperience[];
@@ -132,22 +122,12 @@ export default class NewWorkExperienceDialog extends Vue {
     createWorkExperienceDto: CreateWorkExperienceDto
   ) => Promise<void>;
 
-  @DialogStore.Mutation
-  popDialogComponent!: () => void;
-
-  @DialogStore.Mutation
-  pushDialogComponent!: (dialogComponent: DialogComponent) => void;
-
   @Watch("search")
   async searchChanged(keyword: string) {
     this.companies = await SearchCompanies({
       name: keyword || "",
       limit: 10
     });
-  }
-
-  get form(): VForm {
-    return this.$refs.form as VForm;
   }
 
   async onSave() {
@@ -165,10 +145,6 @@ export default class NewWorkExperienceDialog extends Vue {
       await this.createWorkExperience(createWorkExperienceDto);
       this.popDialogComponent();
     }
-  }
-
-  async onCancel() {
-    this.popDialogComponent();
   }
 
   async newCompany() {

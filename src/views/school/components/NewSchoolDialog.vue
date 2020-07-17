@@ -7,7 +7,7 @@
         <v-text-field
           v-model="name"
           :counter="255"
-          :rules="nameRules"
+          :rules="isRequiredRule"
           label="Name"
           required
         ></v-text-field>
@@ -29,37 +29,23 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue, Prop } from "vue-property-decorator";
+import { Component, Prop, Mixins } from "vue-property-decorator";
 import { namespace } from "vuex-class";
-import { DialogComponent } from "@/dialog";
 import { School, CreateSchoolDto } from "@/model/education";
-import { VForm } from "@/types";
+import { DialogFormMixin } from "@/mixins";
 
 const SchoolStore = namespace("SchoolStore");
-const DialogStore = namespace("DialogStore");
 
 @Component
-export default class NewSchoolDialog extends Vue {
+export default class NewSchoolDialog extends Mixins(DialogFormMixin) {
   @Prop({ required: true }) readonly afterCreate!: (
     school: School
   ) => Promise<void>;
 
-  valid = false;
   name = "";
-  nameRules = [(v: string) => !!v || "Name is required"];
 
   @SchoolStore.Action
   createSchool!: (createSchoolDto: CreateSchoolDto) => Promise<School>;
-
-  @DialogStore.Mutation
-  popDialogComponent!: () => void;
-
-  @DialogStore.Mutation
-  pushDialogComponent!: (dialogComponent: DialogComponent) => void;
-
-  get form(): VForm {
-    return this.$refs.form as VForm;
-  }
 
   async onSave(): Promise<void> {
     if (this.form.validate()) {
@@ -70,10 +56,6 @@ export default class NewSchoolDialog extends Vue {
       await this.afterCreate(school);
       this.popDialogComponent();
     }
-  }
-
-  async onCancel() {
-    this.popDialogComponent();
   }
 }
 </script>

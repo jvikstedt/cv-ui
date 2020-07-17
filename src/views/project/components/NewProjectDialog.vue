@@ -12,7 +12,7 @@
           item-value="id"
           label="Company"
           placeholder="Start typing to search"
-          :rules="companyRules"
+          :rules="isRequiredRule"
           return-object
         >
           <template v-slot:append-outer>
@@ -23,7 +23,7 @@
         <v-text-field
           v-model="name"
           :counter="255"
-          :rules="nameRules"
+          :rules="isRequiredRule"
           label="Name"
           required
         ></v-text-field>
@@ -45,45 +45,30 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue, Prop, Watch } from "vue-property-decorator";
+import { Component, Prop, Watch, Mixins } from "vue-property-decorator";
 import { namespace } from "vuex-class";
-import { DialogComponent } from "@/dialog";
 import { Project, CreateProjectDto } from "@/model/project";
 import { Company } from "@/model/work_experience";
-import { VForm } from "@/types";
 import NewCompanyDialog from "@/views/company/components/NewCompanyDialog.vue";
 import { SearchCompanies } from "@/api/company";
+import { DialogFormMixin } from "@/mixins";
 
 const ProjectStore = namespace("ProjectStore");
-const DialogStore = namespace("DialogStore");
 
 @Component
-export default class NewProjectDialog extends Vue {
+export default class NewProjectDialog extends Mixins(DialogFormMixin) {
   @Prop({ required: true }) readonly afterCreate!: (
     project: Project
   ) => Promise<void>;
 
-  valid = false;
   name = "";
-  nameRules = [(v: string) => !!v || "Name is required"];
 
   search = "";
   companies: Company[] = [];
   company: Company | null = null;
-  companyRules = [(company: Company) => !!company || "Company is required"];
 
   @ProjectStore.Action
   createProject!: (createProjectDto: CreateProjectDto) => Promise<Project>;
-
-  @DialogStore.Mutation
-  popDialogComponent!: () => void;
-
-  @DialogStore.Mutation
-  pushDialogComponent!: (dialogComponent: DialogComponent) => void;
-
-  get form(): VForm {
-    return this.$refs.form as VForm;
-  }
 
   @Watch("search")
   async searchChanged(input: string) {
@@ -103,10 +88,6 @@ export default class NewProjectDialog extends Vue {
       await this.afterCreate(project);
       this.popDialogComponent();
     }
-  }
-
-  async onCancel() {
-    this.popDialogComponent();
   }
 
   async newCompany() {

@@ -9,7 +9,7 @@
         <v-text-field
           v-model="description"
           :counter="255"
-          :rules="descriptionRules"
+          :rules="isRequiredRule"
           label="Description"
           required
         ></v-text-field>
@@ -17,7 +17,7 @@
         <v-text-field
           v-model.number="startYear"
           label="Start year"
-          :rules="startYearRules"
+          :rules="isRequiredRule"
           type="number"
           required
         ></v-text-field>
@@ -25,7 +25,7 @@
         <v-text-field
           v-model.number="startMonth"
           label="Start month"
-          :rules="startMonthRules"
+          :rules="isRequiredRule"
           type="number"
           required
         ></v-text-field>
@@ -33,14 +33,14 @@
         <v-text-field
           v-model.number="endYear"
           label="End year"
-          :rules="endYearRules"
+          :rules="isRequiredRule"
           type="number"
         ></v-text-field>
 
         <v-text-field
           v-model.number="endMonth"
           label="End month"
-          :rules="endMonthRules"
+          :rules="isRequiredRule"
           type="number"
         ></v-text-field>
       </v-card-text>
@@ -65,41 +65,33 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue, Prop } from "vue-property-decorator";
+import { Component, Prop, Mixins } from "vue-property-decorator";
 import { namespace } from "vuex-class";
 import {
   ProjectMembership,
   PatchProjectMembershipDto,
   DeleteProjectMembershipDto
 } from "@/model/project";
-import { VForm } from "@/types";
+import { DialogFormMixin } from "@/mixins";
 
 const CVShowStore = namespace("CVShowStore");
-const DialogStore = namespace("DialogStore");
 
 @Component
-export default class EditProjectMembershipDialog extends Vue {
+export default class EditProjectMembershipDialog extends Mixins(
+  DialogFormMixin
+) {
   @Prop({ required: true }) readonly projectMembershipId!: number;
 
-  valid = false;
   description = "";
-  descriptionRules = [(v: string) => !!v || "Description is required"];
   startYear = 2010;
-  startYearRules = [(v: number) => !!v || "Start year is required"];
   startMonth = 1;
-  startMonthRules = [(v: number) => !!v || "Start month is required"];
   endYear = 2014;
-  endYearRules = [(v: number) => !!v || "End year is required"];
   endMonth = 12;
-  endMonthRules = [(v: number) => !!v || "End month is required"];
 
   @CVShowStore.Action
   patchProjectMembership!: (
     patchProjectMembershipDto: PatchProjectMembershipDto
   ) => Promise<void>;
-
-  @DialogStore.Mutation
-  popDialogComponent!: () => void;
 
   @CVShowStore.Getter
   getProjectMembership!: (projectMembershipId: number) => ProjectMembership;
@@ -111,10 +103,6 @@ export default class EditProjectMembershipDialog extends Vue {
 
   get projectMembership(): ProjectMembership {
     return this.getProjectMembership(this.projectMembershipId);
-  }
-
-  get form(): VForm {
-    return this.$refs.form as VForm;
   }
 
   created() {
@@ -161,10 +149,6 @@ export default class EditProjectMembershipDialog extends Vue {
 
       this.popDialogComponent();
     }
-  }
-
-  async onCancel() {
-    this.popDialogComponent();
   }
 }
 </script>

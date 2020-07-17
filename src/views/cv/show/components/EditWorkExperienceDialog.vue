@@ -9,7 +9,7 @@
         <v-text-field
           v-model="jobTitle"
           :counter="255"
-          :rules="jobTitleRules"
+          :rules="isRequiredRule"
           label="Job title"
           required
         ></v-text-field>
@@ -17,7 +17,7 @@
         <v-text-field
           v-model="description"
           :counter="255"
-          :rules="descriptionRules"
+          :rules="isRequiredRule"
           label="Description"
           required
         ></v-text-field>
@@ -25,7 +25,7 @@
         <v-text-field
           v-model.number="startYear"
           label="Start year"
-          :rules="startYearRules"
+          :rules="isRequiredRule"
           type="number"
           required
         ></v-text-field>
@@ -33,7 +33,7 @@
         <v-text-field
           v-model.number="startMonth"
           label="Start month"
-          :rules="startMonthRules"
+          :rules="isRequiredRule"
           type="number"
           required
         ></v-text-field>
@@ -41,14 +41,14 @@
         <v-text-field
           v-model.number="endYear"
           label="End year"
-          :rules="endYearRules"
+          :rules="isRequiredRule"
           type="number"
         ></v-text-field>
 
         <v-text-field
           v-model.number="endMonth"
           label="End month"
-          :rules="endMonthRules"
+          :rules="isRequiredRule"
           type="number"
         ></v-text-field>
       </v-card-text>
@@ -73,43 +73,32 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue, Prop } from "vue-property-decorator";
+import { Component, Prop, Mixins } from "vue-property-decorator";
 import { namespace } from "vuex-class";
 import {
   WorkExperience,
   PatchWorkExperienceDto,
   DeleteWorkExperienceDto
 } from "@/model/work_experience";
-import { VForm } from "@/types";
+import { DialogFormMixin } from "@/mixins";
 
 const CVShowStore = namespace("CVShowStore");
-const DialogStore = namespace("DialogStore");
 
 @Component
-export default class EditWorkExperienceDialog extends Vue {
+export default class EditWorkExperienceDialog extends Mixins(DialogFormMixin) {
   @Prop({ required: true }) readonly workExperienceId!: number;
 
-  valid = false;
   jobTitle = "";
-  jobTitleRules = [(v: string) => !!v || "Job title is required"];
   description = "";
-  descriptionRules = [(v: string) => !!v || "Description is required"];
   startYear = 2010;
-  startYearRules = [(v: number) => !!v || "Start year is required"];
   startMonth = 1;
-  startMonthRules = [(v: number) => !!v || "Start month is required"];
   endYear = 2014;
-  endYearRules = [(v: number) => !!v || "End year is required"];
   endMonth = 12;
-  endMonthRules = [(v: number) => !!v || "End month is required"];
 
   @CVShowStore.Action
   patchWorkExperience!: (
     patchWorkExperienceDto: PatchWorkExperienceDto
   ) => Promise<void>;
-
-  @DialogStore.Mutation
-  popDialogComponent!: () => void;
 
   @CVShowStore.Getter
   getWorkExperience!: (workExperienceId: number) => WorkExperience;
@@ -121,10 +110,6 @@ export default class EditWorkExperienceDialog extends Vue {
 
   get workExperience(): WorkExperience {
     return this.getWorkExperience(this.workExperienceId);
-  }
-
-  get form(): VForm {
-    return this.$refs.form as VForm;
   }
 
   created() {
@@ -169,10 +154,6 @@ export default class EditWorkExperienceDialog extends Vue {
 
       this.popDialogComponent();
     }
-  }
-
-  async onCancel() {
-    this.popDialogComponent();
   }
 }
 </script>

@@ -16,7 +16,7 @@
             <v-text-field
               name="experienceInYears"
               v-model="experienceInYears"
-              :rules="experienceInYearsRules"
+              :rules="isRequiredRule"
               class="mt-0 pt-0"
               hide-details
               single-line
@@ -47,25 +47,19 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue, Prop } from "vue-property-decorator";
+import { Component, Prop, Mixins } from "vue-property-decorator";
 import { namespace } from "vuex-class";
 import { PatchCVDto } from "@/model/cv";
 import { Skill, PatchSkillDto, DeleteSkillDto } from "@/model/skill";
-import { VForm } from "@/types";
+import { DialogFormMixin } from "@/mixins";
 
 const CVShowStore = namespace("CVShowStore");
-const DialogStore = namespace("DialogStore");
 
 @Component
-export default class EditSkillDialog extends Vue {
+export default class EditSkillDialog extends Mixins(DialogFormMixin) {
   @Prop({ required: true }) readonly skillId!: number;
 
-  valid = false;
   experienceInYears = 1;
-  experienceInYearsRules = [
-    (experienceInYears: number) =>
-      !!experienceInYears || "Experience in years is required"
-  ];
 
   @CVShowStore.Action
   patchSkill!: (patchSkillDto: PatchSkillDto) => Promise<void>;
@@ -73,18 +67,11 @@ export default class EditSkillDialog extends Vue {
   @CVShowStore.Action
   patchCV!: (patchCVDto: PatchCVDto) => Promise<void>;
 
-  @DialogStore.Mutation
-  popDialogComponent!: () => void;
-
   @CVShowStore.Getter
   getSkill!: (skillId: number) => Skill;
 
   @CVShowStore.Action
   deleteSkill!: (deleteSkillDto: DeleteSkillDto) => Promise<void>;
-
-  get form(): VForm {
-    return this.$refs.form as VForm;
-  }
 
   get skill(): Skill {
     return this.getSkill(this.skillId);
@@ -122,10 +109,6 @@ export default class EditSkillDialog extends Vue {
 
       this.popDialogComponent();
     }
-  }
-
-  async onCancel() {
-    this.popDialogComponent();
   }
 }
 </script>
