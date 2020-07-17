@@ -11,6 +11,7 @@
       <CVSkills :id="id" :canEdit="canEditCV(id)" />
       <CVEducations :id="id" :canEdit="canEditCV(id)" />
       <CVWorkExperiences :id="id" :canEdit="canEditCV(id)" />
+      <CVProjectMemberships :id="id" :canEdit="canEditCV(id)" />
     </template>
     <template v-else>
       <p>Something went wrong</p>
@@ -26,6 +27,7 @@ import CVDetails from "./CVDetails.vue";
 import CVSkills from "./CVSkills.vue";
 import CVEducations from "./CVEducations.vue";
 import CVWorkExperiences from "./CVWorkExperiences.vue";
+import CVProjectMemberships from "./CVProjectMemberships.vue";
 
 const CVShowStore = namespace("CVShowStore");
 const AuthStore = namespace("AuthStore");
@@ -35,7 +37,8 @@ const AuthStore = namespace("AuthStore");
     CVDetails,
     CVSkills,
     CVEducations,
-    CVWorkExperiences
+    CVWorkExperiences,
+    CVProjectMemberships
   }
 })
 export default class CVShowView extends Vue {
