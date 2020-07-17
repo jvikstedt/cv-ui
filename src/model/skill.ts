@@ -1,26 +1,4 @@
-export class SkillGroup {
-  id!: number;
-
-  name!: string;
-
-  createdAt!: Date;
-
-  updatedAt!: Date;
-}
-
-export class SkillSubject {
-  id!: number;
-
-  name!: string;
-
-  skillGroup!: SkillGroup;
-
-  skillGroupId!: number;
-
-  createdAt!: Date;
-
-  updatedAt!: Date;
-}
+import { SkillSubject } from "./skill_subject";
 
 export class Skill {
   id!: number;
@@ -59,14 +37,4 @@ export class CreateSkillDto {
   skillSubjectId!: number;
 
   experienceInYears!: number;
-}
-
-export class CreateSkillSubjectDto {
-  name!: string;
-
-  skillGroupId!: number;
-}
-
-export class CreateSkillGroupDto {
-  name!: string;
 }

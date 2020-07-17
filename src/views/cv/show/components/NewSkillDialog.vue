@@ -65,7 +65,8 @@
 import * as R from "ramda";
 import { Component, Prop, Watch, Mixins } from "vue-property-decorator";
 import { namespace } from "vuex-class";
-import { Skill, CreateSkillDto, SkillSubject } from "@/model/skill";
+import { Skill, CreateSkillDto } from "@/model/skill";
+import { SkillSubject } from "@/model/skill_subject";
 import { SearchSkillSubjects } from "@/api/skill_subject";
 import NewSkillSubjectDialog from "@/views/skill_subject/components/NewSkillSubjectDialog.vue";
 import { DialogFormMixin } from "@/mixins";

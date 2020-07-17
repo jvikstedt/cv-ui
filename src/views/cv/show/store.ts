@@ -27,7 +27,7 @@ import {
   PatchProjectMembershipDto,
   CreateProjectMembershipDto,
   DeleteProjectMembershipDto
-} from "@/model/project";
+} from "@/model/project_membership";
 
 @Module({ namespaced: true })
 export class CVShowStore extends VuexModule {

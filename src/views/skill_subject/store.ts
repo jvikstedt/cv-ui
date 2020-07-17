@@ -1,7 +1,7 @@
 import Vue from "vue";
 import { VuexModule, Module, Mutation, Action } from "vuex-module-decorators";
 import Api from "@/api/api";
-import { SkillSubject, CreateSkillSubjectDto } from "@/model/skill";
+import { SkillSubject, CreateSkillSubjectDto } from "@/model/skill_subject";
 
 @Module({ namespaced: true })
 export class SkillSubjectStore extends VuexModule {

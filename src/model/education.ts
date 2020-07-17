@@ -1,12 +1,4 @@
-export class School {
-  id!: number;
-
-  name!: string;
-
-  createdAt!: Date;
-
-  updatedAt!: Date;
-}
+import { School } from "./school";
 
 export class Education {
   id!: number;
@@ -69,8 +61,4 @@ export class CreateEducationDto {
   startYear!: number;
 
   endYear?: number;
-}
-
-export class CreateSchoolDto {
-  name!: string;
 }

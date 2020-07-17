@@ -1,7 +1,7 @@
 import Vue from "vue";
 import { VuexModule, Module, Mutation, Action } from "vuex-module-decorators";
 import Api from "@/api/api";
-import { SkillGroup, CreateSkillGroupDto } from "@/model/skill";
+import { SkillGroup, CreateSkillGroupDto } from "@/model/skill_group";
 
 @Module({ namespaced: true })
 export class SkillGroupStore extends VuexModule {

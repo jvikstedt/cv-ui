@@ -1,7 +1,7 @@
 import Vue from "vue";
 import { VuexModule, Module, Mutation, Action } from "vuex-module-decorators";
 import Api from "@/api/api";
-import { Company, CreateCompanyDto } from "@/model/work_experience";
+import { Company, CreateCompanyDto } from "@/model/company";
 
 @Module({ namespaced: true })
 export class CompanyStore extends VuexModule {

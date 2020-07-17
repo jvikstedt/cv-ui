@@ -47,7 +47,7 @@
 <script lang="ts">
 import { Component, Vue, Prop } from "vue-property-decorator";
 import { namespace } from "vuex-class";
-import { ProjectMembership } from "@/model/project";
+import { ProjectMembership } from "@/model/project_membership";
 import { DialogComponent } from "@/dialog";
 import NewProjectMembershipDialog from "./components/NewProjectMembershipDialog.vue";
 import EditProjectMembershipDialog from "./components/EditProjectMembershipDialog.vue";

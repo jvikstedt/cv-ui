@@ -1,9 +1,7 @@
-import { Company } from "./company";
+import { Project } from "./project";
 
-export class WorkExperience {
+export class ProjectMembership {
   id!: number;
-
-  jobTitle!: string;
 
   description!: string;
 
@@ -15,18 +13,16 @@ export class WorkExperience {
 
   cvId!: number;
 
-  company!: Company;
+  project!: Project;
 
-  companyId!: number;
+  projectId!: number;
 
   createdAt!: Date;
 
   updatedAt!: Date;
 }
 
-export class PatchWorkExperienceDtoData {
-  jobTitle?: string;
-
+export class PatchProjectMembershipDtoData {
   description?: string;
 
   startYear?: number;
@@ -36,23 +32,21 @@ export class PatchWorkExperienceDtoData {
   endMonth?: number;
 }
 
-export class PatchWorkExperienceDto {
+export class PatchProjectMembershipDto {
   cvId!: number;
-  workExperienceId!: number;
-  data!: PatchWorkExperienceDtoData;
+  projectMembershipId!: number;
+  data!: PatchProjectMembershipDtoData;
 }
 
-export class DeleteWorkExperienceDto {
+export class DeleteProjectMembershipDto {
   cvId!: number;
-  workExperienceId!: number;
+  projectMembershipId!: number;
 }
 
-export class CreateWorkExperienceDto {
+export class CreateProjectMembershipDto {
   cvId!: number;
 
-  companyId!: number;
-
-  jobTitle!: string;
+  projectId!: number;
 
   description!: string;
 

@@ -96,7 +96,7 @@
 import * as R from "ramda";
 import { Component, Watch, Mixins } from "vue-property-decorator";
 import { CVSearchDtoSkill, CVSearchDto, CVSearchResult } from "@/model/cv";
-import { SkillSubject } from "@/model/skill";
+import { SkillSubject } from "@/model/skill_subject";
 import { SearchSkillSubjects } from "@/api/skill_subject";
 import { SearchMixin, DialogMixin } from "@/mixins";
 

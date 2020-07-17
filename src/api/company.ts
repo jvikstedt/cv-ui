@@ -1,5 +1,5 @@
 import Api from "@/api/api";
-import { Company } from "@/model/work_experience";
+import { Company } from "@/model/company";
 
 export interface SearchCompanyDto {
   name: string;

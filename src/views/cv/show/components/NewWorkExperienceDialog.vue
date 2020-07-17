@@ -90,10 +90,10 @@ import { Component, Prop, Watch, Mixins } from "vue-property-decorator";
 import { namespace } from "vuex-class";
 import { SearchCompanies } from "@/api/company";
 import {
-  Company,
   WorkExperience,
   CreateWorkExperienceDto
 } from "@/model/work_experience";
+import { Company } from "@/model/company";
 import NewCompanyDialog from "@/views/company/components/NewCompanyDialog.vue";
 import { DialogFormMixin } from "@/mixins";
 

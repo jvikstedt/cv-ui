@@ -82,7 +82,8 @@
 import * as R from "ramda";
 import { Component, Prop, Watch, Mixins } from "vue-property-decorator";
 import { namespace } from "vuex-class";
-import { Education, CreateEducationDto, School } from "@/model/education";
+import { Education, CreateEducationDto } from "@/model/education";
+import { School } from "@/model/school";
 import { SearchSchools } from "@/api/school";
 import NewSchoolDialog from "@/views/school/components/NewSchoolDialog.vue";
 import { DialogFormMixin } from "@/mixins";

@@ -81,11 +81,11 @@
 import { Component, Prop, Watch, Mixins } from "vue-property-decorator";
 import { namespace } from "vuex-class";
 import { SearchProjects } from "@/api/project";
+import { Project } from "@/model/project";
 import {
-  Project,
   ProjectMembership,
   CreateProjectMembershipDto
-} from "@/model/project";
+} from "@/model/project_membership";
 import NewProjectDialog from "@/views/project/components/NewProjectDialog.vue";
 import { DialogFormMixin } from "@/mixins";
 
