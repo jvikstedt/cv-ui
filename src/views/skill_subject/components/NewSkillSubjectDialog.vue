@@ -16,7 +16,7 @@
           return-object
         >
           <template v-slot:append-outer>
-            <v-btn @click="newSkillSubject">New</v-btn>
+            <v-btn @click="newSkillGroup">New</v-btn>
           </template>
         </v-autocomplete>
 
@@ -79,10 +79,10 @@ export default class NewSkillSubjectDialog extends Vue {
 
   valid = false;
 
-  search = "";
   name = "";
   nameRules = [(name: string) => !!name || "Name is required"];
 
+  search = "";
   skillGroups: SkillGroup[] = [];
   skillGroup: SkillGroup | null = null;
   skillGroupRules = [
@@ -113,7 +113,7 @@ export default class NewSkillSubjectDialog extends Vue {
     this.popDialogComponent();
   }
 
-  async newSkillSubject() {
+  async newSkillGroup() {
     this.pushDialogComponent({
       component: NewSkillGroupDialog,
       props: { afterCreate: this.afterSkillGroupCreate }

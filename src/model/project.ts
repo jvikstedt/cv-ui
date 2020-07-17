@@ -1,7 +1,13 @@
+import { Company } from "./work_experience";
+
 export class Project {
   id!: number;
 
   name!: string;
+
+  company!: Company;
+
+  companyId!: number;
 
   createdAt!: Date;
 
@@ -67,4 +73,5 @@ export class CreateProjectMembershipDto {
 
 export class CreateProjectDto {
   name!: string;
+  companyId!: number;
 }
