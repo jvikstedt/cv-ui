@@ -14,7 +14,7 @@
     :search-input.sync="searchInput"
     @focus="search('', 0)"
     @change="onSelect"
-    @click:append-outer="advancedSearch"
+    @click:append-outer="openAdvancedSearch"
   >
     <template v-slot:item="data">
       <v-list-item-avatar tile size="50" color="indigo">
@@ -34,45 +34,22 @@
 </template>
 
 <script lang="ts">
-import * as R from "ramda";
-import { Component, Vue, Watch } from "vue-property-decorator";
-import { namespace } from "vuex-class";
-import { CV, CVSearchResult, CVSearchDto } from "@/model/cv";
-import { DialogComponent } from "@/dialog";
+import { Component, Watch, Mixins } from "vue-property-decorator";
+import { CV, CVSearchDto } from "@/model/cv";
 import { CVSearchView } from "@/views/cv/search";
-
-const CVSearchStore = namespace("CVSearchStore");
-const DialogStore = namespace("DialogStore");
+import { SearchMixin, DialogMixin } from "@/mixins";
 
 @Component
-export default class CVSearchBar extends Vue {
+export default class CVSearchBar extends Mixins(SearchMixin, DialogMixin) {
+  searchKey = "CVSearchBar";
+
   cv: CV | null = null;
   searchInput = null;
   debounce = 0;
 
-  @CVSearchStore.Getter
-  searchingByKey!: (key: string) => boolean;
-
-  @CVSearchStore.Getter
-  resultsByKey!: (key: string) => CVSearchResult[];
-
-  @CVSearchStore.Action
-  searchCVs!: (cvSearchDto: CVSearchDto) => Promise<void>;
-
-  @DialogStore.Mutation
-  pushDialogComponent!: (dialogComponent: DialogComponent) => void;
-
   @Watch("searchInput")
   async searchInputChanged(input: string) {
     await this.search(input, 500);
-  }
-
-  get results(): CVSearchResult[] {
-    return this.resultsByKey("CVSearchBar");
-  }
-
-  get searching(): boolean {
-    return this.searchingByKey("CVSearchBar");
   }
 
   async search(input: string, debounce: number) {
@@ -80,7 +57,7 @@ export default class CVSearchBar extends Vue {
 
     this.debounce = window.setTimeout(async () => {
       const cvSearchDto = new CVSearchDto({
-        key: "CVSearchBar",
+        key: this.searchKey,
         data: { fullName: input || "" }
       });
       await this.searchCVs(cvSearchDto);
@@ -97,27 +74,11 @@ export default class CVSearchBar extends Vue {
     }
   }
 
-  advancedSearch() {
+  openAdvancedSearch() {
     this.pushDialogComponent({
       component: CVSearchView,
       props: {}
     });
-  }
-
-  avatarSrc(cvSearchResult: CVSearchResult): string | null {
-    if (cvSearchResult.avatarId) {
-      return `/api/files/${cvSearchResult.avatarId}`;
-    }
-    return null;
-  }
-
-  initials(cvSearchResult: CVSearchResult): string {
-    return R.toUpper(
-      R.join(
-        "",
-        R.map((name: string) => name[0], R.split(" ", cvSearchResult.fullName))
-      )
-    );
   }
 }
 </script>

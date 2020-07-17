@@ -94,21 +94,20 @@
 
 <script lang="ts">
 import * as R from "ramda";
-import { Component, Vue, Watch } from "vue-property-decorator";
-import { namespace } from "vuex-class";
+import { Component, Watch, Mixins } from "vue-property-decorator";
 import { CVSearchDtoSkill, CVSearchDto, CVSearchResult } from "@/model/cv";
 import { SkillSubject } from "@/model/skill";
 import { SearchSkillSubjects } from "@/api/skill_subject";
+import { SearchMixin, DialogMixin } from "@/mixins";
 
 class SkillSearchOption extends CVSearchDtoSkill {
   name!: string;
 }
 
-const CVSearchStore = namespace("CVSearchStore");
-const DialogStore = namespace("DialogStore");
-
 @Component
-export default class CVSearchView extends Vue {
+export default class CVSearchView extends Mixins(SearchMixin, DialogMixin) {
+  searchKey = "CVSearchView";
+
   fullName = "";
 
   searchInput = null;
@@ -116,18 +115,6 @@ export default class CVSearchView extends Vue {
   skillSubjects: SkillSubject[] = [];
 
   skillSearchOptions: SkillSearchOption[] = [];
-
-  @CVSearchStore.Getter
-  searchingByKey!: (key: string) => boolean;
-
-  @CVSearchStore.Getter
-  resultsByKey!: (key: string) => CVSearchResult[];
-
-  @CVSearchStore.Action
-  searchCVs!: (cvSearchDto: CVSearchDto) => Promise<void>;
-
-  @DialogStore.Mutation
-  popDialogComponent!: () => void;
 
   @Watch("searchInput")
   async searchInputChanged(input: string) {
@@ -151,14 +138,6 @@ export default class CVSearchView extends Vue {
     await this.searchInputChanged("");
   }
 
-  get results(): CVSearchResult[] {
-    return this.resultsByKey("CVSearchView");
-  }
-
-  get searching(): boolean {
-    return this.searchingByKey("CVSearchView");
-  }
-
   commonSkills(cvSearchResult: CVSearchResult) {
     return R.filter(
       skill =>
@@ -180,7 +159,7 @@ export default class CVSearchView extends Vue {
 
   async onSearch() {
     const cvSearchDto = new CVSearchDto({
-      key: "CVSearchView",
+      key: this.searchKey,
       data: {
         fullName: this.fullName,
         skills: this.skillSearchOptions
@@ -211,22 +190,6 @@ export default class CVSearchView extends Vue {
 
   async onCancel() {
     this.popDialogComponent();
-  }
-
-  avatarSrc(cvSearchResult: CVSearchResult): string | null {
-    if (cvSearchResult.avatarId) {
-      return `/api/files/${cvSearchResult.avatarId}`;
-    }
-    return null;
-  }
-
-  initials(cvSearchResult: CVSearchResult): string {
-    return R.toUpper(
-      R.join(
-        "",
-        R.map((name: string) => name[0], R.split(" ", cvSearchResult.fullName))
-      )
-    );
   }
 }
 </script>

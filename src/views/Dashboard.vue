@@ -40,32 +40,24 @@
 </template>
 
 <script lang="ts">
-import * as R from "ramda";
-import { Component, Vue } from "vue-property-decorator";
+import { Component, Mixins } from "vue-property-decorator";
 import { namespace } from "vuex-class";
-import { CVSearchDto, CVSearchResult } from "@/model/cv";
+import { CVSearchDto } from "@/model/cv";
 import { TokenData } from "@/model/user";
+import { SearchMixin } from "@/mixins";
 
 const AuthStore = namespace("AuthStore");
-const CVSearchStore = namespace("CVSearchStore");
 
 @Component
-export default class Dashboard extends Vue {
+export default class Dashboard extends Mixins(SearchMixin) {
+  searchKey = "Dashboard";
+
   @AuthStore.Getter
   user!: TokenData;
 
-  @CVSearchStore.Getter
-  searchingByKey!: (key: string) => boolean;
-
-  @CVSearchStore.Getter
-  resultsByKey!: (key: string) => CVSearchResult[];
-
-  @CVSearchStore.Action
-  searchCVs!: (cvSearchDto: CVSearchDto) => Promise<void>;
-
   async created() {
     const cvSearchDto = new CVSearchDto({
-      key: "Dashboard",
+      key: this.searchKey,
       data: {
         sorts: [{ field: "updatedAt", order: "desc" }]
       }
@@ -73,40 +65,9 @@ export default class Dashboard extends Vue {
     await this.searchCVs(cvSearchDto);
   }
 
-  get results(): CVSearchResult[] {
-    return this.resultsByKey("Dashboard");
-  }
-
-  get searching(): boolean {
-    return this.searchingByKey("Dashboard");
-  }
-
   async openMyCV() {
     const cvId = this.user.cvIds[0];
     this.$router.push(`/cv/${cvId}`);
-  }
-
-  avatarSrc(cvSearchResult: CVSearchResult): string | null {
-    if (cvSearchResult.avatarId) {
-      return `/api/files/${cvSearchResult.avatarId}`;
-    }
-    return null;
-  }
-
-  initials(cvSearchResult: CVSearchResult): string {
-    return R.toUpper(
-      R.join(
-        "",
-        R.map((name: string) => name[0], R.split(" ", cvSearchResult.fullName))
-      )
-    );
-  }
-
-  onResultClick(cvSearchResult: CVSearchResult) {
-    const route = `/cv/${cvSearchResult.id}`;
-    if (this.$route.path !== route) {
-      this.$router.push(route);
-    }
   }
 }
 </script>
