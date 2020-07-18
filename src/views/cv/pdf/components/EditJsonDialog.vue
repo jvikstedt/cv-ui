@@ -1,7 +1,7 @@
 <template>
   <v-card>
     <v-card-title class="headline">
-      JSON
+      JSON Editor
     </v-card-title>
 
     <v-card-actions>
@@ -28,44 +28,39 @@
 
 <script lang="ts">
 import JSONEditor from "jsoneditor";
-import { Component, Vue, Prop } from "vue-property-decorator";
-import { namespace } from "vuex-class";
+import { Component, Mixins } from "vue-property-decorator";
 import { CVExportData } from "@/model/cv";
+import { DialogFormMixin } from "@/mixins";
+import { namespace } from "vuex-class";
 
-const DialogStore = namespace("DialogStore");
+const CVPDFStore = namespace("CVPDFStore");
 
 @Component
-export default class EditJsonDialog extends Vue {
-  @Prop({ required: true }) readonly data!: CVExportData;
-  @Prop({ required: true }) readonly use!: (
-    data: CVExportData
-  ) => Promise<void>;
+export default class EditJsonDialog extends Mixins(DialogFormMixin) {
+  @CVPDFStore.State
+  cvExportData!: CVExportData | null;
+
+  @CVPDFStore.Mutation
+  setCVExportData!: (cvExportData: CVExportData) => void;
 
   editor?: JSONEditor;
 
-  @DialogStore.Mutation
-  popDialogComponent!: () => void;
-
   mounted() {
     const element = document.getElementById("jsoneditor");
-    if (element) {
+    if (element && this.cvExportData) {
       this.editor = new JSONEditor(element, {
         mode: "tree",
         search: true
       });
-      this.editor.set(this.data);
+      this.editor.set(this.cvExportData);
     }
   }
 
-  async onUse() {
+  onUse() {
     if (this.editor) {
-      await this.use(this.editor.get());
+      this.setCVExportData(this.editor.get());
     }
 
-    this.popDialogComponent();
-  }
-
-  async onCancel() {
     this.popDialogComponent();
   }
 }

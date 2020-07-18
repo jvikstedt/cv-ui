@@ -20,9 +20,7 @@
       </div>
     </v-card-text>
     <v-card-actions>
-      <v-btn v-if="canEdit" color="primary" dark @click="newSkill"
-        >New Skill</v-btn
-      >
+      <v-btn v-if="canEdit" color="primary" @click="newSkill">New Skill</v-btn>
     </v-card-actions>
   </v-card>
 </template>

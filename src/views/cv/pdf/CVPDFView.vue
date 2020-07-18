@@ -1,63 +1,55 @@
 <template>
-  <div style="width:800px">
-    <v-btn @click="openEditTemplateDialog">
-      TEMPLATE
-    </v-btn>
-    <v-btn @click="openEditJsonDialog">
-      JSON
-    </v-btn>
-
-    <object
-      v-if="pdfUrl"
-      id="pdfviewer"
-      v-bind:data="pdfUrl"
-      type="application/pdf"
-      width="100%"
-      height="750px"
-    />
-    <p v-if="!pdfUrl">Select template</p>
-  </div>
+  <v-container style="max-width: 1024px">
+    <v-card :loading="fetching">
+      <v-card-title class="headline">PDF export</v-card-title>
+      <v-card-actions>
+        <v-btn color="primary" @click="editTemplate">Template</v-btn>
+        <v-btn color="primary" @click="editData">Edit data</v-btn>
+      </v-card-actions>
+      <v-card-text>
+        <object
+          v-if="pdf"
+          id="pdfviewer"
+          v-bind:data="pdf"
+          type="application/pdf"
+          width="100%"
+          height="750px"
+        />
+        <p v-if="!pdf">Select template</p>
+      </v-card-text>
+    </v-card>
+  </v-container>
 </template>
 
 <script lang="ts">
-import { Component, Vue } from "vue-property-decorator";
+import { Component, Vue, Watch } from "vue-property-decorator";
 import { namespace } from "vuex-class";
 import * as handlebars from "handlebars";
-import { Template } from "@/model/template";
-import { CVExportData } from "@/model/cv";
-import { ExportPdfDto } from "@/model/exporter";
-import { DialogComponent } from "@/dialog";
-import TemplatePdfForm from "./components/TemplatePdfForm.vue";
-import EditTemplateDialog from "./components/EditTemplateDialog.vue";
 import EditJsonDialog from "./components/EditJsonDialog.vue";
+import { DialogComponent } from "@/dialog";
+import { CVExportData } from "@/model/cv";
+import { Template } from "@/model/template";
+import { ExportPdfDto } from "@/model/exporter";
+import EditTemplateDialog from "./components/EditTemplateDialog.vue";
 
 const CVPDFStore = namespace("CVPDFStore");
 const DialogStore = namespace("DialogStore");
 
-@Component({
-  components: {
-    TemplatePdfForm,
-    EditTemplateDialog,
-    EditJsonDialog
-  }
-})
+@Component
 export default class CVPDFView extends Vue {
   id: number | null = null;
 
   @CVPDFStore.State
-  selectedTemplate!: Template | null;
-
-  @CVPDFStore.State
-  cvData!: CVExportData;
-
-  @CVPDFStore.State
   fetching!: boolean;
 
-  @CVPDFStore.Getter
-  getTemplates!: Template[];
+  @CVPDFStore.State
+  pdf!: string | null;
 
   @CVPDFStore.State
-  blob!: Blob | null;
+  cvExportData!: CVExportData | null;
+
+  @CVPDFStore.State
+  selectedTemplate!: Template | null;
 
   @CVPDFStore.Action
   fetchCV!: (id: number) => Promise<void>;
@@ -66,24 +58,10 @@ export default class CVPDFView extends Vue {
   fetchTemplates!: () => Promise<void>;
 
   @CVPDFStore.Action
-  setCVDataAction!: (cvData: CVExportData) => Promise<void>;
-
-  @CVPDFStore.Action
-  setSelectedTemplateAction!: (template: Template) => Promise<void>;
-
-  @CVPDFStore.Action
   exportPDF!: (exportPdfDto: ExportPdfDto) => Promise<void>;
 
   @DialogStore.Mutation
   pushDialogComponent!: (dialogComponent: DialogComponent) => void;
-
-  get pdfUrl() {
-    if (this.blob) {
-      return window.URL.createObjectURL(this.blob);
-    }
-
-    return null;
-  }
 
   async created(): Promise<void> {
     const idStr = this.$route.params.id;
@@ -93,42 +71,38 @@ export default class CVPDFView extends Vue {
     await this.fetchTemplates();
   }
 
-  async onTemplateUse(template: Template): Promise<void> {
-    await this.setSelectedTemplateAction(template);
-    await this.print();
+  editData() {
+    this.pushDialogComponent({
+      component: EditJsonDialog,
+      props: {}
+    });
   }
 
-  async onJsonUse(cvData: CVExportData): Promise<void> {
-    await this.setCVDataAction(cvData);
-    await this.print();
+  editTemplate() {
+    this.pushDialogComponent({
+      component: EditTemplateDialog,
+      props: {}
+    });
   }
 
   async print(): Promise<void> {
-    if (this.selectedTemplate) {
+    if (this.selectedTemplate && this.cvExportData) {
       const content = handlebars.compile(this.selectedTemplate.data.content)(
-        this.cvData
+        this.cvExportData
       );
 
       await this.exportPDF({ ...this.selectedTemplate.data, content });
     }
   }
 
-  openEditJsonDialog() {
-    this.pushDialogComponent({
-      component: EditJsonDialog,
-      props: { data: this.cvData, use: this.onJsonUse }
-    });
+  @Watch("selectedTemplate")
+  async selectedTemplateChanged() {
+    await this.print();
   }
 
-  openEditTemplateDialog() {
-    this.pushDialogComponent({
-      component: EditTemplateDialog,
-      props: {
-        initialTemplate: this.selectedTemplate,
-        templates: this.getTemplates,
-        use: this.onTemplateUse
-      }
-    });
+  @Watch("cvExportData")
+  async cvExportDataChanged() {
+    await this.print();
   }
 }
 </script>

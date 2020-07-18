@@ -28,7 +28,7 @@
       </div>
     </v-card-text>
     <v-card-actions>
-      <v-btn v-if="canEdit" color="primary" dark @click="newEducation">
+      <v-btn v-if="canEdit" color="primary" @click="newEducation">
         New Education
       </v-btn>
     </v-card-actions>
