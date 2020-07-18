@@ -1,5 +1,8 @@
 import { User } from "./user";
 import { Skill } from "./skill";
+import { Education } from "./education";
+import { WorkExperience } from "./work_experience";
+import { ProjectMembership } from "./project_membership";
 
 export class PatchCVDtoData {
   description!: string;
@@ -84,6 +87,10 @@ export class CVSearchResult {
   skills!: CVSearchResultSkill[];
 }
 
-export class CVExportData extends CV {
+export class CVExportData {
+  cv!: CV;
   skills!: Skill[];
+  educations!: Education[];
+  workExperiences!: WorkExperience[];
+  projectMemberships!: ProjectMembership[];
 }

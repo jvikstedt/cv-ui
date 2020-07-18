@@ -7,7 +7,7 @@
     <v-card-actions>
       <v-spacer></v-spacer>
 
-      <v-btn color="red darken-1" text @click="onSave">
+      <v-btn color="red darken-1" text @click="onSave" :disabled="!template">
         Save
       </v-btn>
 
@@ -15,7 +15,7 @@
         Cancel
       </v-btn>
 
-      <v-btn color="green darken-1" text @click="onUse">
+      <v-btn color="green darken-1" text @click="onUse" :disabled="!template">
         Use
       </v-btn>
     </v-card-actions>
@@ -23,13 +23,13 @@
     <v-card-text>
       <v-select
         v-model="template"
-        :items="templates"
+        :items="getTemplates"
         label="Template"
         item-text="name"
         return-object
       >
         <template v-slot:append-outer>
-          <v-btn @click="createTemplate">
+          <v-btn @click="newTemplate">
             New
           </v-btn>
         </template>
@@ -47,35 +47,48 @@
 
 <script lang="ts">
 import * as R from "ramda";
-import { Component, Vue, Prop } from "vue-property-decorator";
 import { namespace } from "vuex-class";
-import { Template } from "@/model/template";
+import { Component, Mixins } from "vue-property-decorator";
+import {
+  Template,
+  CreateTemplateDto,
+  PatchTemplateDto
+} from "@/model/template";
 import TemplatePdfForm from "./TemplatePdfForm.vue";
 import { ExportPdfDto } from "@/model/exporter";
-import { CreateTemplate, UpdateTemplate } from "@/api/template";
+import { DialogFormMixin } from "@/mixins";
 
-const DialogStore = namespace("DialogStore");
+const CVPDFStore = namespace("CVPDFStore");
 
 @Component({
   components: {
     TemplatePdfForm
   }
 })
-export default class EditTemplateDialog extends Vue {
-  @Prop({ required: false }) readonly initialTemplate!: Template;
-  @Prop({ required: true }) readonly templates!: Template[];
-  @Prop({ required: true }) readonly use!: (
-    template: Template
-  ) => Promise<void>;
+export default class EditTemplateDialog extends Mixins(DialogFormMixin) {
+  @CVPDFStore.State
+  selectedTemplate!: Template | null;
+
+  @CVPDFStore.Getter
+  getTemplates!: Template[];
+
+  @CVPDFStore.Mutation
+  setSelectedTemplate!: (template: Template) => void;
+
+  @CVPDFStore.Action
+  fetchTemplates!: () => Promise<void>;
+
+  @CVPDFStore.Action
+  createTemplate!: (createTemplateDto: CreateTemplateDto) => Promise<void>;
+
+  @CVPDFStore.Action
+  patchTemplate!: (patchTemplateDto: PatchTemplateDto) => Promise<void>;
 
   template: Template | null = null;
 
-  @DialogStore.Mutation
-  popDialogComponent!: () => void;
-
   async created(): Promise<void> {
-    if (this.initialTemplate) {
-      this.template = R.clone(this.initialTemplate);
+    if (this.selectedTemplate) {
+      this.template = R.clone(this.selectedTemplate);
     }
   }
 
@@ -85,31 +98,29 @@ export default class EditTemplateDialog extends Vue {
 
   async onSave() {
     if (this.template && !this.template.id) {
-      this.template = await CreateTemplate({
+      await this.createTemplate({
         name: this.template.name,
         exporter: this.template.exporter,
         data: this.template.data
       });
     } else if (this.template) {
-      this.template = await UpdateTemplate(this.template.id, {
-        name: this.template.name,
+      await this.patchTemplate({
+        id: this.template.id,
         data: this.template.data
       });
     }
+
+    this.popDialogComponent();
   }
 
   async onUse() {
     if (this.template) {
-      await this.use(this.template);
+      this.setSelectedTemplate(this.template);
     }
     this.popDialogComponent();
   }
 
-  async onCancel() {
-    this.popDialogComponent();
-  }
-
-  async createTemplate() {
+  async newTemplate() {
     this.template = R.merge(new Template(), {
       name: "",
       exporter: "pdf",

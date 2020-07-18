@@ -32,7 +32,7 @@
       </div>
     </v-card-text>
     <v-card-actions>
-      <v-btn v-if="canEdit" color="primary" dark @click="newProjectMembership">
+      <v-btn v-if="canEdit" color="primary" @click="newProjectMembership">
         New project
       </v-btn>
     </v-card-actions>

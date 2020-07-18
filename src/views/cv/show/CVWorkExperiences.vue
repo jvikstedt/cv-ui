@@ -29,7 +29,7 @@
       </div>
     </v-card-text>
     <v-card-actions>
-      <v-btn v-if="canEdit" color="primary" dark @click="newWorkExperience">
+      <v-btn v-if="canEdit" color="primary" @click="newWorkExperience">
         New work experience
       </v-btn>
     </v-card-actions>
