@@ -169,6 +169,7 @@ export class CVPDFStore extends VuexModule {
 
   @Action
   public async exportPDF(exportPdfDto: ExportPdfDto): Promise<void> {
+    this.context.commit("setFetching", true);
     const pdf = await Api.post("/exporters/pdf/export", exportPdfDto, {
       responseType: "arraybuffer",
       headers: {
@@ -180,5 +181,6 @@ export class CVPDFStore extends VuexModule {
     const pdfUrl = window.URL.createObjectURL(blob);
 
     this.context.commit("setPDF", pdfUrl);
+    this.context.commit("setFetching", false);
   }
 }

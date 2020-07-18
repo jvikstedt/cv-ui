@@ -11,7 +11,7 @@
         :search-input.sync="searchInput"
         item-text="name"
         item-value="id"
-        label="Skill subject"
+        label="Skill"
         placeholder="Start typing to search"
         return-object
         @change="onSelect"
@@ -42,6 +42,10 @@
 
       <v-btn @click="onSearch">
         Search
+      </v-btn>
+
+      <v-btn color="green darken-1" text @click="onCancel">
+        Close
       </v-btn>
 
       <v-list class="mt-2">
@@ -81,14 +85,6 @@
         <p v-else>No results!</p>
       </v-list>
     </v-card-text>
-
-    <v-card-actions>
-      <v-spacer></v-spacer>
-
-      <v-btn color="green darken-1" text @click="onCancel">
-        Close
-      </v-btn>
-    </v-card-actions>
   </v-card>
 </template>
 

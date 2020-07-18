@@ -2,12 +2,12 @@
   <v-card :loading="fetching">
     <v-row>
       <v-col cols="12" sm="4">
+        <p class="text-center">
+          <v-btn color="primary darken-1" text @click="onExport">
+            Export
+          </v-btn>
+        </p>
         <template v-if="!fetching">
-          <p class="text-center">
-            <v-btn color="primary darken-1" text @click="onExport">
-              Export
-            </v-btn>
-          </p>
           <p class="text-center">
             <v-avatar size="146.6" tile color="indigo">
               <v-img v-if="avatarSrc" :src="avatarSrc"></v-img>

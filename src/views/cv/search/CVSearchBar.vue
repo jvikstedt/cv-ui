@@ -2,7 +2,7 @@
   <v-autocomplete
     v-model="cv"
     :items="results"
-    label="Search"
+    label="Search by name"
     item-text="fullName"
     return-object
     single-line
@@ -58,7 +58,10 @@ export default class CVSearchBar extends Mixins(SearchMixin, DialogMixin) {
     this.debounce = window.setTimeout(async () => {
       const cvSearchDto = new CVSearchDto({
         key: this.searchKey,
-        data: { fullName: input || "" }
+        data: {
+          fullName: input || "",
+          sorts: [{ field: "updatedAt", order: "desc" }]
+        }
       });
       await this.searchCVs(cvSearchDto);
     }, debounce);
