@@ -7,6 +7,8 @@ export class DialogComponent {
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   props: any = {};
+
+  maxWidth?: number;
 }
 
 @Module({ namespaced: true })

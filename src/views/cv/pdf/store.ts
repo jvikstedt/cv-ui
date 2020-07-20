@@ -7,12 +7,12 @@ import {
   CreateTemplateDto,
   PatchTemplateDto
 } from "@/model/template";
-import { CVExportData } from "@/model/cv";
 import { Skill } from "@/model/skill";
 import { ExportPdfDto } from "@/model/exporter";
+import { ExportData } from "./types";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-const buildCVExportData = (responses: any[]): any => {
+const buildCVExportData = (responses: any[]): ExportData => {
   const [
     cv,
     skills,
@@ -22,22 +22,29 @@ const buildCVExportData = (responses: any[]): any => {
   ] = responses;
 
   return {
-    id: cv.id,
-    description: cv.description,
-    updatedAt: cv.updatedAt,
-    userId: cv.userId,
-    username: cv.user.username,
-    avatarId: cv.user.avatarId,
-    fullName: `${cv.user.firstName} ${cv.user.lastName}`,
-    jobTitle: cv.user.jobTitle,
-    phone: cv.user.phone,
-    location: cv.user.location,
-    email: cv.user.email,
+    user: {
+      cvId: cv.id,
+      description: cv.description,
+      updatedAt: cv.updatedAt,
+      userId: cv.userId,
+      username: cv.user.username,
+      avatarId: cv.user.avatarId,
+      firstName: cv.user.firstName,
+      lastName: cv.user.lastName,
+      jobTitle: cv.user.jobTitle,
+      phone: cv.user.phone,
+      location: cv.user.location,
+      email: cv.user.email
+    },
     skills: R.map(
       skill => ({
+        id: skill.id,
         experienceInYears: skill.experienceInYears,
         skillSubjectId: skill.skillSubject.id,
-        name: skill.skillSubject.name
+        name: skill.skillSubject.name,
+        skillGroupId: skill.skillSubject.skillGroup.id,
+        skillGroupName: skill.skillSubject.skillGroup.name,
+        disabled: false
       }),
       skills
     ),
@@ -86,7 +93,7 @@ const buildCVExportData = (responses: any[]): any => {
 @Module({ namespaced: true })
 export class CVPDFStore extends VuexModule {
   public fetching = false;
-  public cvExportData: CVExportData | null = null;
+  public exportData: ExportData | null = null;
   public templates: { [key: number]: Template } = {};
   public selectedTemplate: Template | null = null;
   public pdf: string | null = null;
@@ -118,8 +125,8 @@ export class CVPDFStore extends VuexModule {
   }
 
   @Mutation
-  public setCVExportData(cvExportData: CVExportData): void {
-    this.cvExportData = cvExportData;
+  public setCVExportData(exportData: ExportData): void {
+    this.exportData = exportData;
   }
 
   @Action
