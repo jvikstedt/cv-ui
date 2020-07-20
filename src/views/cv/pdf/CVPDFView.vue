@@ -27,10 +27,10 @@ import { namespace } from "vuex-class";
 import * as handlebars from "handlebars";
 import EditJsonDialog from "./components/EditJsonDialog.vue";
 import { DialogComponent } from "@/dialog";
-import { CVExportData } from "@/model/cv";
 import { Template } from "@/model/template";
 import { ExportPdfDto } from "@/model/exporter";
 import EditTemplateDialog from "./components/EditTemplateDialog.vue";
+import { ExportData } from "./types";
 
 const CVPDFStore = namespace("CVPDFStore");
 const DialogStore = namespace("DialogStore");
@@ -46,7 +46,7 @@ export default class CVPDFView extends Vue {
   pdf!: string | null;
 
   @CVPDFStore.State
-  cvExportData!: CVExportData | null;
+  exportData!: ExportData | null;
 
   @CVPDFStore.State
   selectedTemplate!: Template | null;
@@ -74,7 +74,8 @@ export default class CVPDFView extends Vue {
   editData() {
     this.pushDialogComponent({
       component: EditJsonDialog,
-      props: {}
+      props: {},
+      maxWidth: 1200
     });
   }
 
@@ -86,9 +87,9 @@ export default class CVPDFView extends Vue {
   }
 
   async print(): Promise<void> {
-    if (this.selectedTemplate && this.cvExportData) {
+    if (this.selectedTemplate && this.exportData) {
       const content = handlebars.compile(this.selectedTemplate.data.content)(
-        this.cvExportData
+        this.exportData
       );
 
       await this.exportPDF({ ...this.selectedTemplate.data, content });
@@ -100,7 +101,7 @@ export default class CVPDFView extends Vue {
     await this.print();
   }
 
-  @Watch("cvExportData")
+  @Watch("exportData")
   async cvExportDataChanged() {
     await this.print();
   }

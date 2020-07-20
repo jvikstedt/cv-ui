@@ -20,7 +20,7 @@
       <div
         id="jsoneditor"
         ref="jsoneditor"
-        style="width: 100%; height: 400px"
+        style="width: 100%; height: 600px"
       ></div>
     </v-card-text>
   </v-card>
@@ -29,30 +29,30 @@
 <script lang="ts">
 import JSONEditor from "jsoneditor";
 import { Component, Mixins } from "vue-property-decorator";
-import { CVExportData } from "@/model/cv";
 import { DialogFormMixin } from "@/mixins";
 import { namespace } from "vuex-class";
+import { ExportData } from "../types";
 
 const CVPDFStore = namespace("CVPDFStore");
 
 @Component
 export default class EditJsonDialog extends Mixins(DialogFormMixin) {
   @CVPDFStore.State
-  cvExportData!: CVExportData | null;
+  exportData!: ExportData | null;
 
   @CVPDFStore.Mutation
-  setCVExportData!: (cvExportData: CVExportData) => void;
+  setCVExportData!: (exportData: ExportData) => void;
 
   editor?: JSONEditor;
 
   mounted() {
     const element = document.getElementById("jsoneditor");
-    if (element && this.cvExportData) {
+    if (element && this.exportData) {
       this.editor = new JSONEditor(element, {
         mode: "tree",
         search: true
       });
-      this.editor.set(this.cvExportData);
+      this.editor.set(this.exportData);
     }
   }
 

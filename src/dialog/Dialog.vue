@@ -1,7 +1,11 @@
 <template>
   <div>
     <template v-for="dc in dialogComponents">
-      <v-dialog :key="dc.component.name" v-model="dialog" max-width="600">
+      <v-dialog
+        :key="dc.component.name"
+        v-model="dialog"
+        :max-width="dc.maxWidth || 600"
+      >
         <component v-bind="dc.props" :is="dc.component"></component>
       </v-dialog>
     </template>
