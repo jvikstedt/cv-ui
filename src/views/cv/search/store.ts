@@ -1,7 +1,7 @@
 import Vue from "vue";
 import { VuexModule, Module, Mutation, Action } from "vuex-module-decorators";
 import Api from "@/api/api";
-import { CVSearchResult, CVSearchDto } from "@/model/cv";
+import { CVSearchResult, CVSearchDtoData, CVSearchDto } from "@/model/cv";
 
 class CVSearchResultContainer {
   key!: string;
@@ -17,6 +17,8 @@ class CVSearchingContainer {
 export class CVSearchStore extends VuexModule {
   public results: { [key: string]: CVSearchResult[] } = {};
   public searching: { [key: string]: boolean } = {};
+
+  public searchData: CVSearchDtoData = new CVSearchDtoData();
 
   get resultsByKey() {
     return (key: string): CVSearchResult[] => this.results[key] || [];
@@ -34,6 +36,11 @@ export class CVSearchStore extends VuexModule {
   @Mutation
   public setSearching(container: CVSearchingContainer): void {
     Vue.set(this.searching, container.key, container.searching);
+  }
+
+  @Mutation
+  public setSearchData(searchData: CVSearchDtoData): void {
+    this.searchData = searchData;
   }
 
   @Action

@@ -27,6 +27,8 @@ export class CVSearchDtoSkill {
   required? = false;
 
   skillSubjectId!: number;
+
+  name?: string;
 }
 
 export class Sort {
