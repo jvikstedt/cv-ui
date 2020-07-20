@@ -56,7 +56,8 @@ const buildCVExportData = (responses: any[]): ExportData => {
         endYear: education.endYear,
         degree: education.degree,
         fieldOfStudy: education.fieldOfStudy,
-        description: education.description
+        description: education.description,
+        disabled: false
       }),
       educations
     ),
@@ -69,7 +70,8 @@ const buildCVExportData = (responses: any[]): ExportData => {
         endYear: workExperience.endYear,
         endMonth: workExperience.endMonth,
         description: workExperience.description,
-        jobTitle: workExperience.jobTitle
+        jobTitle: workExperience.jobTitle,
+        disabled: false
       }),
       workExperiences
     ),
@@ -83,7 +85,8 @@ const buildCVExportData = (responses: any[]): ExportData => {
         startMonth: projectMembership.startMonth,
         endYear: projectMembership.endYear,
         endMonth: projectMembership.endMonth,
-        description: projectMembership.description
+        description: projectMembership.description,
+        disabled: false
       }),
       projectMemberships
     )

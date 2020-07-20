@@ -3,7 +3,11 @@
     <v-card-title class="headline">Search</v-card-title>
 
     <v-card-text>
-      <v-text-field label="name" v-model="fullName"></v-text-field>
+      <v-text-field
+        label="name"
+        :value="searchData.fullName"
+        @input="setFullName"
+      ></v-text-field>
 
       <v-autocomplete
         v-model="selectedSkillSubject"
@@ -17,12 +21,14 @@
         @change="onSelect"
       ></v-autocomplete>
 
-      <template v-for="option in skillSearchOptions">
-        <div :key="option.skillSubjectId">
+      <template v-for="skill in searchData.skills">
+        <div :key="skill.skillSubjectId">
           <v-row class="ml-1 mr-1 mb-2">
-            <p class="ma-0">{{ option.name }}</p>
+            <p class="ma-0">{{ skill.name }}</p>
             <v-checkbox
-              v-model="option.required"
+              v-model="skill.required"
+              :value="skill.required"
+              @input="setSkillRequired($event.target.value, skill)"
               label="Required"
               dense
               hide-details
@@ -32,7 +38,7 @@
               height="auto"
               icon
               color="red lighten-2"
-              @click="removeSelectedSkillSubject(option)"
+              @click="removeSelectedSkillSubject(skill)"
             >
               <v-icon>mdi-delete</v-icon>
             </v-btn>
@@ -91,26 +97,33 @@
 <script lang="ts">
 import * as R from "ramda";
 import { Component, Watch, Mixins } from "vue-property-decorator";
-import { CVSearchDtoSkill, CVSearchDto, CVSearchResult } from "@/model/cv";
+import {
+  CVSearchDtoSkill,
+  CVSearchResult,
+  CVSearchDtoData,
+  CVSearchDto,
+  CVSearchResultSkill
+} from "@/model/cv";
+import { namespace } from "vuex-class";
 import { SkillSubject } from "@/model/skill_subject";
 import { SearchSkillSubjects } from "@/api/skill_subject";
 import { SearchMixin, DialogMixin } from "@/mixins";
 
-class SkillSearchOption extends CVSearchDtoSkill {
-  name!: string;
-}
+const CVSearchStore = namespace("CVSearchStore");
 
 @Component
 export default class CVSearchView extends Mixins(SearchMixin, DialogMixin) {
   searchKey = "CVSearchView";
 
-  fullName = "";
-
   searchInput = null;
   selectedSkillSubject: SkillSubject | null = null;
   skillSubjects: SkillSubject[] = [];
 
-  skillSearchOptions: SkillSearchOption[] = [];
+  @CVSearchStore.State
+  searchData!: CVSearchDtoData;
+
+  @CVSearchStore.Mutation
+  setSearchData!: (searchData: CVSearchDtoData) => void;
 
   @Watch("searchInput")
   async searchInputChanged(input: string) {
@@ -122,12 +135,17 @@ export default class CVSearchView extends Mixins(SearchMixin, DialogMixin) {
     this.skillSubjects = R.reject(
       (skillSubject: SkillSubject) =>
         !!R.find(
-          (skillSearchOption: SkillSearchOption) =>
-            R.equals(skillSearchOption.skillSubjectId, skillSubject.id),
-          this.skillSearchOptions
+          (skill: CVSearchDtoSkill) =>
+            R.equals(skill.skillSubjectId, skillSubject.id),
+          this.searchData.skills || []
         ),
       skillSubjects
     );
+  }
+
+  @Watch("searchData")
+  async searchDataChanged() {
+    await this.onSearch();
   }
 
   async created() {
@@ -136,10 +154,10 @@ export default class CVSearchView extends Mixins(SearchMixin, DialogMixin) {
 
   commonSkills(cvSearchResult: CVSearchResult) {
     return R.filter(
-      skill =>
+      resultSkill =>
         !!R.find(
-          option => R.equals(option.skillSubjectId, skill.skillSubjectId),
-          this.skillSearchOptions
+          skill => R.equals(skill.skillSubjectId, resultSkill.skillSubjectId),
+          this.searchData.skills || []
         ),
       cvSearchResult.skills
     );
@@ -156,20 +174,19 @@ export default class CVSearchView extends Mixins(SearchMixin, DialogMixin) {
   async onSearch() {
     const cvSearchDto = new CVSearchDto({
       key: this.searchKey,
-      data: {
-        fullName: this.fullName,
-        skills: this.skillSearchOptions
-      }
+      data: this.searchData
     });
     await this.searchCVs(cvSearchDto);
   }
 
-  async removeSelectedSkillSubject(skillSearchOption: SkillSearchOption) {
-    this.skillSearchOptions = R.reject(
-      option =>
-        R.equals(option.skillSubjectId, skillSearchOption.skillSubjectId),
-      this.skillSearchOptions
-    );
+  async removeSelectedSkillSubject(resultSkill: CVSearchResultSkill) {
+    this.setSearchData({
+      ...this.searchData,
+      skills: R.reject(
+        skill => R.equals(skill.skillSubjectId, resultSkill.skillSubjectId),
+        this.searchData.skills || []
+      )
+    });
   }
 
   async onSelect(skillSubject: SkillSubject) {
@@ -177,11 +194,33 @@ export default class CVSearchView extends Mixins(SearchMixin, DialogMixin) {
       this.selectedSkillSubject = null;
     });
 
-    const skillSearchOption = new SkillSearchOption();
-    skillSearchOption.skillSubjectId = skillSubject.id;
-    skillSearchOption.name = skillSubject.name;
+    const searchDtoSkill = new CVSearchDtoSkill();
+    searchDtoSkill.skillSubjectId = skillSubject.id;
+    searchDtoSkill.name = skillSubject.name;
 
-    this.skillSearchOptions = [...this.skillSearchOptions, skillSearchOption];
+    this.setSearchData({
+      ...this.searchData,
+      skills: [...(this.searchData.skills || []), searchDtoSkill]
+    });
+  }
+
+  setSkillRequired(required: boolean, skill: CVSearchDtoSkill) {
+    this.setSearchData({
+      ...this.searchData,
+      skills: R.map(s => {
+        if (R.equals(s.skillSubjectId, skill.skillSubjectId)) {
+          return { ...s, required };
+        }
+        return s;
+      }, this.searchData.skills || [])
+    });
+  }
+
+  setFullName(fullName: string) {
+    this.setSearchData({
+      ...this.searchData,
+      fullName
+    });
   }
 
   async onCancel() {
