@@ -26,9 +26,8 @@
           <v-row class="ml-1 mr-1 mb-2">
             <p class="ma-0">{{ skill.name }}</p>
             <v-checkbox
-              v-model="skill.required"
               :value="skill.required"
-              @input="setSkillRequired($event.target.value, skill)"
+              @change="setSkillRequired($event, skill)"
               label="Required"
               dense
               hide-details
@@ -107,12 +106,12 @@ import {
 import { namespace } from "vuex-class";
 import { SkillSubject } from "@/model/skill_subject";
 import { SearchSkillSubjects } from "@/api/skill_subject";
-import { SearchMixin, DialogMixin } from "@/mixins";
+import { SearchMixin, DialogFormMixin } from "@/mixins";
 
 const CVSearchStore = namespace("CVSearchStore");
 
 @Component
-export default class CVSearchView extends Mixins(SearchMixin, DialogMixin) {
+export default class CVSearchView extends Mixins(SearchMixin, DialogFormMixin) {
   searchKey = "CVSearchView";
 
   searchInput = null;
@@ -221,10 +220,6 @@ export default class CVSearchView extends Mixins(SearchMixin, DialogMixin) {
       ...this.searchData,
       fullName
     });
-  }
-
-  async onCancel() {
-    this.popDialogComponent();
   }
 }
 </script>
