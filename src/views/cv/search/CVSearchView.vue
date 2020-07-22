@@ -1,12 +1,13 @@
 <template>
-  <v-card>
+  <v-card :loading="searching">
     <v-card-title class="headline">Search</v-card-title>
 
     <v-card-text>
       <v-text-field
-        label="name"
-        :value="searchData.fullName"
-        @input="setFullName"
+        label="Text"
+        :value="searchData.text"
+        @input="setText"
+        placeholder="Search by name, location, job title..."
       ></v-text-field>
 
       <v-autocomplete
@@ -54,13 +55,7 @@
       </v-btn>
 
       <v-list class="mt-2">
-        <template v-if="searching">
-          <v-progress-circular
-            indeterminate
-            color="primary"
-          ></v-progress-circular>
-        </template>
-        <template v-else-if="results.length">
+        <template v-if="results.length">
           <template v-for="item in results">
             <v-list-item :key="item.id" @click="onResultClick(item)">
               <v-list-item-avatar tile size="50" color="indigo">
@@ -175,7 +170,7 @@ export default class CVSearchView extends Mixins(SearchMixin, DialogFormMixin) {
       key: this.searchKey,
       data: this.searchData
     });
-    await this.searchCVs(cvSearchDto);
+    await this.searchAndDebounce(cvSearchDto);
   }
 
   async removeSelectedSkillSubject(resultSkill: CVSearchResultSkill) {
@@ -215,10 +210,10 @@ export default class CVSearchView extends Mixins(SearchMixin, DialogFormMixin) {
     });
   }
 
-  setFullName(fullName: string) {
+  setText(text: string) {
     this.setSearchData({
       ...this.searchData,
-      fullName
+      text
     });
   }
 }

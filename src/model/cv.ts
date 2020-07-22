@@ -40,6 +40,8 @@ export class Sort {
 export class CVSearchDtoData {
   fullName?: string = "";
 
+  text?: string = "";
+
   limit?: number = 10;
 
   skills?: CVSearchDtoSkill[] = [];

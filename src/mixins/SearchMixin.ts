@@ -18,6 +18,16 @@ export default class SearchMixin extends Vue {
   @CVSearchStore.Action
   searchCVs!: (cvSearchDto: CVSearchDto) => Promise<void>;
 
+  debounce = 0;
+
+  searchAndDebounce(cvSearchDto: CVSearchDto, debounce = 500): void {
+    clearTimeout(this.debounce);
+
+    this.debounce = window.setTimeout(async () => {
+      await this.searchCVs(cvSearchDto);
+    }, debounce);
+  }
+
   get results(): CVSearchResult[] {
     return this.resultsByKey(this.searchKey);
   }

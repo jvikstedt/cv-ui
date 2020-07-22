@@ -12,7 +12,7 @@
     filled
     :loading="searching"
     :search-input.sync="searchInput"
-    @focus="search('', 0)"
+    @focus="search('')"
     @change="onSelect"
     @click:append-outer="openAdvancedSearch"
   >
@@ -45,26 +45,22 @@ export default class CVSearchBar extends Mixins(SearchMixin, DialogMixin) {
 
   cv: CV | null = null;
   searchInput = null;
-  debounce = 0;
 
   @Watch("searchInput")
   async searchInputChanged(input: string) {
-    await this.search(input, 500);
+    await this.search(input);
   }
 
-  async search(input: string, debounce: number) {
-    clearTimeout(this.debounce);
+  async search(input: string) {
+    const cvSearchDto = new CVSearchDto({
+      key: this.searchKey,
+      data: {
+        fullName: input || "",
+        sorts: [{ field: "updatedAt", order: "desc" }]
+      }
+    });
 
-    this.debounce = window.setTimeout(async () => {
-      const cvSearchDto = new CVSearchDto({
-        key: this.searchKey,
-        data: {
-          fullName: input || "",
-          sorts: [{ field: "updatedAt", order: "desc" }]
-        }
-      });
-      await this.searchCVs(cvSearchDto);
-    }, debounce);
+    this.searchAndDebounce(cvSearchDto);
   }
 
   async onSelect(cv: CV) {
