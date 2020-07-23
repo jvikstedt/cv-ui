@@ -24,7 +24,7 @@
 <script lang="ts">
 import { Component, Vue, Watch } from "vue-property-decorator";
 import { namespace } from "vuex-class";
-import * as handlebars from "handlebars";
+import * as nunjucks from "nunjucks";
 import EditJsonDialog from "./components/EditJsonDialog.vue";
 import { DialogComponent } from "@/dialog";
 import { Template } from "@/model/template";
@@ -88,7 +88,9 @@ export default class CVPDFView extends Vue {
 
   async print(): Promise<void> {
     if (this.selectedTemplate && this.exportData) {
-      const content = handlebars.compile(this.selectedTemplate.data.content)(
+      nunjucks.configure({ autoescape: true });
+      const content = nunjucks.renderString(
+        this.selectedTemplate.data.content,
         this.exportData
       );
 
