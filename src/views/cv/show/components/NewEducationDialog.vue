@@ -61,6 +61,8 @@
           :rules="isRequiredRule"
           type="number"
         ></v-text-field>
+
+        <v-checkbox v-model="highlight" label="Highlight"></v-checkbox>
       </v-card-text>
 
       <v-card-actions>
@@ -107,6 +109,7 @@ export default class NewEducationDialog extends Mixins(DialogFormMixin) {
   description = "";
   startYear = 2010;
   endYear = 2014;
+  highlight = false;
 
   @CVShowStore.Getter
   getCVEducations!: (id: number) => Education[];
@@ -139,7 +142,8 @@ export default class NewEducationDialog extends Mixins(DialogFormMixin) {
         fieldOfStudy: this.fieldOfStudy,
         description: this.description,
         startYear: this.startYear,
-        endYear: this.endYear
+        endYear: this.endYear,
+        highlight: this.highlight
       };
       await this.createEducation(createEducationDto);
       this.popDialogComponent();

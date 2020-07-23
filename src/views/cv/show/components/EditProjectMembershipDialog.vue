@@ -43,6 +43,8 @@
           :rules="isRequiredRule"
           type="number"
         ></v-text-field>
+
+        <v-checkbox v-model="highlight" label="Highlight"></v-checkbox>
       </v-card-text>
 
       <v-card-actions>
@@ -87,6 +89,7 @@ export default class EditProjectMembershipDialog extends Mixins(
   startMonth = 1;
   endYear = 2014;
   endMonth = 12;
+  highlight = false;
 
   @CVShowStore.Action
   patchProjectMembership!: (
@@ -111,6 +114,7 @@ export default class EditProjectMembershipDialog extends Mixins(
     this.startMonth = this.projectMembership.startMonth;
     this.endYear = this.projectMembership.endYear;
     this.endMonth = this.projectMembership.endMonth;
+    this.highlight = this.projectMembership.highlight;
   }
 
   async onProjectMembershipDelete() {
@@ -142,7 +146,8 @@ export default class EditProjectMembershipDialog extends Mixins(
           startYear: this.startYear,
           startMonth: this.startMonth,
           endYear: this.endYear,
-          endMonth: this.endMonth
+          endMonth: this.endMonth,
+          highlight: this.highlight
         }
       };
       await this.patchProjectMembership(patchProjectMembershipDto);
