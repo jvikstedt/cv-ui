@@ -5,6 +5,8 @@ export class Skill {
 
   experienceInYears!: number;
 
+  highlight!: boolean;
+
   cvId!: number;
 
   skillSubject!: SkillSubject;
@@ -18,6 +20,8 @@ export class Skill {
 
 export class PatchSkillDtoData {
   experienceInYears!: number;
+
+  highlight!: boolean;
 }
 
 export class PatchSkillDto {
@@ -37,4 +41,6 @@ export class CreateSkillDto {
   skillSubjectId!: number;
 
   experienceInYears!: number;
+
+  highlight!: boolean;
 }

@@ -13,6 +13,8 @@ export class User {
 
   location!: string;
 
+  workExperienceInYears!: number;
+
   email!: string;
 
   avatarId!: string;
@@ -32,6 +34,8 @@ export class PatchUserDtoData {
   phone?: string;
 
   location?: string;
+
+  workExperienceInYears?: number;
 
   email?: string;
 

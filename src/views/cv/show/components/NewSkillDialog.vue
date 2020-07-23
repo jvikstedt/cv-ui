@@ -44,6 +44,8 @@
             ></v-text-field>
           </template>
         </v-slider>
+
+        <v-checkbox v-model="highlight" label="Highlight"></v-checkbox>
       </v-card-text>
 
       <v-card-actions>
@@ -82,6 +84,7 @@ export default class NewSkillDialog extends Mixins(DialogFormMixin) {
   @Prop({ required: true }) readonly id!: number;
 
   experienceInYears = 1;
+  highlight = false;
   search = "";
   skillSubjects: SkillSubject[] = [];
   skillSubject: SkillSubject | null = null;
@@ -113,6 +116,7 @@ export default class NewSkillDialog extends Mixins(DialogFormMixin) {
       const createSkillDto: CreateSkillDto = {
         cvId: this.id,
         experienceInYears: this.experienceInYears,
+        highlight: this.highlight,
         skillSubjectId: this.skillSubject.id
       };
       await this.createSkill(createSkillDto);

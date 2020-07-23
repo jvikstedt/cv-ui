@@ -34,6 +34,7 @@ const buildCVExportData = (responses: any[]): ExportData => {
       jobTitle: cv.user.jobTitle,
       phone: cv.user.phone,
       location: cv.user.location,
+      workExperienceInYears: cv.user.workExperienceInYears,
       email: cv.user.email
     },
     skills: R.map(
@@ -44,6 +45,7 @@ const buildCVExportData = (responses: any[]): ExportData => {
         name: skill.skillSubject.name,
         skillGroupId: skill.skillSubject.skillGroup.id,
         skillGroupName: skill.skillSubject.skillGroup.name,
+        highlight: skill.highlight,
         disabled: false
       }),
       skills
