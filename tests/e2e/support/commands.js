@@ -51,7 +51,7 @@ Cypress.Commands.add("logout", () => {
 
 Cypress.Commands.add(
   "createSkill",
-  (skillSubjectName = "Ruby", experienceInYears = 1) => {
+  (skillSubjectName = "Ruby", experienceInYears = 1, highlight = false) => {
     const accessToken = window.localStorage.getItem("accessToken");
     const tokenData = jwt(accessToken);
 
@@ -79,7 +79,8 @@ Cypress.Commands.add(
           },
           body: {
             skillSubjectId: skillSubject.id,
-            experienceInYears
+            experienceInYears,
+            highlight
           }
         });
       });

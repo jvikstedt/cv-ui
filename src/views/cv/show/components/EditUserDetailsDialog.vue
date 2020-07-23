@@ -36,6 +36,13 @@
         ></v-text-field>
 
         <v-text-field
+          v-model="workExperienceInYears"
+          label="Work experience in years"
+          :rules="isRequiredRule"
+          type="number"
+        ></v-text-field>
+
+        <v-text-field
           name="phone"
           v-model="phone"
           label="Phone"
@@ -98,6 +105,7 @@ export default class EditUserNamesDialog extends Mixins(DialogFormMixin) {
   jobTitle = "";
   phone = "";
   location = "";
+  workExperienceInYears = 1;
   email = "";
   avatarId = "";
 
@@ -111,6 +119,7 @@ export default class EditUserNamesDialog extends Mixins(DialogFormMixin) {
     this.jobTitle = this.user.jobTitle;
     this.phone = this.user.phone;
     this.location = this.user.location;
+    this.workExperienceInYears = this.user.workExperienceInYears;
     this.email = this.user.email;
     this.avatarId = this.user.avatarId;
   }
@@ -143,6 +152,7 @@ export default class EditUserNamesDialog extends Mixins(DialogFormMixin) {
           jobTitle: this.jobTitle,
           phone: this.phone,
           location: this.location,
+          workExperienceInYears: this.workExperienceInYears,
           email: this.email,
           avatarId: this.avatarId
         }

@@ -25,6 +25,8 @@
             ></v-text-field>
           </template>
         </v-slider>
+
+        <v-checkbox v-model="highlight" label="Highlight"></v-checkbox>
       </v-card-text>
 
       <v-card-actions>
@@ -60,6 +62,7 @@ export default class EditSkillDialog extends Mixins(DialogFormMixin) {
   @Prop({ required: true }) readonly skillId!: number;
 
   experienceInYears = 1;
+  highlight = false;
 
   @CVShowStore.Action
   patchSkill!: (patchSkillDto: PatchSkillDto) => Promise<void>;
@@ -79,6 +82,7 @@ export default class EditSkillDialog extends Mixins(DialogFormMixin) {
 
   created() {
     this.experienceInYears = this.skill.experienceInYears;
+    this.highlight = this.skill.highlight;
   }
 
   async onSkillDelete() {
@@ -102,7 +106,8 @@ export default class EditSkillDialog extends Mixins(DialogFormMixin) {
         cvId: skill.cvId,
         skillId: skill.id,
         data: {
-          experienceInYears: this.experienceInYears
+          experienceInYears: this.experienceInYears,
+          highlight: this.highlight
         }
       };
       await this.patchSkill(patchSkillDto);

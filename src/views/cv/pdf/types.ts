@@ -18,6 +18,7 @@ export class ExportDataUser {
   jobTitle!: string;
   phone!: string;
   location!: string;
+  workExperienceInYears!: number;
   email!: string;
 }
 
@@ -28,6 +29,7 @@ export class ExportDataSkill {
   name!: string;
   skillGroupId!: number;
   skillGroupName!: string;
+  highlight!: boolean;
   disabled!: boolean;
 }
 

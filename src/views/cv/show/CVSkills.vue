@@ -16,6 +16,7 @@
             {{ skill.experienceInYears }}
           </v-avatar>
           {{ skill.skillSubject.name }}
+          <v-icon v-if="skill.highlight" right>mdi-star</v-icon>
         </v-chip>
       </div>
     </v-card-text>
