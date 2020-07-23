@@ -30,7 +30,7 @@
       <v-btn icon @click="search" class="d-flex d-sm-none" v-if="isLoggedIn">
         <v-icon>mdi-magnify</v-icon>
       </v-btn>
-      <v-btn icon @click="logout" v-if="isLoggedIn">
+      <v-btn id="logout-btn" icon @click="logout" v-if="isLoggedIn">
         <v-icon>mdi-exit-to-app</v-icon>
       </v-btn>
     </v-app-bar>
