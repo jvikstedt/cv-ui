@@ -13,6 +13,8 @@ export class Education {
 
   endYear!: number;
 
+  highlight!: boolean;
+
   cvId!: number;
 
   school!: School;
@@ -34,6 +36,8 @@ export class PatchEducationDtoData {
   startYear?: number;
 
   endYear?: number;
+
+  highlight?: boolean;
 }
 
 export class PatchEducationDto {
@@ -61,4 +65,6 @@ export class CreateEducationDto {
   startYear!: number;
 
   endYear?: number;
+
+  highlight!: boolean;
 }

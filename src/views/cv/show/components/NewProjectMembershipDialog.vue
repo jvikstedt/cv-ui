@@ -60,6 +60,8 @@
           :rules="isRequiredRule"
           type="number"
         ></v-text-field>
+
+        <v-checkbox v-model="highlight" label="Highlight"></v-checkbox>
       </v-card-text>
 
       <v-card-actions>
@@ -106,6 +108,7 @@ export default class NewProjectMembershipDialog extends Mixins(
   startMonth = 1;
   endYear = 2014;
   endMonth = 12;
+  highlight = false;
 
   @CVShowStore.Getter
   getCVProjectMemberships!: (id: number) => ProjectMembership[];
@@ -132,7 +135,8 @@ export default class NewProjectMembershipDialog extends Mixins(
         startYear: this.startYear,
         startMonth: this.startMonth,
         endYear: this.endYear,
-        endMonth: this.endMonth
+        endMonth: this.endMonth,
+        highlight: this.highlight
       };
       await this.createProjectMembership(createProjectMembershipDto);
       this.popDialogComponent();

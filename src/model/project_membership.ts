@@ -11,6 +11,8 @@ export class ProjectMembership {
   endYear!: number;
   endMonth!: number;
 
+  highlight!: boolean;
+
   cvId!: number;
 
   project!: Project;
@@ -30,6 +32,8 @@ export class PatchProjectMembershipDtoData {
 
   endYear?: number;
   endMonth?: number;
+
+  highlight?: boolean;
 }
 
 export class PatchProjectMembershipDto {
@@ -55,4 +59,6 @@ export class CreateProjectMembershipDto {
 
   endYear?: number;
   endMonth?: number;
+
+  highlight!: boolean;
 }

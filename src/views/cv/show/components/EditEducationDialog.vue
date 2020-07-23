@@ -42,6 +42,8 @@
           :rules="isRequiredRule"
           type="number"
         ></v-text-field>
+
+        <v-checkbox v-model="highlight" label="Highlight"></v-checkbox>
       </v-card-text>
 
       <v-card-actions>
@@ -84,6 +86,7 @@ export default class EditEducationDialog extends Mixins(DialogFormMixin) {
   description = "";
   startYear = 2010;
   endYear = 2014;
+  highlight = false;
 
   @CVShowStore.Action
   patchEducation!: (patchEducationDto: PatchEducationDto) => Promise<void>;
@@ -104,6 +107,7 @@ export default class EditEducationDialog extends Mixins(DialogFormMixin) {
     this.description = this.education.description;
     this.startYear = this.education.startYear;
     this.endYear = this.education.endYear;
+    this.highlight = this.education.highlight;
   }
 
   async onEducationDelete() {
@@ -131,7 +135,8 @@ export default class EditEducationDialog extends Mixins(DialogFormMixin) {
           fieldOfStudy: this.fieldOfStudy,
           description: this.description,
           startYear: this.startYear,
-          endYear: this.endYear
+          endYear: this.endYear,
+          highlight: this.highlight
         }
       };
       await this.patchEducation(patchEducationDto);

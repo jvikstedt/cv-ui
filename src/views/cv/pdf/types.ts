@@ -41,6 +41,7 @@ export class ExportDataEducation {
   degree!: string;
   fieldOfStudy!: string;
   description!: string;
+  highlight!: boolean;
   disabled!: boolean;
 }
 
@@ -66,5 +67,6 @@ export class ExportDataProjectMembership {
   endYear!: number;
   endMonth!: number;
   description!: string;
+  highlight!: boolean;
   disabled!: boolean;
 }
