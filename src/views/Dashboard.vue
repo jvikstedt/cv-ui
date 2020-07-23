@@ -38,7 +38,7 @@
                       v-html="item.fullName"
                     ></v-list-item-title>
                     <v-list-item-subtitle>
-                      {{ item.updatedAt }}
+                      {{ formatDateTime(item.updatedAt) }}
                     </v-list-item-subtitle>
                   </v-list-item-content>
                 </v-list-item>
@@ -60,6 +60,7 @@ import { CVSearchDto } from "@/model/cv";
 import { TokenData } from "@/model/user";
 import { SearchMixin } from "@/mixins";
 import { CVSearchView } from "@/views/cv/search";
+import { FormatDateTime } from "@/helpers";
 
 const AuthStore = namespace("AuthStore");
 const DialogStore = namespace("DialogStore");
@@ -70,6 +71,8 @@ export default class Dashboard extends Mixins(SearchMixin) {
 
   @AuthStore.Getter
   user!: TokenData;
+
+  formatDateTime = FormatDateTime;
 
   @DialogStore.Mutation
   pushDialogComponent!: (dialogComponent: DialogComponent) => void;
