@@ -1,6 +1,7 @@
 <template>
   <v-autocomplete
     v-model="cv"
+    name="searchbar"
     :items="results"
     label="Search by name"
     item-text="fullName"

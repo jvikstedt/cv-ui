@@ -12,6 +12,7 @@
 
       <v-autocomplete
         v-model="selectedSkillSubject"
+        name="skill"
         :items="skillSubjects"
         :search-input.sync="searchInput"
         item-text="name"
@@ -46,7 +47,7 @@
         </div>
       </template>
 
-      <v-btn @click="onSearch">
+      <v-btn id="search-view-search-btn" @click="onSearch">
         Search
       </v-btn>
 
