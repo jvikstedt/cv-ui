@@ -8,11 +8,13 @@
     >
       <v-text-field
         v-model="username"
+        name="username"
         label="Username"
         :rules="usernameRules"
       />
       <v-text-field
         v-model="password"
+        name="password"
         label="Password"
         :rules="passwordRules"
         type="password"

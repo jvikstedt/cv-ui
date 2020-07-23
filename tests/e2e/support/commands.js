@@ -45,6 +45,10 @@ Cypress.Commands.add(
   }
 );
 
+Cypress.Commands.add("logout", () => {
+  window.localStorage.removeItem("accessToken");
+});
+
 Cypress.Commands.add(
   "createSkill",
   (skillSubjectName = "Ruby", experienceInYears = 1) => {
