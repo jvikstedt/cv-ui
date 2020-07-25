@@ -33,14 +33,14 @@ import { DialogFormMixin } from "@/mixins";
 import { namespace } from "vuex-class";
 import { ExportData } from "../types";
 
-const CVPDFStore = namespace("CVPDFStore");
+const CVExportStore = namespace("CVExportStore");
 
 @Component
 export default class EditJsonDialog extends Mixins(DialogFormMixin) {
-  @CVPDFStore.State
+  @CVExportStore.State
   exportData!: ExportData | null;
 
-  @CVPDFStore.Mutation
+  @CVExportStore.Mutation
   setCVExportData!: (exportData: ExportData) => void;
 
   editor?: JSONEditor;

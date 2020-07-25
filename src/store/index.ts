@@ -6,7 +6,7 @@ import { AlertStore } from "@/alert";
 
 import { CVShowStore } from "@/views/cv/show";
 import { CVSearchStore } from "@/views/cv/search";
-import { CVPDFStore } from "@/views/cv/pdf";
+import { CVExportStore } from "@/views/cv/export";
 
 import { DialogStore } from "@/dialog";
 
@@ -24,7 +24,7 @@ const store = new Vuex.Store({
     AlertStore,
     CVShowStore,
     CVSearchStore,
-    CVPDFStore,
+    CVExportStore,
     DialogStore,
     SkillSubjectStore,
     SkillGroupStore,

@@ -8,14 +8,24 @@
       </v-card-actions>
       <v-card-text>
         <object
-          v-if="pdf"
+          v-if="selectedTemplate && selectedTemplate.exporter === 'pdf' && pdf"
           id="pdfviewer"
           v-bind:data="pdf"
           type="application/pdf"
           width="100%"
           height="750px"
         />
-        <p v-if="!pdf">Select template</p>
+        <a
+          v-if="
+            selectedTemplate && selectedTemplate.exporter === 'docx' && docx
+          "
+          :download="docxFileName()"
+          :href="docx"
+          target="_blank"
+        >
+          Download docx
+        </a>
+        <p v-if="!selectedTemplate">Select template</p>
       </v-card-text>
     </v-card>
   </v-container>
@@ -24,41 +34,46 @@
 <script lang="ts">
 import { Component, Vue, Watch } from "vue-property-decorator";
 import { namespace } from "vuex-class";
-import * as nunjucks from "nunjucks";
 import EditJsonDialog from "./components/EditJsonDialog.vue";
 import { DialogComponent } from "@/dialog";
 import { Template } from "@/model/template";
-import { ExportPdfDto } from "@/model/exporter";
+import { ExportPdfDto, ExportDocxDto } from "@/model/exporter";
 import EditTemplateDialog from "./components/EditTemplateDialog.vue";
 import { ExportData } from "./types";
 
-const CVPDFStore = namespace("CVPDFStore");
+const CVExportStore = namespace("CVExportStore");
 const DialogStore = namespace("DialogStore");
 
 @Component
-export default class CVPDFView extends Vue {
+export default class CVExportView extends Vue {
   id: number | null = null;
 
-  @CVPDFStore.State
+  @CVExportStore.State
   fetching!: boolean;
 
-  @CVPDFStore.State
+  @CVExportStore.State
   pdf!: string | null;
 
-  @CVPDFStore.State
+  @CVExportStore.State
+  docx!: string | null;
+
+  @CVExportStore.State
   exportData!: ExportData | null;
 
-  @CVPDFStore.State
+  @CVExportStore.State
   selectedTemplate!: Template | null;
 
-  @CVPDFStore.Action
+  @CVExportStore.Action
   fetchCV!: (id: number) => Promise<void>;
 
-  @CVPDFStore.Action
+  @CVExportStore.Action
   fetchTemplates!: () => Promise<void>;
 
-  @CVPDFStore.Action
+  @CVExportStore.Action
   exportPDF!: (exportPdfDto: ExportPdfDto) => Promise<void>;
+
+  @CVExportStore.Action
+  exportDocx!: (exportDocxDto: ExportDocxDto) => Promise<void>;
 
   @DialogStore.Mutation
   pushDialogComponent!: (dialogComponent: DialogComponent) => void;
@@ -88,13 +103,24 @@ export default class CVPDFView extends Vue {
 
   async print(): Promise<void> {
     if (this.selectedTemplate && this.exportData) {
-      nunjucks.configure({ autoescape: true });
-      const content = nunjucks.renderString(
-        this.selectedTemplate.data.content,
-        this.exportData
-      );
-
-      await this.exportPDF({ ...this.selectedTemplate.data, content });
+      switch (this.selectedTemplate.exporter) {
+        case "pdf":
+          await this.exportPDF({
+            ...this.selectedTemplate.data,
+            data: this.exportData
+          });
+          break;
+        case "docx":
+          await this.exportDocx({
+            ...this.selectedTemplate.data,
+            data: this.exportData
+          });
+          break;
+        default:
+          console.log(
+            `${this.selectedTemplate.exporter} not supported exporter`
+          );
+      }
     }
   }
 
@@ -106,6 +132,13 @@ export default class CVPDFView extends Vue {
   @Watch("exportData")
   async cvExportDataChanged() {
     await this.print();
+  }
+
+  docxFileName(): string {
+    if (this.exportData) {
+      return `${this.exportData.user.firstName}-${this.exportData.user.lastName}.docx`.toLowerCase();
+    }
+    return "noname.docx";
   }
 }
 </script>
