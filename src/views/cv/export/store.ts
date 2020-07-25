@@ -8,7 +8,7 @@ import {
   PatchTemplateDto
 } from "@/model/template";
 import { Skill } from "@/model/skill";
-import { ExportPdfDto } from "@/model/exporter";
+import { ExportPdfDto, ExportDocxDto } from "@/model/exporter";
 import { ExportData } from "./types";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -98,12 +98,13 @@ const buildCVExportData = (responses: any[]): ExportData => {
 };
 
 @Module({ namespaced: true })
-export class CVPDFStore extends VuexModule {
+export class CVExportStore extends VuexModule {
   public fetching = false;
   public exportData: ExportData | null = null;
   public templates: { [key: number]: Template } = {};
   public selectedTemplate: Template | null = null;
   public pdf: string | null = null;
+  public docx: string | null = null;
 
   get getTemplates(): Template[] {
     return Object.values(this.templates);
@@ -117,6 +118,11 @@ export class CVPDFStore extends VuexModule {
   @Mutation
   public setPDF(pdf: string): void {
     this.pdf = pdf;
+  }
+
+  @Mutation
+  public setDocx(docx: string): void {
+    this.docx = docx;
   }
 
   @Mutation
@@ -195,6 +201,27 @@ export class CVPDFStore extends VuexModule {
     const pdfUrl = window.URL.createObjectURL(blob);
 
     this.context.commit("setPDF", pdfUrl);
+    this.context.commit("setFetching", false);
+  }
+
+  @Action
+  public async exportDocx(exportDocxDto: ExportDocxDto): Promise<void> {
+    this.context.commit("setFetching", true);
+    const response = await Api.post("/exporters/docx/export", exportDocxDto, {
+      responseType: "arraybuffer",
+      headers: {
+        Accept:
+          "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+      }
+    });
+
+    const blob = new Blob([response], {
+      type:
+        "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+    });
+    const docxURL = window.URL.createObjectURL(blob);
+
+    this.context.commit("setDocx", docxURL);
     this.context.commit("setFetching", false);
   }
 }

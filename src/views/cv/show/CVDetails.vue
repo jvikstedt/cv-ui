@@ -123,7 +123,7 @@ export default class CVDetails extends Vue {
   }
 
   onExport() {
-    this.$router.push(`/cv/${this.id}/pdf`);
+    this.$router.push(`/cv/${this.id}/export`);
   }
 }
 </script>

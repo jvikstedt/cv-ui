@@ -35,7 +35,7 @@
         </template>
       </v-select>
 
-      <TemplatePdfForm
+      <TemplateForm
         :key="template.id"
         v-if="template"
         :initialTemplate="template"
@@ -54,34 +54,34 @@ import {
   CreateTemplateDto,
   PatchTemplateDto
 } from "@/model/template";
-import TemplatePdfForm from "./TemplatePdfForm.vue";
+import TemplateForm from "./TemplateForm.vue";
 import { ExportPdfDto } from "@/model/exporter";
 import { DialogFormMixin } from "@/mixins";
 
-const CVPDFStore = namespace("CVPDFStore");
+const CVExportStore = namespace("CVExportStore");
 
 @Component({
   components: {
-    TemplatePdfForm
+    TemplateForm
   }
 })
 export default class EditTemplateDialog extends Mixins(DialogFormMixin) {
-  @CVPDFStore.State
+  @CVExportStore.State
   selectedTemplate!: Template | null;
 
-  @CVPDFStore.Getter
+  @CVExportStore.Getter
   getTemplates!: Template[];
 
-  @CVPDFStore.Mutation
+  @CVExportStore.Mutation
   setSelectedTemplate!: (template: Template) => void;
 
-  @CVPDFStore.Action
+  @CVExportStore.Action
   fetchTemplates!: () => Promise<void>;
 
-  @CVPDFStore.Action
+  @CVExportStore.Action
   createTemplate!: (createTemplateDto: CreateTemplateDto) => Promise<void>;
 
-  @CVPDFStore.Action
+  @CVExportStore.Action
   patchTemplate!: (patchTemplateDto: PatchTemplateDto) => Promise<void>;
 
   template: Template | null = null;

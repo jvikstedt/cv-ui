@@ -4,7 +4,7 @@ import Dashboard from "@/views/Dashboard.vue";
 import store from "@/store";
 
 import { CVShowView } from "@/views/cv/show";
-import { CVPDFView } from "@/views/cv/pdf";
+import { CVExportView } from "@/views/cv/export";
 import { LoginView } from "@/views/auth";
 
 Vue.use(VueRouter);
@@ -35,9 +35,9 @@ const routes: Array<RouteConfig> = [
     }
   },
   {
-    path: "/cv/:id/pdf",
-    name: "CVPDFView",
-    component: CVPDFView,
+    path: "/cv/:id/export",
+    name: "CVExportView",
+    component: CVExportView,
     meta: {
       requiresAuth: true
     }
