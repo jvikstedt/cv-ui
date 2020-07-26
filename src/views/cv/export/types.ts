@@ -2,8 +2,8 @@ export class ExportData {
   user!: ExportDataUser;
   skills!: ExportDataSkill[];
   educations!: ExportDataEducation[];
-  workExperiences!: ExportDataWorkExperience[];
-  projectMemberships!: ExportDataProjectMembership[];
+  jobs!: ExportDataJob[];
+  projects!: ExportDataProject[];
 }
 
 export class ExportDataUser {
@@ -45,7 +45,7 @@ export class ExportDataEducation {
   disabled!: boolean;
 }
 
-export class ExportDataWorkExperience {
+export class ExportDataJob {
   companyId!: number;
   companyName!: string;
   startYear!: number;
@@ -57,7 +57,7 @@ export class ExportDataWorkExperience {
   disabled!: boolean;
 }
 
-export class ExportDataProjectMembership {
+export class ExportDataProject {
   projectId!: number;
   projectName!: string;
   companyId!: number;
