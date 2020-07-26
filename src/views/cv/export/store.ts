@@ -64,7 +64,7 @@ const buildCVExportData = (responses: any[]): ExportData => {
       }),
       educations
     ),
-    workExperiences: R.map(
+    jobs: R.map(
       workExperience => ({
         companyId: workExperience.company.id,
         companyName: workExperience.company.name,
@@ -78,7 +78,7 @@ const buildCVExportData = (responses: any[]): ExportData => {
       }),
       workExperiences
     ),
-    projectMemberships: R.map(
+    projects: R.map(
       projectMembership => ({
         projectId: projectMembership.project.id,
         projectName: projectMembership.project.name,
