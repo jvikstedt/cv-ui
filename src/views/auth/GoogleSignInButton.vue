@@ -1,5 +1,6 @@
 <template>
   <g-signin-button
+    v-if="isReady"
     :params="googleSignInParams"
     @success="onSignInSuccess"
     @error="onSignInError"
@@ -14,11 +15,12 @@ import { namespace } from "vuex-class";
 
 const AuthStore = namespace("AuthStore");
 
+const GOOGLE_CLIENT_ID = process.env.VUE_APP_GOOGLE_CLIENT_ID;
+
 @Component
 export default class GoogleSignInButton extends Vue {
   googleSignInParams = {
-    ["client_id"]:
-      "433163468571-bqv3tk03pq1044qvir0qqkp3qunb3niu.apps.googleusercontent.com"
+    ["client_id"]: GOOGLE_CLIENT_ID
   };
 
   @AuthStore.Action
@@ -28,6 +30,11 @@ export default class GoogleSignInButton extends Vue {
   async onSignInSuccess(authData: any) {
     await this.googleSignIn(authData.wc.id_token);
     this.$router.push("/");
+  }
+
+  get isReady(): boolean {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    return !!(window as any).gapi;
   }
 
   async onSignInError(err: Error) {
