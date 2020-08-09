@@ -1,24 +1,34 @@
 <template>
   <v-card class="mt-5">
     <v-card-title class="headline">Skills</v-card-title>
+
     <v-card-text>
-      <div v-for="skillGroupName in skillGroups()" :key="skillGroupName">
-        <v-subheader>{{ skillGroupName }}</v-subheader>
-        <v-chip
-          :key="skill.id"
-          class="ma-2"
-          color="green"
-          text-color="white"
-          v-for="skill in skillsBySkillGroup(skillGroupName)"
-          v-on="canEdit ? { click: () => onSkillClick(skill) } : {}"
+      <v-expansion-panels>
+        <v-expansion-panel
+          v-for="skillGroupName in skillGroups()"
+          :key="skillGroupName"
         >
-          <v-avatar left class="green darken-4">
-            {{ skill.experienceInYears }}
-          </v-avatar>
-          {{ skill.skillSubject.name }}
-          <v-icon v-if="skill.highlight" right>mdi-star</v-icon>
-        </v-chip>
-      </div>
+          <v-expansion-panel-header>{{
+            `${skillGroupName} (${skillsBySkillGroup(skillGroupName).length})`
+          }}</v-expansion-panel-header>
+          <v-expansion-panel-content>
+            <v-chip
+              :key="skill.id"
+              class="ma-2"
+              color="green"
+              text-color="white"
+              v-for="skill in skillsBySkillGroup(skillGroupName)"
+              v-on="canEdit ? { click: () => onSkillClick(skill) } : {}"
+            >
+              <v-avatar left class="green darken-4">
+                {{ skill.experienceInYears }}
+              </v-avatar>
+              {{ skill.skillSubject.name }}
+              <v-icon v-if="skill.highlight" right>mdi-star</v-icon>
+            </v-chip>
+          </v-expansion-panel-content>
+        </v-expansion-panel>
+      </v-expansion-panels>
     </v-card-text>
     <v-card-actions>
       <v-btn v-if="canEdit" color="primary" @click="newSkill">New Skill</v-btn>
