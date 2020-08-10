@@ -79,9 +79,16 @@ describe("MY CV", () => {
 
     cy.contains("Save").click();
 
+    cy.get(".v-expansion-panel-header")
+      .contains("Other")
+      .click();
     cy.get(".v-chip__content").contains("Ansible");
     cy.get(".v-chip__content").contains("4");
     cy.reload();
+
+    cy.get(".v-expansion-panel-header")
+      .contains("Other")
+      .click();
     cy.get(".v-chip__content").contains("Ansible");
     cy.get(".v-chip__content").contains("4");
   });
@@ -90,6 +97,9 @@ describe("MY CV", () => {
     cy.createSkill("Java", 1);
     cy.visit(`/cv/${user.cvIds[0]}`);
 
+    cy.get(".v-expansion-panel-header")
+      .contains("Programming")
+      .click();
     cy.get(".v-chip__content")
       .contains("Java")
       .click();
@@ -100,9 +110,15 @@ describe("MY CV", () => {
 
     cy.contains("Save").click();
 
+    cy.get(".v-expansion-panel-header")
+      .contains("Programming")
+      .click();
     cy.get(".v-chip__content").contains("Java");
     cy.get(".v-chip__content").contains("3");
     cy.reload();
+    cy.get(".v-expansion-panel-header")
+      .contains("Programming")
+      .click();
     cy.get(".v-chip__content").contains("Java");
     cy.get(".v-chip__content").contains("3");
   });
@@ -110,12 +126,16 @@ describe("MY CV", () => {
   it("Delete existing skill", () => {
     cy.createSkill("Docker", 4);
     cy.visit(`/cv/${user.cvIds[0]}`);
+
+    cy.get(".v-expansion-panel-header")
+      .contains("Other")
+      .click();
     cy.contains("Docker").click();
 
     cy.contains("Delete").click();
 
-    cy.contains("Docker").should("not.exist");
+    cy.contains("Other").should("not.exist");
     cy.reload();
-    cy.contains("Docker").should("not.exist");
+    cy.contains("Other").should("not.exist");
   });
 });
