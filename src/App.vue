@@ -92,11 +92,23 @@ export default class App extends Vue {
       response => response,
       error => {
         return new Promise((resolve, reject) => {
+          let responseData = error.response.data;
+
+          // When dealing with arraybuffer response, error message has to be
+          // manually parsed
+          if (
+            error.request.responseType === "arraybuffer" &&
+            responseData.toString() === "[object ArrayBuffer]"
+          ) {
+            responseData = JSON.parse(
+              Buffer.from(responseData).toString("utf8")
+            );
+          }
           this.setAlert(
             new AlertInfo({
               message: error.toString(),
               color: "error",
-              details: JSON.stringify(error.response.data, null, 2)
+              details: JSON.stringify(responseData, null, 2)
             })
           );
           if (error.response.status === 401) {
