@@ -19,14 +19,15 @@
           </p>
           <p class="text-center ma-0">{{ cv.user.jobTitle }}</p>
           <p class="text-center ma-0">{{ cv.user.location }}</p>
-          <p v-if="canEdit" class="text-center ma-0">
+          <p class="text-center ma-0">
             <v-btn
               id="edit-user-details-btn"
               icon
               small
               @click="openEditUserDetailsDialog"
             >
-              <v-icon>mdi-pencil</v-icon>
+              <v-icon v-if="canEdit">mdi-pencil</v-icon>
+              <v-icon v-else>mdi-information-outline</v-icon>
             </v-btn>
           </p>
         </template>
@@ -102,7 +103,7 @@ export default class CVDetails extends Vue {
   openEditUserDetailsDialog() {
     this.pushDialogComponent({
       component: EditUserDetailsDialog,
-      props: { id: this.id }
+      props: { id: this.id, canEdit: this.canEdit }
     });
   }
 
