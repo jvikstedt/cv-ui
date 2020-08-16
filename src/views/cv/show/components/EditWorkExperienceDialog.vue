@@ -17,7 +17,6 @@
         <v-text-field
           v-model="description"
           :counter="255"
-          :rules="isRequiredRule"
           label="Description"
           required
         ></v-text-field>
@@ -41,14 +40,12 @@
         <v-text-field
           v-model.number="endYear"
           label="End year"
-          :rules="isRequiredRule"
           type="number"
         ></v-text-field>
 
         <v-text-field
           v-model.number="endMonth"
           label="End month"
-          :rules="isRequiredRule"
           type="number"
         ></v-text-field>
       </v-card-text>
@@ -73,6 +70,7 @@
 </template>
 
 <script lang="ts">
+import * as R from "ramda";
 import { Component, Prop, Mixins } from "vue-property-decorator";
 import { namespace } from "vuex-class";
 import {
@@ -90,10 +88,10 @@ export default class EditWorkExperienceDialog extends Mixins(DialogFormMixin) {
 
   jobTitle = "";
   description = "";
-  startYear = 2010;
-  startMonth = 1;
-  endYear = 2014;
-  endMonth = 12;
+  startYear!: number;
+  startMonth!: number;
+  endYear: number | null = null;
+  endMonth: number | null = null;
 
   @CVShowStore.Action
   patchWorkExperience!: (
@@ -146,8 +144,8 @@ export default class EditWorkExperienceDialog extends Mixins(DialogFormMixin) {
           description: this.description,
           startYear: this.startYear,
           startMonth: this.startMonth,
-          endYear: this.endYear,
-          endMonth: this.endMonth
+          endYear: R.isEmpty(this.endYear) ? null : this.endYear,
+          endMonth: R.isEmpty(this.endMonth) ? null : this.endMonth
         }
       };
       await this.patchWorkExperience(patchWorkExperienceDto);

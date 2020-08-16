@@ -30,8 +30,8 @@ export class PatchProjectMembershipDtoData {
   startYear?: number;
   startMonth?: number;
 
-  endYear?: number;
-  endMonth?: number;
+  endYear?: number | null;
+  endMonth?: number | null;
 
   highlight?: boolean;
 }
@@ -57,8 +57,8 @@ export class CreateProjectMembershipDto {
   startYear!: number;
   startMonth!: number;
 
-  endYear?: number;
-  endMonth?: number;
+  endYear?: number | null;
+  endMonth?: number | null;
 
   highlight!: boolean;
 }

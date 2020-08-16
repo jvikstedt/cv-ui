@@ -10,7 +10,6 @@
           name="description"
           v-model="description"
           label="Description"
-          :rules="isRequiredRule"
         />
       </v-card-text>
 

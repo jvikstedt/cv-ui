@@ -33,14 +33,12 @@
         <v-text-field
           v-model.number="endYear"
           label="End year"
-          :rules="isRequiredRule"
           type="number"
         ></v-text-field>
 
         <v-text-field
           v-model.number="endMonth"
           label="End month"
-          :rules="isRequiredRule"
           type="number"
         ></v-text-field>
 
@@ -67,6 +65,7 @@
 </template>
 
 <script lang="ts">
+import * as R from "ramda";
 import { Component, Prop, Mixins } from "vue-property-decorator";
 import { namespace } from "vuex-class";
 import {
@@ -145,8 +144,8 @@ export default class EditProjectMembershipDialog extends Mixins(
           description: this.description,
           startYear: this.startYear,
           startMonth: this.startMonth,
-          endYear: this.endYear,
-          endMonth: this.endMonth,
+          endYear: R.isEmpty(this.endYear) ? null : this.endYear,
+          endMonth: R.isEmpty(this.endMonth) ? null : this.endMonth,
           highlight: this.highlight
         }
       };

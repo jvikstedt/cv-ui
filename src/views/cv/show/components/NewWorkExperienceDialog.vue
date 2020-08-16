@@ -34,7 +34,6 @@
         <v-text-field
           v-model="description"
           :counter="255"
-          :rules="isRequiredRule"
           label="Description"
           required
         ></v-text-field>
@@ -58,14 +57,12 @@
         <v-text-field
           v-model.number="endYear"
           label="End year"
-          :rules="isRequiredRule"
           type="number"
         ></v-text-field>
 
         <v-text-field
           v-model.number="endMonth"
           label="End month"
-          :rules="isRequiredRule"
           type="number"
         ></v-text-field>
       </v-card-text>
@@ -86,6 +83,7 @@
 </template>
 
 <script lang="ts">
+import * as R from "ramda";
 import { Component, Prop, Watch, Mixins } from "vue-property-decorator";
 import { namespace } from "vuex-class";
 import { SearchCompanies } from "@/api/company";
@@ -109,10 +107,10 @@ export default class NewWorkExperienceDialog extends Mixins(DialogFormMixin) {
 
   jobTitle = "";
   description = "";
-  startYear = 2010;
-  startMonth = 1;
-  endYear = 2014;
-  endMonth = 12;
+  startYear: number | null = null;
+  startMonth: number | null = null;
+  endYear: number | null = null;
+  endMonth: number | null = null;
 
   @CVShowStore.Getter
   getCVWorkExperiences!: (id: number) => WorkExperience[];
@@ -131,7 +129,12 @@ export default class NewWorkExperienceDialog extends Mixins(DialogFormMixin) {
   }
 
   async onSave() {
-    if (this.form.validate() && this.company) {
+    if (
+      this.form.validate() &&
+      this.company &&
+      this.startYear &&
+      this.startMonth
+    ) {
       const createWorkExperienceDto: CreateWorkExperienceDto = {
         cvId: this.id,
         companyId: this.company.id,
@@ -139,8 +142,8 @@ export default class NewWorkExperienceDialog extends Mixins(DialogFormMixin) {
         description: this.description,
         startYear: this.startYear,
         startMonth: this.startMonth,
-        endYear: this.endYear,
-        endMonth: this.endMonth
+        endYear: R.isEmpty(this.endYear) ? null : this.endYear,
+        endMonth: R.isEmpty(this.endMonth) ? null : this.endMonth
       };
       await this.createWorkExperience(createWorkExperienceDto);
       this.popDialogComponent();
