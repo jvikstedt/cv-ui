@@ -1,7 +1,11 @@
 import Vue from "vue";
 import { VuexModule, Module, Mutation, Action } from "vuex-module-decorators";
 import Api from "@/api/api";
-import { SkillSubject, CreateSkillSubjectDto } from "@/model/skill_subject";
+import {
+  SkillSubject,
+  CreateSkillSubjectDto,
+  PatchSkillSubjectDto
+} from "@/model/skill_subject";
 
 @Module({ namespaced: true })
 export class SkillSubjectStore extends VuexModule {
@@ -10,6 +14,10 @@ export class SkillSubjectStore extends VuexModule {
 
   get getSkillSubjects() {
     return Object.values(this.skillSubjects);
+  }
+
+  get getSkillSubject() {
+    return (id: number): SkillSubject => this.skillSubjects[id];
   }
 
   @Mutation
@@ -42,6 +50,22 @@ export class SkillSubjectStore extends VuexModule {
   }
 
   @Action
+  public async fetchSkillSubject(
+    skillSubjectId: number
+  ): Promise<SkillSubject> {
+    this.context.commit("setFetching", true);
+
+    const skillSubject: SkillSubject = await Api.get(
+      `/skill_subjects/${skillSubjectId}`
+    );
+    this.context.commit("addSkillSubjects", [skillSubject]);
+
+    this.context.commit("setFetching", false);
+
+    return skillSubject;
+  }
+
+  @Action
   public async deleteSkillSubject(id: number): Promise<void> {
     await Api.delete(`/skill_subjects/${id}`);
     this.context.commit("deleteSkillSubjects", [id]);
@@ -58,5 +82,17 @@ export class SkillSubjectStore extends VuexModule {
     this.context.commit("addSkillSubjects", [skillSubject]);
 
     return skillSubject;
+  }
+
+  @Action
+  public async patchSkillSubject({
+    skillSubjectId,
+    data
+  }: PatchSkillSubjectDto): Promise<void> {
+    const savedSkillSubject: SkillSubject = await Api.patch(
+      `/skill_subjects/${skillSubjectId}`,
+      data
+    );
+    this.context.commit("addSkillSubjects", [savedSkillSubject]);
   }
 }
