@@ -19,3 +19,12 @@ export class CreateSkillSubjectDto {
 
   skillGroupId!: number;
 }
+
+export class PatchSkillSubjectDtoData {
+  name?: string;
+}
+
+export class PatchSkillSubjectDto {
+  skillSubjectId!: number;
+  data!: PatchSkillSubjectDtoData;
+}

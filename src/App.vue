@@ -8,7 +8,7 @@
             <v-icon>mdi-settings</v-icon>
           </v-list-item-action>
           <v-list-item-content>
-            <!-- <v-list-item-title>Skill subjects</v-list-item-title> -->
+            <v-list-item-title>Skill subjects</v-list-item-title>
           </v-list-item-content>
         </v-list-item>
       </v-list>

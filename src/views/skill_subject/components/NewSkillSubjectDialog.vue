@@ -57,7 +57,7 @@ const SkillSubjectStore = namespace("SkillSubjectStore");
 
 @Component
 export default class NewSkillSubjectDialog extends Mixins(DialogFormMixin) {
-  @Prop({ required: true }) readonly afterCreate!: (
+  @Prop({ required: false }) readonly afterCreate!: (
     skillSubject: SkillSubject
   ) => Promise<void>;
 
@@ -87,7 +87,9 @@ export default class NewSkillSubjectDialog extends Mixins(DialogFormMixin) {
         skillGroupId: this.skillGroup.id
       });
 
-      await this.afterCreate(skillSubject);
+      if (this.afterCreate) {
+        await this.afterCreate(skillSubject);
+      }
       this.popDialogComponent();
     }
   }
