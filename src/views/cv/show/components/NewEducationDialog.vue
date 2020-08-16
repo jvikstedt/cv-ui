@@ -42,7 +42,6 @@
         <v-text-field
           v-model="description"
           :counter="255"
-          :rules="isRequiredRule"
           label="Description"
           required
         ></v-text-field>
@@ -58,7 +57,6 @@
         <v-text-field
           v-model.number="endYear"
           label="End year"
-          :rules="isRequiredRule"
           type="number"
         ></v-text-field>
 
@@ -107,8 +105,8 @@ export default class NewEducationDialog extends Mixins(DialogFormMixin) {
   degree = "";
   fieldOfStudy = "";
   description = "";
-  startYear = 2010;
-  endYear = 2014;
+  startYear: number | null = null;
+  endYear: number | null = null;
   highlight = false;
 
   @CVShowStore.Getter
@@ -142,7 +140,7 @@ export default class NewEducationDialog extends Mixins(DialogFormMixin) {
         fieldOfStudy: this.fieldOfStudy,
         description: this.description,
         startYear: this.startYear,
-        endYear: this.endYear,
+        endYear: R.isEmpty(this.endYear) ? null : this.endYear,
         highlight: this.highlight
       };
       await this.createEducation(createEducationDto);

@@ -32,8 +32,8 @@ export class PatchWorkExperienceDtoData {
   startYear?: number;
   startMonth?: number;
 
-  endYear?: number;
-  endMonth?: number;
+  endYear?: number | null;
+  endMonth?: number | null;
 }
 
 export class PatchWorkExperienceDto {
@@ -59,6 +59,6 @@ export class CreateWorkExperienceDto {
   startYear!: number;
   startMonth!: number;
 
-  endYear?: number;
-  endMonth?: number;
+  endYear?: number | null;
+  endMonth?: number | null;
 }

@@ -35,7 +35,7 @@ export class PatchEducationDtoData {
 
   startYear?: number;
 
-  endYear?: number;
+  endYear?: number | null;
 
   highlight?: boolean;
 }
@@ -64,7 +64,7 @@ export class CreateEducationDto {
 
   startYear!: number;
 
-  endYear?: number;
+  endYear?: number | null;
 
   highlight!: boolean;
 }

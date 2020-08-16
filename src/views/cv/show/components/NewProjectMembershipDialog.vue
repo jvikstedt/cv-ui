@@ -26,7 +26,6 @@
         <v-text-field
           v-model="description"
           :counter="255"
-          :rules="isRequiredRule"
           label="Description"
           required
         ></v-text-field>
@@ -50,14 +49,12 @@
         <v-text-field
           v-model.number="endYear"
           label="End year"
-          :rules="isRequiredRule"
           type="number"
         ></v-text-field>
 
         <v-text-field
           v-model.number="endMonth"
           label="End month"
-          :rules="isRequiredRule"
           type="number"
         ></v-text-field>
 
@@ -80,6 +77,7 @@
 </template>
 
 <script lang="ts">
+import * as R from "ramda";
 import { Component, Prop, Watch, Mixins } from "vue-property-decorator";
 import { namespace } from "vuex-class";
 import { SearchProjects } from "@/api/project";
@@ -104,10 +102,10 @@ export default class NewProjectMembershipDialog extends Mixins(
   project: Project | null = null;
 
   description = "";
-  startYear = 2010;
-  startMonth = 1;
-  endYear = 2014;
-  endMonth = 12;
+  startYear: number | null = null;
+  startMonth: number | null = null;
+  endYear: number | null = null;
+  endMonth: number | null = null;
   highlight = false;
 
   @CVShowStore.Getter
@@ -127,15 +125,20 @@ export default class NewProjectMembershipDialog extends Mixins(
   }
 
   async onSave() {
-    if (this.form.validate() && this.project) {
+    if (
+      this.form.validate() &&
+      this.project &&
+      this.startYear &&
+      this.startMonth
+    ) {
       const createProjectMembershipDto: CreateProjectMembershipDto = {
         cvId: this.id,
         projectId: this.project.id,
         description: this.description,
         startYear: this.startYear,
         startMonth: this.startMonth,
-        endYear: this.endYear,
-        endMonth: this.endMonth,
+        endYear: R.isEmpty(this.endYear) ? null : this.endYear,
+        endMonth: R.isEmpty(this.endMonth) ? null : this.endMonth,
         highlight: this.highlight
       };
       await this.createProjectMembership(createProjectMembershipDto);

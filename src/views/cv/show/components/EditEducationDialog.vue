@@ -23,7 +23,6 @@
         <v-text-field
           v-model="description"
           :counter="255"
-          :rules="isRequiredRule"
           label="Description"
           required
         ></v-text-field>
@@ -39,7 +38,6 @@
         <v-text-field
           v-model.number="endYear"
           label="End year"
-          :rules="isRequiredRule"
           type="number"
         ></v-text-field>
 
@@ -66,6 +64,7 @@
 </template>
 
 <script lang="ts">
+import * as R from "ramda";
 import { Component, Prop, Mixins } from "vue-property-decorator";
 import { namespace } from "vuex-class";
 import {
@@ -84,8 +83,8 @@ export default class EditEducationDialog extends Mixins(DialogFormMixin) {
   degree = "";
   fieldOfStudy = "";
   description = "";
-  startYear = 2010;
-  endYear = 2014;
+  startYear!: number;
+  endYear: number | null = null;
   highlight = false;
 
   @CVShowStore.Action
@@ -135,7 +134,7 @@ export default class EditEducationDialog extends Mixins(DialogFormMixin) {
           fieldOfStudy: this.fieldOfStudy,
           description: this.description,
           startYear: this.startYear,
-          endYear: this.endYear,
+          endYear: R.isEmpty(this.endYear) ? null : this.endYear,
           highlight: this.highlight
         }
       };
