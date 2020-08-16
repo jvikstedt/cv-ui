@@ -171,7 +171,7 @@ export default class CVSearchView extends Mixins(SearchMixin, DialogFormMixin) {
       key: this.searchKey,
       data: this.searchData
     });
-    await this.searchAndDebounce(cvSearchDto);
+    await this.searchAndDebounce(cvSearchDto, 100);
   }
 
   async removeSelectedSkillSubject(resultSkill: CVSearchResultSkill) {

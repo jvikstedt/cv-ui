@@ -20,7 +20,7 @@ export default class SearchMixin extends Vue {
 
   debounce = 0;
 
-  searchAndDebounce(cvSearchDto: CVSearchDto, debounce = 500): void {
+  searchAndDebounce(cvSearchDto: CVSearchDto, debounce = 350): void {
     clearTimeout(this.debounce);
 
     this.debounce = window.setTimeout(async () => {

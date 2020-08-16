@@ -35,6 +35,7 @@
 </template>
 
 <script lang="ts">
+import * as R from "ramda";
 import { Component, Watch, Mixins } from "vue-property-decorator";
 import { CV, CVSearchDto } from "@/model/cv";
 import { CVSearchView } from "@/views/cv/search";
@@ -61,7 +62,7 @@ export default class CVSearchBar extends Mixins(SearchMixin, DialogMixin) {
       }
     });
 
-    this.searchAndDebounce(cvSearchDto);
+    this.searchAndDebounce(cvSearchDto, R.isEmpty(input || "") ? 0 : 350);
   }
 
   async onSelect(cv: CV) {
