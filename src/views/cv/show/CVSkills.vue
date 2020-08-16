@@ -3,10 +3,10 @@
     <v-card-title class="headline">Skills</v-card-title>
 
     <v-card-text>
-      <v-expansion-panels>
+      <v-expansion-panels v-model="panel">
         <v-expansion-panel
-          v-for="skillGroupName in skillGroups()"
-          :key="skillGroupName"
+          v-for="(skillGroupName, i) in skillGroups()"
+          :key="i"
         >
           <v-expansion-panel-header>{{
             `${skillGroupName} (${skillsBySkillGroup(skillGroupName).length})`
@@ -53,6 +53,8 @@ export default class CVSkills extends Vue {
   @Prop({ required: true }) readonly id!: number;
   @Prop({ required: true }) readonly canEdit!: boolean;
 
+  panel: number | null = null;
+
   @CVShowStore.Getter
   getCVSkillsGrouped!: (id: number) => { [key: string]: Skill[] };
 
@@ -80,8 +82,19 @@ export default class CVSkills extends Vue {
   async newSkill() {
     this.pushDialogComponent({
       component: NewSkillDialog,
-      props: { id: this.id }
+      props: {
+        id: this.id,
+        afterCreate: this.afterSkillCreate
+      }
     });
+  }
+
+  async afterSkillCreate(skill: Skill) {
+    const skillGroups = this.skillGroups();
+    const index = R.findIndex(R.equals(skill.skillSubject.skillGroup.name))(
+      skillGroups
+    );
+    this.panel = index != -1 ? index : null;
   }
 }
 </script>
