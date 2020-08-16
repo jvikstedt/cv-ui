@@ -82,6 +82,9 @@ const CVShowStore = namespace("CVShowStore");
 })
 export default class NewSkillDialog extends Mixins(DialogFormMixin) {
   @Prop({ required: true }) readonly id!: number;
+  @Prop({ required: false }) readonly afterCreate!: (
+    skill: Skill
+  ) => Promise<void>;
 
   experienceInYears = 1;
   highlight = false;
@@ -93,7 +96,7 @@ export default class NewSkillDialog extends Mixins(DialogFormMixin) {
   getCVSkills!: (id: number) => Skill[];
 
   @CVShowStore.Action
-  createSkill!: (createSkillDto: CreateSkillDto) => Promise<void>;
+  createSkill!: (createSkillDto: CreateSkillDto) => Promise<Skill>;
 
   @Watch("search")
   async searchChanged(keyword: string) {
@@ -119,7 +122,11 @@ export default class NewSkillDialog extends Mixins(DialogFormMixin) {
         highlight: this.highlight,
         skillSubjectId: this.skillSubject.id
       };
-      await this.createSkill(createSkillDto);
+      const skill = await this.createSkill(createSkillDto);
+
+      if (this.afterCreate) {
+        await this.afterCreate(skill);
+      }
 
       this.popDialogComponent();
     }

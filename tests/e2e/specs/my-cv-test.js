@@ -79,9 +79,6 @@ describe("MY CV", () => {
 
     cy.contains("Save").click();
 
-    cy.get(".v-expansion-panel-header")
-      .contains("Other")
-      .click();
     cy.get(".v-chip__content").contains("Ansible");
     cy.get(".v-chip__content").contains("4");
     cy.reload();

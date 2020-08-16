@@ -223,12 +223,14 @@ export class CVShowStore extends VuexModule {
   }
 
   @Action
-  public async createSkill(createSkillDto: CreateSkillDto): Promise<void> {
+  public async createSkill(createSkillDto: CreateSkillDto): Promise<Skill> {
     const savedSkill: Skill = await Api.post(
       `/cv/${createSkillDto.cvId}/skills`,
       createSkillDto
     );
     this.context.commit("addSkills", [savedSkill]);
+
+    return savedSkill;
   }
 
   @Action
