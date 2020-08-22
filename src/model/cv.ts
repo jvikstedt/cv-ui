@@ -70,6 +70,8 @@ export class CVSearchResultSkill {
 
   interestLevel!: number;
 
+  highlight!: boolean;
+
   name!: string;
 }
 
