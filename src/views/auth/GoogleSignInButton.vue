@@ -19,6 +19,8 @@ const GOOGLE_CLIENT_ID = process.env.VUE_APP_GOOGLE_CLIENT_ID;
 
 @Component
 export default class GoogleSignInButton extends Vue {
+  isReady = false;
+  interval = 0;
   googleSignInParams = {
     ["client_id"]: GOOGLE_CLIENT_ID
   };
@@ -32,9 +34,24 @@ export default class GoogleSignInButton extends Vue {
     this.$router.push("/");
   }
 
-  get isReady(): boolean {
+  created() {
+    this.updateIsReady();
+
+    this.interval = setInterval(() => {
+      this.updateIsReady();
+      if (this.isReady) {
+        clearInterval(this.interval);
+      }
+    }, 500) as any; // eslint-disable-line @typescript-eslint/no-explicit-any
+  }
+
+  updateIsReady() {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    return !!(window as any).gapi;
+    if ((window as any).gapi) {
+      this.isReady = true;
+    } else {
+      this.isReady = false;
+    }
   }
 
   async onSignInError(err: Error) {
