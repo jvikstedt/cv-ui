@@ -1,14 +1,23 @@
 <template>
   <v-app id="inspire">
     <Dialog />
-    <v-navigation-drawer v-model="drawer" app clipped v-if="isLoggedIn">
-      <v-list dense>
+    <v-navigation-drawer
+      v-model="drawer"
+      app
+      clipped
+      v-if="isLoggedIn"
+      color="grey lighten-1"
+    >
+      <v-list>
         <v-list-item link router to="/skill_subjects">
           <v-list-item-action>
             <v-icon>mdi-settings</v-icon>
           </v-list-item-action>
           <v-list-item-content>
-            <v-list-item-title>Skill subjects</v-list-item-title>
+            <v-list-item-title>
+              <v-icon left>mdi-code-braces</v-icon>
+              Skills
+            </v-list-item-title>
           </v-list-item-content>
         </v-list-item>
       </v-list>

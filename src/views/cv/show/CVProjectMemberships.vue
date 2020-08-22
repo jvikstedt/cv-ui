@@ -1,6 +1,9 @@
 <template>
   <v-card class="mt-5" color="grey lighten-1">
-    <v-card-title class="headline">Projects</v-card-title>
+    <v-card-title class="headline">
+      <v-icon left>mdi-account-group</v-icon>
+      Projects
+    </v-card-title>
     <v-card-text>
       <div
         v-for="projectMembership in projectMemberships"

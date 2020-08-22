@@ -1,6 +1,9 @@
 <template>
   <v-card :loading="searching">
-    <v-card-title class="headline">Search</v-card-title>
+    <v-card-title class="headline">
+      <v-icon left>mdi-magnify</v-icon>
+      Search
+    </v-card-title>
 
     <v-card-text>
       <v-text-field
@@ -47,11 +50,12 @@
         </div>
       </template>
 
-      <v-btn id="search-view-search-btn" @click="onSearch">
+      <v-btn id="search-view-search-btn" color="primary" @click="onSearch">
         Search
+        <v-icon right>mdi-magnify</v-icon>
       </v-btn>
 
-      <v-btn color="green darken-1" text @click="onCancel">
+      <v-btn color="red darken-1" text @click="onCancel">
         Close
       </v-btn>
 
@@ -85,6 +89,10 @@
                 </v-list-item-subtitle>
               </v-list-item-content>
             </v-list-item>
+            <v-divider
+              :key="item.id + 'divider'"
+              style="border-color: rgba(0, 0, 0, 0.3);"
+            ></v-divider>
           </template>
         </template>
         <p v-else>No results!</p>

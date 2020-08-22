@@ -1,7 +1,10 @@
 <template>
   <v-container style="max-width: 1024px">
     <v-card color="grey lighten-1">
-      <v-card-title class="headline">Dashboard</v-card-title>
+      <v-card-title class="headline">
+        <v-icon left>mdi-view-dashboard</v-icon>
+        Dashboard
+      </v-card-title>
       <v-card-text>
         <v-row>
           <v-col sm="6">
@@ -10,6 +13,7 @@
             </v-btn>
             <v-btn color="primary" outlined @click="search" class="ma-2">
               Advanced Search
+              <v-icon right>mdi-magnify</v-icon>
             </v-btn>
           </v-col>
           <v-col sm="6">
@@ -42,6 +46,7 @@
                     </v-list-item-subtitle>
                   </v-list-item-content>
                 </v-list-item>
+                <v-divider :key="item.id + 'divider'"></v-divider>
               </template>
             </template>
             <p v-else>No results!</p>
