@@ -1,6 +1,6 @@
 <template>
   <v-container style="max-width: 1024px">
-    <v-card :loading="fetching" color="grey lighten-1">
+    <v-card :loading="fetching">
       <v-card-title class="headline">
         <v-icon left>mdi-export</v-icon>
         Export

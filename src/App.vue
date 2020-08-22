@@ -6,7 +6,7 @@
       app
       clipped
       v-if="isLoggedIn"
-      color="grey lighten-1"
+      style="background-color: #E3E3E3"
     >
       <v-list>
         <v-list-item link router to="/skill_subjects">
@@ -23,28 +23,37 @@
       </v-list>
     </v-navigation-drawer>
 
-    <v-app-bar app clipped-left>
+    <v-app-bar app clipped-left color="teal lighten-1">
       <v-app-bar-nav-icon
         @click.stop="drawer = !drawer"
         v-if="isLoggedIn"
+        dark
       ></v-app-bar-nav-icon>
-      <v-toolbar-title @click="onLogoClick" style="cursor: pointer;"
+      <v-toolbar-title
+        @click="onLogoClick"
+        style="cursor: pointer; color: white;"
         >CV</v-toolbar-title
       >
       <v-toolbar-title class="ml-2 d-none d-sm-flex" v-if="isLoggedIn">
-        <v-divider class="mx-4" vertical></v-divider>
+        <v-divider dark class="mx-4" vertical></v-divider>
         <CVSearchBar />
       </v-toolbar-title>
       <v-spacer></v-spacer>
-      <v-btn icon @click="search" class="d-flex d-sm-none" v-if="isLoggedIn">
+      <v-btn
+        icon
+        dark
+        @click="search"
+        class="d-flex d-sm-none"
+        v-if="isLoggedIn"
+      >
         <v-icon>mdi-magnify</v-icon>
       </v-btn>
-      <v-btn id="logout-btn" icon @click="logout" v-if="isLoggedIn">
+      <v-btn id="logout-btn" icon dark @click="logout" v-if="isLoggedIn">
         <v-icon>mdi-exit-to-app</v-icon>
       </v-btn>
     </v-app-bar>
 
-    <v-main>
+    <v-main style="background-color: #E3E3E3">
       <v-container fluid>
         <v-row align="center" justify="center">
           <Alert />
@@ -52,10 +61,6 @@
         </v-row>
       </v-container>
     </v-main>
-
-    <v-footer app>
-      <span>&copy; 2020</span>
-    </v-footer>
   </v-app>
 </template>
 

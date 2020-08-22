@@ -1,5 +1,5 @@
 <template>
-  <v-card class="mt-5" color="grey lighten-1">
+  <v-card class="mt-5">
     <v-card-title class="headline">
       <v-icon left>mdi-code-braces</v-icon>
       Skills
