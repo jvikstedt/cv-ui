@@ -54,6 +54,14 @@ export class CVShowStore extends VuexModule {
       );
   }
 
+  get getCVHighlightedSkills() {
+    return (id: number): Skill[] =>
+      R.filter(
+        (skill: Skill) => R.equals(skill.cvId, id) && skill.highlight,
+        Object.values(this.skills)
+      );
+  }
+
   get getCVSkillsGrouped() {
     return (id: number): { [key: string]: Skill[] } =>
       R.groupBy(

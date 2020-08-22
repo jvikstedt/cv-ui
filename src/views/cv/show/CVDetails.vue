@@ -19,7 +19,6 @@
             {{ cv.user.firstName }} {{ cv.user.lastName }}
           </p>
           <p class="text-center ma-0">{{ cv.user.jobTitle }}</p>
-          <p class="text-center ma-0">{{ cv.user.location }}</p>
           <p class="text-center ma-0">
             <v-btn
               id="edit-user-details-btn"
@@ -35,21 +34,47 @@
       </v-col>
       <v-col cols="12" sm="8">
         <template v-if="!fetching">
-          <h3>
-            Description
-            <v-btn
-              id="edit-cv-details-btn"
-              icon
-              small
-              @click="openEditCVDetailsDialog"
-              v-if="canEdit"
-            >
-              <v-icon>mdi-pencil</v-icon>
-            </v-btn>
-          </h3>
-          <p style="white-space: pre-line;">
-            {{ cv.description }}
-          </p>
+          <v-card-text>
+            <h3 class="mt-sm-9">
+              Details
+              <v-btn
+                id="edit-cv-details-btn"
+                icon
+                small
+                @click="openEditUserDetailsDialog"
+                v-if="canEdit"
+              >
+                <v-icon>mdi-pencil</v-icon>
+              </v-btn>
+            </h3>
+            <p class="pa-0 mb-1 mt-2" v-if="cv.user.phone">
+              <v-icon>mdi-cellphone</v-icon> {{ cv.user.phone }}
+            </p>
+
+            <p class="pa-0 mb-1" v-if="cv.user.location">
+              <v-icon>mdi-map-marker</v-icon> {{ cv.user.location }}
+            </p>
+
+            <p class="pa-0 mb-1" v-if="cv.user.email">
+              <v-icon>mdi-email</v-icon> {{ cv.user.email }}
+            </p>
+
+            <h3 class="mt-4">
+              Description
+              <v-btn
+                id="edit-cv-details-btn"
+                icon
+                small
+                @click="openEditCVDetailsDialog"
+                v-if="canEdit"
+              >
+                <v-icon>mdi-pencil</v-icon>
+              </v-btn>
+            </h3>
+            <p style="white-space: pre-line;">
+              {{ cv.description }}
+            </p>
+          </v-card-text>
         </template>
       </v-col>
     </v-row>
