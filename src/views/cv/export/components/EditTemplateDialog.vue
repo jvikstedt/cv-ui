@@ -7,11 +7,11 @@
     <v-card-actions>
       <v-spacer></v-spacer>
 
-      <v-btn color="red darken-1" text @click="onSave" :disabled="!template">
+      <v-btn color="green darken-1" text @click="onSave" :disabled="!template">
         Save
       </v-btn>
 
-      <v-btn color="blue darken-1" text @click="onCancel">
+      <v-btn color="red darken-1" text @click="onCancel">
         Cancel
       </v-btn>
 

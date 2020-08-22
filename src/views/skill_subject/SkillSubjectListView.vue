@@ -1,6 +1,9 @@
 <template>
   <v-card color="grey lighten-1">
-    <v-card-title class="headline">Skill subjects</v-card-title>
+    <v-card-title class="headline">
+      <v-icon left>mdi-code-braces</v-icon>
+      Skills
+    </v-card-title>
     <v-card-text>
       <v-autocomplete
         name="skillSubject"

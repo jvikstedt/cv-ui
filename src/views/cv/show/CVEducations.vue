@@ -1,6 +1,9 @@
 <template>
   <v-card class="mt-5" color="grey lighten-1">
-    <v-card-title class="headline">Educations</v-card-title>
+    <v-card-title class="headline">
+      <v-icon left>mdi-school</v-icon>
+      Educations
+    </v-card-title>
     <v-card-text>
       <div v-for="education in educations" :key="education.id">
         <v-list-item three-line style="background-color: white">

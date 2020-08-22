@@ -5,6 +5,7 @@
         <p class="text-center">
           <v-btn color="primary darken-1" text @click="onExport">
             Export
+            <v-icon right>mdi-export</v-icon>
           </v-btn>
         </p>
         <template v-if="!fetching">
