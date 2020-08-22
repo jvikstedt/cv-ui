@@ -6,6 +6,23 @@
     </v-card-title>
 
     <v-card-text>
+      <v-subheader class="pa-0">Highlighted skills</v-subheader>
+      <v-chip
+        :key="skill.id"
+        class="ma-2"
+        :style="getChipStyle(skill)"
+        text-color="blue-grey darken-4"
+        v-for="skill in getCVHighlightedSkills(id)"
+        v-on="canEdit ? { click: () => onSkillClick(skill) } : {}"
+      >
+        <v-avatar left class="">
+          {{ skill.experienceInYears }}
+        </v-avatar>
+        {{ skill.skillSubject.name }}
+        <v-icon v-if="skill.highlight" right>mdi-star</v-icon>
+      </v-chip>
+
+      <v-subheader class="pa-0">Skill categories</v-subheader>
       <v-expansion-panels v-model="panel">
         <v-expansion-panel
           v-for="(skillGroupName, i) in skillGroups()"
@@ -60,6 +77,9 @@ export default class CVSkills extends Vue {
 
   @CVShowStore.Getter
   getCVSkillsGrouped!: (id: number) => { [key: string]: Skill[] };
+
+  @CVShowStore.Getter
+  getCVHighlightedSkills!: (id: number) => Skill[];
 
   @DialogStore.Mutation
   pushDialogComponent!: (dialogComponent: DialogComponent) => void;
