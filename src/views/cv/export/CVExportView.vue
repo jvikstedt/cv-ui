@@ -1,6 +1,6 @@
 <template>
   <v-container style="max-width: 1024px">
-    <v-card :loading="fetching">
+    <v-card :loading="fetching" color="grey lighten-1">
       <v-card-title class="headline">Export</v-card-title>
       <v-card-actions>
         <v-btn color="primary" @click="editTemplate">Template</v-btn>

@@ -1,5 +1,5 @@
 <template>
-  <v-card class="mt-5">
+  <v-card class="mt-5" color="grey lighten-1">
     <v-card-title class="headline">Skills</v-card-title>
 
     <v-card-text>
@@ -15,12 +15,12 @@
             <v-chip
               :key="skill.id"
               class="ma-2"
-              color="green"
-              text-color="white"
+              :style="getChipStyle(skill)"
+              text-color="blue-grey darken-4"
               v-for="skill in skillsBySkillGroup(skillGroupName)"
               v-on="canEdit ? { click: () => onSkillClick(skill) } : {}"
             >
-              <v-avatar left class="green darken-4">
+              <v-avatar left class="">
                 {{ skill.experienceInYears }}
               </v-avatar>
               {{ skill.skillSubject.name }}
@@ -60,6 +60,10 @@ export default class CVSkills extends Vue {
 
   @DialogStore.Mutation
   pushDialogComponent!: (dialogComponent: DialogComponent) => void;
+
+  getChipStyle(skill: Skill): string {
+    return `background-color: rgb(76,175,80, ${skill.interestLevel * (1 / 3)})`;
+  }
 
   skillGroups(): string[] {
     return R.sort(

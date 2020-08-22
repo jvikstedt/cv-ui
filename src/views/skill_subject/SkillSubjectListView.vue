@@ -1,5 +1,5 @@
 <template>
-  <v-card>
+  <v-card color="grey lighten-1">
     <v-card-title class="headline">Skill subjects</v-card-title>
     <v-card-text>
       <v-autocomplete

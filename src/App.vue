@@ -20,7 +20,7 @@
         v-if="isLoggedIn"
       ></v-app-bar-nav-icon>
       <v-toolbar-title @click="onLogoClick" style="cursor: pointer;"
-        >Application</v-toolbar-title
+        >CV</v-toolbar-title
       >
       <v-toolbar-title class="ml-2 d-none d-sm-flex" v-if="isLoggedIn">
         <v-divider class="mx-4" vertical></v-divider>

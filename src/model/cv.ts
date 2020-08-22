@@ -68,6 +68,8 @@ export class CVSearchResultSkill {
 
   experienceInYears!: number;
 
+  interestLevel!: number;
+
   name!: string;
 }
 

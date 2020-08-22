@@ -1,5 +1,5 @@
 <template>
-  <v-card :loading="fetching">
+  <v-card :loading="fetching" color="grey lighten-1">
     <v-row>
       <v-col cols="12" sm="4">
         <p class="text-center">

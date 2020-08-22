@@ -1,6 +1,6 @@
 <template>
   <v-container style="max-width: 1024px">
-    <v-card>
+    <v-card color="grey lighten-1">
       <v-card-title class="headline">Dashboard</v-card-title>
       <v-card-text>
         <v-row>

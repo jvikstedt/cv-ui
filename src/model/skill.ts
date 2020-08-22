@@ -5,6 +5,8 @@ export class Skill {
 
   experienceInYears!: number;
 
+  interestLevel!: number;
+
   highlight!: boolean;
 
   cvId!: number;
@@ -20,6 +22,8 @@ export class Skill {
 
 export class PatchSkillDtoData {
   experienceInYears!: number;
+
+  interestLevel!: number;
 
   highlight!: boolean;
 }
@@ -41,6 +45,8 @@ export class CreateSkillDto {
   skillSubjectId!: number;
 
   experienceInYears!: number;
+
+  interestLevel!: number;
 
   highlight!: boolean;
 }
