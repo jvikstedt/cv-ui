@@ -1,9 +1,9 @@
 <template>
-  <v-card class="mt-5">
+  <v-card class="mt-5" color="grey lighten-1">
     <v-card-title class="headline">Work experience</v-card-title>
     <v-card-text>
       <div v-for="workExperience in workExperiences" :key="workExperience.id">
-        <v-list-item three-line>
+        <v-list-item three-line style="background-color: white">
           <v-list-item-content>
             <v-list-item-title class="headline mb-2">
               {{ workExperience.company.name }}

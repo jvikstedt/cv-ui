@@ -1,12 +1,12 @@
 <template>
-  <v-card class="mt-5">
+  <v-card class="mt-5" color="grey lighten-1">
     <v-card-title class="headline">Projects</v-card-title>
     <v-card-text>
       <div
         v-for="projectMembership in projectMemberships"
         :key="projectMembership.id"
       >
-        <v-list-item three-line>
+        <v-list-item three-line style="background-color: white">
           <v-list-item-content>
             <v-list-item-title class="headline mb-2">
               {{ projectMembership.project.company.name }} /

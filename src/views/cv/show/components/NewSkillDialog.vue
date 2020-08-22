@@ -22,8 +22,8 @@
         </v-autocomplete>
       </v-card-text>
 
-      <v-subheader>Experience in years</v-subheader>
       <v-card-text>
+        <v-subheader>Experience in years</v-subheader>
         <v-slider
           v-model="experienceInYears"
           class="align-center"
@@ -35,6 +35,28 @@
             <v-text-field
               name="experienceInYears"
               v-model="experienceInYears"
+              :rules="isRequiredRule"
+              class="mt-0 pt-0"
+              hide-details
+              single-line
+              type="number"
+              style="width: 60px"
+            ></v-text-field>
+          </template>
+        </v-slider>
+
+        <v-subheader>Interest level</v-subheader>
+        <v-slider
+          v-model="interestLevel"
+          class="align-center"
+          :max="3"
+          :min="1"
+          hide-details
+        >
+          <template v-slot:append>
+            <v-text-field
+              name="interestLevel"
+              v-model="interestLevel"
               :rules="isRequiredRule"
               class="mt-0 pt-0"
               hide-details
@@ -87,6 +109,7 @@ export default class NewSkillDialog extends Mixins(DialogFormMixin) {
   ) => Promise<void>;
 
   experienceInYears = 1;
+  interestLevel = 1;
   highlight = false;
   search = "";
   skillSubjects: SkillSubject[] = [];
@@ -119,6 +142,7 @@ export default class NewSkillDialog extends Mixins(DialogFormMixin) {
       const createSkillDto: CreateSkillDto = {
         cvId: this.id,
         experienceInYears: this.experienceInYears,
+        interestLevel: this.interestLevel,
         highlight: this.highlight,
         skillSubjectId: this.skillSubject.id
       };

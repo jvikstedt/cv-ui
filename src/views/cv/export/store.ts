@@ -41,6 +41,7 @@ const buildCVExportData = (responses: any[]): ExportData => {
       skill => ({
         id: skill.id,
         experienceInYears: skill.experienceInYears,
+        interestLevel: skill.interestLevel,
         skillSubjectId: skill.skillSubject.id,
         name: skill.skillSubject.name,
         skillGroupId: skill.skillSubject.skillGroup.id,

@@ -70,13 +70,17 @@
                 <v-list-item-title v-html="item.fullName"></v-list-item-title>
                 <v-list-item-subtitle>
                   <v-chip
-                    class="ma-2"
-                    color="green"
-                    text-color="white"
-                    v-for="skill in commonSkills(item)"
                     :key="skill.id"
+                    class="ma-2"
+                    :style="getChipStyle(skill)"
+                    text-color="blue-grey darken-4"
+                    v-for="skill in commonSkills(item)"
                   >
+                    <v-avatar left class="">
+                      {{ skill.experienceInYears }}
+                    </v-avatar>
                     {{ skill.name }}
+                    <v-icon v-if="skill.highlight" right>mdi-star</v-icon>
                   </v-chip>
                 </v-list-item-subtitle>
               </v-list-item-content>
@@ -119,6 +123,10 @@ export default class CVSearchView extends Mixins(SearchMixin, DialogFormMixin) {
 
   @CVSearchStore.Mutation
   setSearchData!: (searchData: CVSearchDtoData) => void;
+
+  getChipStyle(skill: CVSearchResultSkill): string {
+    return `background-color: rgb(76,175,80, ${skill.interestLevel * (1 / 3)})`;
+  }
 
   @Watch("searchInput")
   async searchInputChanged(input: string) {

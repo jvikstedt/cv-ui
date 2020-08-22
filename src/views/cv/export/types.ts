@@ -25,6 +25,7 @@ export class ExportDataUser {
 export class ExportDataSkill {
   id!: number;
   experienceInYears!: number;
+  interestLevel!: number;
   skillSubjectId!: number;
   name!: string;
   skillGroupId!: number;
