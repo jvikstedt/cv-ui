@@ -16,6 +16,7 @@
     @focus="search('')"
     @change="onSelect"
     @click:append-outer="openAdvancedSearch"
+    dark
   >
     <template v-slot:item="data">
       <v-list-item-avatar tile size="50" color="indigo">

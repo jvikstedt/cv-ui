@@ -1,6 +1,6 @@
 <template>
   <v-container style="max-width: 1024px">
-    <v-card color="grey lighten-1">
+    <v-card>
       <v-card-title class="headline">
         <v-icon left>mdi-view-dashboard</v-icon>
         Dashboard
