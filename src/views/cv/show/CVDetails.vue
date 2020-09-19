@@ -38,7 +38,7 @@
             <h3 class="mt-sm-9">
               Details
               <v-btn
-                id="edit-cv-details-btn"
+                id="edit-user-details-btn"
                 icon
                 small
                 @click="openEditUserDetailsDialog"
