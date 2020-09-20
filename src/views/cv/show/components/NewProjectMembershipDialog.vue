@@ -25,6 +25,7 @@
       <v-card-text>
         <v-text-field
           v-model="description"
+          name="description"
           :counter="255"
           label="Description"
           required
@@ -32,6 +33,7 @@
 
         <v-text-field
           v-model.number="startYear"
+          name="startYear"
           label="Start year"
           :rules="isRequiredRule"
           type="number"
@@ -40,6 +42,7 @@
 
         <v-text-field
           v-model.number="startMonth"
+          name="startMonth"
           label="Start month"
           :rules="isRequiredRule"
           type="number"
@@ -48,17 +51,39 @@
 
         <v-text-field
           v-model.number="endYear"
+          name="endYear"
           label="End year"
           type="number"
         ></v-text-field>
 
         <v-text-field
           v-model.number="endMonth"
+          name="endMonth"
           label="End month"
           type="number"
         ></v-text-field>
 
-        <v-checkbox v-model="highlight" label="Highlight"></v-checkbox>
+        <v-checkbox
+          v-model="highlight"
+          name="highlight"
+          label="Highlight"
+        ></v-checkbox>
+
+        <v-autocomplete
+          name="skillSubjects"
+          v-model="selectedSkillSubjects"
+          :items="skillSubjects"
+          :search-input.sync="searchSkillSubjects"
+          item-text="name"
+          item-value="id"
+          label="Skills"
+          placeholder="Start typing to search"
+          multiple
+          return-object
+          chips
+          deletable-chips
+          cache-items
+        />
       </v-card-text>
 
       <v-card-actions>
@@ -82,6 +107,8 @@ import { Component, Prop, Watch, Mixins } from "vue-property-decorator";
 import { namespace } from "vuex-class";
 import { SearchProjects } from "@/api/project";
 import { Project } from "@/model/project";
+import { SkillSubject } from "@/model/skill_subject";
+import { SearchSkillSubjects } from "@/api/skill_subject";
 import {
   ProjectMembership,
   CreateProjectMembershipDto
@@ -98,8 +125,11 @@ export default class NewProjectMembershipDialog extends Mixins(
   @Prop({ required: true }) readonly id!: number;
 
   search = "";
+  searchSkillSubjects = "";
   projects: Project[] = [];
   project: Project | null = null;
+  skillSubjects: SkillSubject[] = [];
+  selectedSkillSubjects: SkillSubject[] = [];
 
   description = "";
   startYear: number | null = null;
@@ -124,6 +154,14 @@ export default class NewProjectMembershipDialog extends Mixins(
     });
   }
 
+  @Watch("searchSkillSubjects")
+  async searchSkillSubjectsChanged(keyword: string) {
+    this.skillSubjects = await SearchSkillSubjects({
+      name: keyword || "",
+      limit: 10
+    });
+  }
+
   async onSave() {
     if (
       this.form.validate() &&
@@ -139,7 +177,8 @@ export default class NewProjectMembershipDialog extends Mixins(
         startMonth: this.startMonth,
         endYear: R.isEmpty(this.endYear) ? null : this.endYear,
         endMonth: R.isEmpty(this.endMonth) ? null : this.endMonth,
-        highlight: this.highlight
+        highlight: this.highlight,
+        skillSubjectIds: R.map(s => s.id, this.selectedSkillSubjects)
       };
       await this.createProjectMembership(createProjectMembershipDto);
       this.popDialogComponent();

@@ -119,6 +119,105 @@ Cypress.Commands.add("resetSkills", () => {
     });
 });
 
+Cypress.Commands.add(
+  "createProjectMembership",
+  (
+    projectName = "Test project",
+    description = "foo",
+    startYear = 2000,
+    startMonth = 1,
+    endYear = 2015,
+    endMonth = 12,
+    highlight = false,
+    skillSubjectNames = ["Ansible"]
+  ) => {
+    const accessToken = window.localStorage.getItem("accessToken");
+    const tokenData = jwt(accessToken);
+
+    const cvId = tokenData.cvIds[0];
+
+    cy.request({
+      method: "GET",
+      url: `${Cypress.env("EXTERNAL_API")}/skill_subjects`,
+      headers: {
+        Authorization: `Bearer ${accessToken}`
+      }
+    })
+      .its("body")
+      .then(body => {
+        return R.map(
+          name =>
+            R.find(skillSubject => R.equals(skillSubject.name, name), body),
+          skillSubjectNames
+        );
+      })
+      .then(skillSubjects => {
+        return cy
+          .request({
+            method: "GET",
+            url: `${Cypress.env("EXTERNAL_API")}/project`,
+            headers: {
+              Authorization: `Bearer ${accessToken}`
+            }
+          })
+          .its("body")
+          .then(body => {
+            return {
+              skillSubjects,
+              project: R.find(s => R.equals(s.name, projectName), body)
+            };
+          });
+      })
+      .then(result => {
+        cy.request({
+          method: "POST",
+          url: `${Cypress.env("EXTERNAL_API")}/cv/${cvId}/project_membership`,
+          headers: {
+            Authorization: `Bearer ${accessToken}`
+          },
+          body: {
+            projectId: result.project.id,
+            description,
+            startYear,
+            startMonth,
+            endYear,
+            endMonth,
+            highlight,
+            skillSubjectIds: R.map(s => s.id, result.skillSubjects)
+          }
+        });
+      });
+  }
+);
+
+Cypress.Commands.add("resetProjectMemberships", () => {
+  const accessToken = window.localStorage.getItem("accessToken");
+  const tokenData = jwt(accessToken);
+  const cvId = tokenData.cvIds[0];
+
+  cy.request({
+    method: "GET",
+    url: `${Cypress.env("EXTERNAL_API")}/cv/${cvId}/project_membership`,
+    headers: {
+      Authorization: `Bearer ${accessToken}`
+    }
+  })
+    .its("body")
+    .then(body => {
+      for (const project of body) {
+        cy.request({
+          method: "DELETE",
+          url: `${Cypress.env("EXTERNAL_API")}/cv/${cvId}/project_membership/${
+            project.id
+          }`,
+          headers: {
+            Authorization: `Bearer ${accessToken}`
+          }
+        });
+      }
+    });
+});
+
 Cypress.Commands.add("getUser", () => {
   const accessToken = window.localStorage.getItem("accessToken");
   const user = jwt(accessToken);
