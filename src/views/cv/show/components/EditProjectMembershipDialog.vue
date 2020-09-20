@@ -43,6 +43,23 @@
         ></v-text-field>
 
         <v-checkbox v-model="highlight" label="Highlight"></v-checkbox>
+
+        <v-autocomplete
+          name="skillSubjects"
+          v-model="selectedSkillSubjects"
+          :items="skillSubjects"
+          :search-input.sync="searchSkillSubjects"
+          item-text="name"
+          item-value="id"
+          label="Skills"
+          placeholder="Start typing to search"
+          multiple
+          return-object
+          chips
+          deletable-chips
+          cache-items
+          height="100px"
+        />
       </v-card-text>
 
       <v-card-actions>
@@ -66,14 +83,17 @@
 
 <script lang="ts">
 import * as R from "ramda";
-import { Component, Prop, Mixins } from "vue-property-decorator";
+import { Component, Prop, Mixins, Watch } from "vue-property-decorator";
 import { namespace } from "vuex-class";
 import {
   ProjectMembership,
   PatchProjectMembershipDto,
   DeleteProjectMembershipDto
 } from "@/model/project_membership";
+import { SkillSubject } from "@/model/skill_subject";
+import { SearchSkillSubjects } from "@/api/skill_subject";
 import { DialogFormMixin } from "@/mixins";
+import { Skill } from "@/model/skill";
 
 const CVShowStore = namespace("CVShowStore");
 
@@ -83,12 +103,15 @@ export default class EditProjectMembershipDialog extends Mixins(
 ) {
   @Prop({ required: true }) readonly projectMembershipId!: number;
 
+  searchSkillSubjects = "";
   description = "";
   startYear = 2010;
   startMonth = 1;
   endYear = 2014;
   endMonth = 12;
   highlight = false;
+  skillSubjects: SkillSubject[] = [];
+  selectedSkillSubjects: SkillSubject[] = [];
 
   @CVShowStore.Action
   patchProjectMembership!: (
@@ -103,8 +126,18 @@ export default class EditProjectMembershipDialog extends Mixins(
     deleteProjectMembershipDto: DeleteProjectMembershipDto
   ) => Promise<void>;
 
+  @CVShowStore.Getter
+  getSkill!: (skillId: number) => Skill;
+
   get projectMembership(): ProjectMembership {
     return this.getProjectMembership(this.projectMembershipId);
+  }
+
+  get getSkills(): Skill[] {
+    return R.reject(
+      R.isNil,
+      R.map(s => this.getSkill(s.id), this.projectMembership.skills)
+    );
   }
 
   created() {
@@ -114,6 +147,18 @@ export default class EditProjectMembershipDialog extends Mixins(
     this.endYear = this.projectMembership.endYear;
     this.endMonth = this.projectMembership.endMonth;
     this.highlight = this.projectMembership.highlight;
+    this.selectedSkillSubjects = this.skillSubjects = R.map(
+      s => s.skillSubject,
+      this.getSkills
+    );
+  }
+
+  @Watch("searchSkillSubjects")
+  async searchSkillSubjectsChanged(keyword: string) {
+    this.skillSubjects = await SearchSkillSubjects({
+      name: keyword || "",
+      limit: 10
+    });
   }
 
   async onProjectMembershipDelete() {
@@ -146,7 +191,8 @@ export default class EditProjectMembershipDialog extends Mixins(
           startMonth: this.startMonth,
           endYear: R.isEmpty(this.endYear) ? null : this.endYear,
           endMonth: R.isEmpty(this.endMonth) ? null : this.endMonth,
-          highlight: this.highlight
+          highlight: this.highlight,
+          skillSubjectIds: R.map(s => s.id, this.selectedSkillSubjects)
         }
       };
       await this.patchProjectMembership(patchProjectMembershipDto);

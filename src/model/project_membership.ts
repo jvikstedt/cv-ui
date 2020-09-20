@@ -1,4 +1,5 @@
 import { Project } from "./project";
+import { Skill } from './skill';
 
 export class ProjectMembership {
   id!: number;
@@ -22,6 +23,8 @@ export class ProjectMembership {
   createdAt!: Date;
 
   updatedAt!: Date;
+
+  skills!: Skill[];
 }
 
 export class PatchProjectMembershipDtoData {
@@ -34,6 +37,8 @@ export class PatchProjectMembershipDtoData {
   endMonth?: number | null;
 
   highlight?: boolean;
+
+  skillSubjectIds?: number[];
 }
 
 export class PatchProjectMembershipDto {
@@ -61,4 +66,6 @@ export class CreateProjectMembershipDto {
   endMonth?: number | null;
 
   highlight!: boolean;
+
+  skillSubjectIds!: number[];
 }

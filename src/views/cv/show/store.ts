@@ -336,6 +336,7 @@ export class CVShowStore extends VuexModule {
       data
     );
     this.context.commit("addProjectMemberships", [savedProjectMembership]);
+    this.context.commit("addSkills", savedProjectMembership.skills);
   }
 
   @Action
@@ -347,6 +348,7 @@ export class CVShowStore extends VuexModule {
       createProjectMembershipDto
     );
     this.context.commit("addProjectMemberships", [savedProjectMembership]);
+    this.context.commit("addSkills", savedProjectMembership.skills);
   }
 
   @Action
