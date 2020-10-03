@@ -3,7 +3,7 @@ describe("CV skills", () => {
 
   beforeEach(() => {
     cy.login();
-    cy.getUser().then(u => (user = u));
+    cy.getUser().then((u) => (user = u));
   });
 
   afterEach(() => {
@@ -15,17 +15,11 @@ describe("CV skills", () => {
 
     cy.contains("New Skill").click();
 
-    cy.get("input[name=skillSubject]")
-      .first()
-      .type("Ansible");
+    cy.get("input[name=skillSubject]").first().type("Ansible");
 
-    cy.get(".v-list-item__content")
-      .last()
-      .click();
+    cy.get(".v-list-item__content").last().click();
 
-    cy.get("input[name=experienceInYears]")
-      .clear()
-      .type("4");
+    cy.get("input[name=experienceInYears]").clear().type("4");
 
     cy.contains("Save").click();
 
@@ -33,9 +27,7 @@ describe("CV skills", () => {
     cy.get(".v-chip__content").contains("4");
     cy.reload();
 
-    cy.get(".v-expansion-panel-header")
-      .contains("Other")
-      .click();
+    cy.get(".v-expansion-panel-header").contains("Other").click();
     cy.get(".v-chip__content").contains("Ansible");
     cy.get(".v-chip__content").contains("4");
   });
@@ -44,28 +36,18 @@ describe("CV skills", () => {
     cy.createSkill("Java", 1);
     cy.visit(`/cv/${user.cvIds[0]}`);
 
-    cy.get(".v-expansion-panel-header")
-      .contains("Programming")
-      .click();
-    cy.get(".v-chip__content")
-      .contains("Java")
-      .click();
+    cy.get(".v-expansion-panel-header").contains("Programming").click();
+    cy.get(".v-chip__content").contains("Java").click();
 
-    cy.get("input[name=experienceInYears]")
-      .clear()
-      .type("3");
+    cy.get("input[name=experienceInYears]").clear().type("3");
 
     cy.contains("Save").click();
 
-    cy.get(".v-expansion-panel-header")
-      .contains("Programming")
-      .click();
+    cy.get(".v-expansion-panel-header").contains("Programming").click();
     cy.get(".v-chip__content").contains("Java");
     cy.get(".v-chip__content").contains("3");
     cy.reload();
-    cy.get(".v-expansion-panel-header")
-      .contains("Programming")
-      .click();
+    cy.get(".v-expansion-panel-header").contains("Programming").click();
     cy.get(".v-chip__content").contains("Java");
     cy.get(".v-chip__content").contains("3");
   });
@@ -74,9 +56,7 @@ describe("CV skills", () => {
     cy.createSkill("Docker", 4);
     cy.visit(`/cv/${user.cvIds[0]}`);
 
-    cy.get(".v-expansion-panel-header")
-      .contains("Other")
-      .click();
+    cy.get(".v-expansion-panel-header").contains("Other").click();
     cy.contains("Docker").click();
 
     cy.contains("Delete").click();

@@ -78,9 +78,7 @@
       <v-card-actions>
         <v-spacer></v-spacer>
 
-        <v-btn color="red darken-1" text @click="onCancel">
-          Cancel
-        </v-btn>
+        <v-btn color="red darken-1" text @click="onCancel"> Cancel </v-btn>
 
         <v-btn v-if="canEdit" color="green darken-1" text type="submit">
           Save
@@ -93,24 +91,14 @@
 <script lang="ts">
 import * as R from "ramda";
 import { Component, Prop, Mixins } from "vue-property-decorator";
-import { namespace } from "vuex-class";
-import { User, PatchUserDto } from "@/model/user";
+import UserModule, { User, PatchUserDto } from "@/store/modules/user";
 import { CreateFile } from "@/api/file";
-import { CV } from "@/model/cv";
 import { DialogFormMixin } from "@/mixins";
-
-const CVShowStore = namespace("CVShowStore");
 
 @Component
 export default class EditUserNamesDialog extends Mixins(DialogFormMixin) {
-  @Prop({ required: true }) readonly id!: number;
+  @Prop({ required: true }) readonly user!: User;
   @Prop({ required: false }) readonly canEdit!: boolean;
-
-  @CVShowStore.Getter
-  getCV!: (id: number) => CV;
-
-  @CVShowStore.Action
-  patchUser!: (patchUserDto: PatchUserDto) => Promise<void>;
 
   firstName = "";
   lastName = "";
@@ -121,11 +109,7 @@ export default class EditUserNamesDialog extends Mixins(DialogFormMixin) {
   email = "";
   avatarId = "";
 
-  get user(): User {
-    return this.getCV(this.id).user;
-  }
-
-  created() {
+  created(): void {
     this.firstName = this.user.firstName;
     this.lastName = this.user.lastName;
     this.jobTitle = this.user.jobTitle;
@@ -147,14 +131,14 @@ export default class EditUserNamesDialog extends Mixins(DialogFormMixin) {
     return R.toUpper(`${this.user.firstName[0]}${this.user.lastName[0]}`);
   }
 
-  async onFileChange(file: File) {
+  async onFileChange(file: File): Promise<void> {
     if (file) {
       const createdFile = await CreateFile({ file });
       this.avatarId = createdFile.id;
     }
   }
 
-  async onSave() {
+  async onSave(): Promise<void> {
     if (this.form.validate()) {
       const patchUserDto: PatchUserDto = {
         id: this.user.id,
@@ -166,11 +150,11 @@ export default class EditUserNamesDialog extends Mixins(DialogFormMixin) {
           location: this.location,
           workExperienceInYears: this.workExperienceInYears,
           email: this.email,
-          avatarId: this.avatarId
-        }
+          avatarId: this.avatarId,
+        },
       };
 
-      await this.patchUser(patchUserDto);
+      await UserModule.patchUser(patchUserDto);
 
       this.popDialogComponent();
     }

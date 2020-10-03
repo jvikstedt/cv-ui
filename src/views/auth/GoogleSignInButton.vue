@@ -11,30 +11,32 @@
 
 <script lang="ts">
 import { Component, Vue } from "vue-property-decorator";
-import { namespace } from "vuex-class";
-
-const AuthStore = namespace("AuthStore");
+import AuthModule from "@/store/modules/auth";
 
 const GOOGLE_CLIENT_ID = process.env.VUE_APP_GOOGLE_CLIENT_ID;
+
+interface WC {
+  id_token: string;
+}
+
+interface AuthData {
+  wc: WC;
+}
 
 @Component
 export default class GoogleSignInButton extends Vue {
   isReady = false;
   interval = 0;
   googleSignInParams = {
-    ["client_id"]: GOOGLE_CLIENT_ID
+    ["client_id"]: GOOGLE_CLIENT_ID,
   };
 
-  @AuthStore.Action
-  googleSignIn!: (idToken: string) => Promise<void>;
-
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  async onSignInSuccess(authData: any) {
-    await this.googleSignIn(authData.wc.id_token);
+  async onSignInSuccess(authData: AuthData): Promise<void> {
+    await AuthModule.googleSignIn(authData.wc.id_token);
     this.$router.push("/");
   }
 
-  created() {
+  created(): void {
     this.updateIsReady();
 
     this.interval = setInterval(() => {
@@ -45,7 +47,7 @@ export default class GoogleSignInButton extends Vue {
     }, 500) as any; // eslint-disable-line @typescript-eslint/no-explicit-any
   }
 
-  updateIsReady() {
+  updateIsReady(): void {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     if ((window as any).gapi) {
       this.isReady = true;
@@ -54,7 +56,7 @@ export default class GoogleSignInButton extends Vue {
     }
   }
 
-  async onSignInError(err: Error) {
+  onSignInError(err: Error): void {
     console.log("error", err);
   }
 }

@@ -6,7 +6,7 @@
       app
       clipped
       v-if="isLoggedIn"
-      style="background-color: #E3E3E3"
+      style="background-color: #e3e3e3"
     >
       <v-list>
         <v-list-item link router to="/skill_subjects">
@@ -31,7 +31,7 @@
       ></v-app-bar-nav-icon>
       <v-toolbar-title
         @click="onLogoClick"
-        style="cursor: pointer; color: white;"
+        style="cursor: pointer; color: white"
         >CV</v-toolbar-title
       >
       <v-toolbar-title class="ml-2 d-none d-sm-flex" v-if="isLoggedIn">
@@ -53,7 +53,7 @@
       </v-btn>
     </v-app-bar>
 
-    <v-main style="background-color: #E3E3E3">
+    <v-main style="background-color: #e3e3e3">
       <v-container fluid>
         <v-row align="center" justify="center">
           <Alert />
@@ -67,44 +67,33 @@
 <script lang="ts">
 import axios from "axios";
 import { Component, Vue } from "vue-property-decorator";
-import { namespace } from "vuex-class";
-import { Dialog, DialogComponent } from "@/dialog";
+import { Dialog } from "@/dialog";
 import { CVSearchView, CVSearchBar } from "@/views/cv/search";
 import { Alert } from "@/alert";
-import { AlertInfo } from "@/alert/store";
-
-const DialogStore = namespace("DialogStore");
-const AuthStore = namespace("AuthStore");
-const AlertStore = namespace("AlertStore");
+import AlertModule, { AlertInfo } from "@/store/modules/alert";
+import AuthModule from "@/store/modules/auth";
+import DialogModule from "@/store/modules/dialog";
 
 @Component({
   components: {
     CVSearchBar,
     Dialog,
-    Alert
-  }
+    Alert,
+  },
 })
 export default class App extends Vue {
   drawer = null;
 
-  @AlertStore.Mutation
-  setAlert!: (alert: AlertInfo) => void;
+  get isLoggedIn(): boolean {
+    return AuthModule.isLoggedIn;
+  }
 
-  @DialogStore.Mutation
-  pushDialogComponent!: (dialogComponent: DialogComponent) => void;
-
-  @AuthStore.Action
-  logoutAction!: () => Promise<void>;
-
-  @AuthStore.Getter
-  isLoggedIn!: boolean;
-
-  async created() {
+  created(): void {
     this.$vuetify.theme.dark = false;
 
     axios.interceptors.response.use(
-      response => response,
-      error => {
+      (response) => response,
+      (error) => {
         return new Promise((resolve, reject) => {
           let responseData = error.response.data;
 
@@ -118,16 +107,16 @@ export default class App extends Vue {
               Buffer.from(responseData).toString("utf8")
             );
           }
-          this.setAlert(
+          AlertModule.setAlert(
             new AlertInfo({
               message: error.toString(),
               color: "error",
-              details: JSON.stringify(responseData, null, 2)
+              details: JSON.stringify(responseData, null, 2),
             })
           );
           if (error.response.status === 401) {
             this.$router.push("/login");
-            resolve(this.logoutAction());
+            resolve(AuthModule.logoutAction());
           }
           reject(error);
         });
@@ -135,19 +124,19 @@ export default class App extends Vue {
     );
   }
 
-  async logout() {
+  async logout(): Promise<void> {
     this.$router.push("/login");
-    await this.logoutAction();
+    await AuthModule.logoutAction();
   }
 
-  onLogoClick() {
+  onLogoClick(): void {
     this.$router.push("/");
   }
 
-  search() {
-    this.pushDialogComponent({
+  search(): void {
+    DialogModule.pushDialogComponent({
       component: CVSearchView,
-      props: {}
+      props: {},
     });
   }
 }

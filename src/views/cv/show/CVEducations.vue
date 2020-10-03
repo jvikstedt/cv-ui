@@ -40,41 +40,38 @@
 
 <script lang="ts">
 import { Component, Vue, Prop } from "vue-property-decorator";
-import { namespace } from "vuex-class";
-import { Education } from "@/model/education";
-import { DialogComponent } from "@/dialog";
 import NewEducationDialog from "./components/NewEducationDialog.vue";
 import EditEducationDialog from "./components/EditEducationDialog.vue";
-
-const CVShowStore = namespace("CVShowStore");
-const DialogStore = namespace("DialogStore");
+import DialogModule from "@/store/modules/dialog";
+import EducationModule, { Education } from "@/store/modules/education";
 
 @Component
 export default class CVEducations extends Vue {
-  @Prop({ required: true }) readonly id!: number;
+  @Prop({ required: true }) readonly cvId!: number;
   @Prop({ required: true }) readonly canEdit!: boolean;
 
-  @CVShowStore.Getter
-  getCVEducations!: (id: number) => Education[];
-
   get educations(): Education[] {
-    return this.getCVEducations(this.id);
+    return EducationModule.listByCV(this.cvId);
   }
 
-  @DialogStore.Mutation
-  pushDialogComponent!: (dialogComponent: DialogComponent) => void;
+  async created(): Promise<void> {
+    await EducationModule.fetchCVEducations(this.cvId);
+  }
 
-  async onEducationClick(education: Education) {
-    this.pushDialogComponent({
+  onEducationClick(education: Education): void {
+    DialogModule.pushDialogComponent({
       component: EditEducationDialog,
-      props: { educationId: education.id }
+      props: { education },
     });
   }
 
-  async newEducation() {
-    this.pushDialogComponent({
+  newEducation(): void {
+    DialogModule.pushDialogComponent({
       component: NewEducationDialog,
-      props: { id: this.id }
+      props: {
+        cvId: this.cvId,
+        existingEducations: this.educations,
+      },
     });
   }
 }

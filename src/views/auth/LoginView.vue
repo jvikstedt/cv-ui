@@ -19,9 +19,7 @@
         :rules="passwordRules"
         type="password"
       />
-      <v-btn color="green darken-1" text type="login">
-        Login
-      </v-btn>
+      <v-btn color="green darken-1" text type="login"> Login </v-btn>
       <GoogleSignInButton />
     </v-form>
   </div>
@@ -29,40 +27,36 @@
 
 <script lang="ts">
 import { Component, Vue } from "vue-property-decorator";
-import { namespace } from "vuex-class";
 import GoogleSignInButton from "@/views/auth/GoogleSignInButton.vue";
-import { AuthCredentialsDto } from "@/model/user";
+import { AuthCredentialsDto } from "@/store/modules/auth";
 import { VForm } from "@/types";
-
-const AuthStore = namespace("AuthStore");
+import AuthModule from "@/store/modules/auth";
+import { IsRequired } from "@/helpers/validator";
 
 @Component({
   components: {
-    GoogleSignInButton
-  }
+    GoogleSignInButton,
+  },
 })
 export default class LoginView extends Vue {
   valid = false;
   username = "";
-  usernameRules = [(v: string) => !!v || "Username is required"];
+  usernameRules = [IsRequired()];
   password = "";
-  passwordRules = [(v: string) => !!v || "Password is required"];
-
-  @AuthStore.Action
-  signIn!: (authCredentialsDto: AuthCredentialsDto) => Promise<void>;
+  passwordRules = [IsRequired()];
 
   get form(): VForm {
     return this.$refs.form as VForm;
   }
 
-  async onSignIn() {
+  async onSignIn(): Promise<void> {
     if (this.form.validate()) {
       const authCredentialsDto: AuthCredentialsDto = {
         username: this.username,
-        password: this.password
+        password: this.password,
       };
 
-      await this.signIn(authCredentialsDto);
+      await AuthModule.signIn(authCredentialsDto);
       this.$router.push("/");
     }
   }

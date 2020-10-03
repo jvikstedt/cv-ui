@@ -1,6 +1,7 @@
 import { Component } from "vue-property-decorator";
 import DialogMixin from "./DialogMixin";
 import { VForm } from "@/types";
+import { IsRequired } from "@/helpers/validator";
 
 @Component
 export default class DialogFormMixin extends DialogMixin {
@@ -10,10 +11,9 @@ export default class DialogFormMixin extends DialogMixin {
     return this.$refs.form as VForm;
   }
 
-  onCancel() {
+  onCancel(): void {
     this.popDialogComponent();
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  isRequiredRule = [(v: any) => !!v || "Is required"];
+  isRequiredRule = [IsRequired()];
 }

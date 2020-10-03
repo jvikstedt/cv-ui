@@ -32,13 +32,9 @@
       <v-card-actions>
         <v-spacer></v-spacer>
 
-        <v-btn color="red darken-1" text @click="onCancel">
-          Cancel
-        </v-btn>
+        <v-btn color="red darken-1" text @click="onCancel"> Cancel </v-btn>
 
-        <v-btn color="green darken-1" text type="submit">
-          Save
-        </v-btn>
+        <v-btn color="green darken-1" text type="submit"> Save </v-btn>
       </v-card-actions>
     </v-form>
   </v-card>
@@ -46,14 +42,10 @@
 
 <script lang="ts">
 import { Component, Prop, Watch, Mixins } from "vue-property-decorator";
-import { namespace } from "vuex-class";
-import { Project, CreateProjectDto } from "@/model/project";
-import { Company } from "@/model/company";
+import CompanyModule, { Company } from "@/store/modules/company";
 import NewCompanyDialog from "@/views/company/components/NewCompanyDialog.vue";
-import { SearchCompanies } from "@/api/company";
 import { DialogFormMixin } from "@/mixins";
-
-const ProjectStore = namespace("ProjectStore");
+import ProjectModule, { Project } from "@/store/modules/project";
 
 @Component
 export default class NewProjectDialog extends Mixins(DialogFormMixin) {
@@ -67,22 +59,19 @@ export default class NewProjectDialog extends Mixins(DialogFormMixin) {
   companies: Company[] = [];
   company: Company | null = null;
 
-  @ProjectStore.Action
-  createProject!: (createProjectDto: CreateProjectDto) => Promise<Project>;
-
   @Watch("search")
-  async searchChanged(input: string) {
-    this.companies = await SearchCompanies({
+  async searchChanged(input: string): Promise<void> {
+    this.companies = await CompanyModule.searchCompanies({
       name: input || "",
-      limit: 10
+      limit: 10,
     });
   }
 
   async onSave(): Promise<void> {
     if (this.form.validate() && this.company) {
-      const project = await this.createProject({
+      const project = await ProjectModule.createProject({
         name: this.name,
-        companyId: this.company.id
+        companyId: this.company.id,
       });
 
       await this.afterCreate(project);
@@ -90,14 +79,14 @@ export default class NewProjectDialog extends Mixins(DialogFormMixin) {
     }
   }
 
-  async newCompany() {
+  newCompany(): void {
     this.pushDialogComponent({
       component: NewCompanyDialog,
-      props: { afterCreate: this.afterCompanyCreate }
+      props: { afterCreate: this.afterCompanyCreate },
     });
   }
 
-  async afterCompanyCreate(company: Company) {
+  afterCompanyCreate(company: Company): void {
     this.companies = [...this.companies, company];
     this.company = company;
   }

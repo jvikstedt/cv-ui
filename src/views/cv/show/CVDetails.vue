@@ -8,7 +8,7 @@
             <v-icon right>mdi-export</v-icon>
           </v-btn>
         </p>
-        <template v-if="!fetching">
+        <template v-if="!fetching && cv">
           <p class="text-center">
             <v-avatar size="146.6" tile color="indigo">
               <v-img v-if="avatarSrc" :src="avatarSrc"></v-img>
@@ -33,7 +33,7 @@
         </template>
       </v-col>
       <v-col cols="12" sm="8">
-        <template v-if="!fetching">
+        <template v-if="!fetching && cv">
           <v-card-text>
             <h3 class="mt-sm-9">
               Details
@@ -71,7 +71,7 @@
                 <v-icon>mdi-pencil</v-icon>
               </v-btn>
             </h3>
-            <p style="white-space: pre-line;">
+            <p style="white-space: pre-line">
               {{ cv.description }}
             </p>
           </v-card-text>
@@ -84,73 +84,67 @@
 <script lang="ts">
 import * as R from "ramda";
 import { Component, Vue, Prop } from "vue-property-decorator";
-import { namespace } from "vuex-class";
 import EditUserDetailsDialog from "./components/EditUserDetailsDialog.vue";
 import EditCVDetailsDialog from "./components/EditCVDetailsDialog.vue";
-import { CV, PatchCVDto } from "@/model/cv";
-import { PatchUserDto } from "@/model/user";
-import { DialogComponent } from "@/dialog";
-
-const CVShowStore = namespace("CVShowStore");
-const DialogStore = namespace("DialogStore");
+import CVModule, { CV } from "@/store/modules/cv";
+import DialogModule from "@/store/modules/dialog";
 
 @Component({
   components: {
     EditUserDetailsDialog,
-    EditCVDetailsDialog
-  }
+    EditCVDetailsDialog,
+  },
 })
 export default class CVDetails extends Vue {
-  @Prop({ required: true }) readonly id!: number;
+  @Prop({ required: true }) readonly cvId!: number;
   @Prop({ required: true }) readonly canEdit!: boolean;
 
-  @CVShowStore.Getter
-  getCV!: (id: number) => CV;
+  get fetching(): boolean {
+    return CVModule.fetching;
+  }
 
-  @CVShowStore.State
-  fetching!: boolean;
+  async created(): Promise<void> {
+    await CVModule.fetchCV(this.cvId);
+  }
 
-  @CVShowStore.Action
-  patchUser!: (patchUserDto: PatchUserDto) => Promise<void>;
-
-  @CVShowStore.Action
-  patchCV!: (patchCVDto: PatchCVDto) => Promise<void>;
-
-  @DialogStore.Mutation
-  pushDialogComponent!: (dialogComponent: DialogComponent) => void;
-
-  openEditCVDetailsDialog() {
-    this.pushDialogComponent({
+  openEditCVDetailsDialog(): void {
+    DialogModule.pushDialogComponent({
       component: EditCVDetailsDialog,
-      props: { id: this.id }
+      props: { cv: this.cv },
     });
   }
 
-  openEditUserDetailsDialog() {
-    this.pushDialogComponent({
-      component: EditUserDetailsDialog,
-      props: { id: this.id, canEdit: this.canEdit }
-    });
+  openEditUserDetailsDialog(): void {
+    if (this.cv) {
+      DialogModule.pushDialogComponent({
+        component: EditUserDetailsDialog,
+        props: { user: this.cv.user, canEdit: this.canEdit },
+      });
+    }
   }
 
-  get cv(): CV {
-    return this.getCV(this.id);
+  get cv(): CV | undefined {
+    return CVModule.find(this.cvId);
   }
 
   get avatarSrc(): string | null {
-    if (this.getCV(this.id).user.avatarId) {
-      return `/api/files/${this.getCV(this.id).user.avatarId}`;
+    const cv = this.cv;
+    if (cv && cv.user.avatarId) {
+      return `/api/files/${cv.user.avatarId}`;
     }
     return null;
   }
 
   get initials(): string {
-    const user = this.cv.user;
-    return R.toUpper(`${user.firstName[0]}${user.lastName[0]}`);
+    const cv = this.cv;
+    if (cv) {
+      return R.toUpper(`${cv.user.firstName[0]}${cv.user.lastName[0]}`);
+    }
+    return "";
   }
 
-  onExport() {
-    this.$router.push(`/cv/${this.id}/export`);
+  onExport(): void {
+    this.$router.push(`/cv/${this.cvId}/export`);
   }
 }
 </script>

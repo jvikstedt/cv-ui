@@ -1,7 +1,18 @@
 import Vue from "vue";
-import { VuexModule, Module, Mutation, Action } from "vuex-module-decorators";
+import {
+  VuexModule,
+  Module,
+  Mutation,
+  Action,
+  getModule,
+} from "vuex-module-decorators";
 import Api from "@/api/api";
-import { CVSearchResult, CVSearchDtoData, CVSearchDto } from "@/model/cv";
+import {
+  CVSearchResult,
+  CVSearchDtoData,
+  CVSearchDto,
+} from "@/store/modules/cv";
+import store from "@/store";
 
 class CVSearchResultContainer {
   key!: string;
@@ -13,8 +24,13 @@ class CVSearchingContainer {
   searching = false;
 }
 
-@Module({ namespaced: true })
-export class CVSearchStore extends VuexModule {
+@Module({
+  dynamic: true,
+  namespaced: true,
+  name: "search",
+  store,
+})
+class SearchModule extends VuexModule {
   public results: { [key: string]: CVSearchResult[] } = {};
   public searching: { [key: string]: boolean } = {};
 
@@ -47,7 +63,7 @@ export class CVSearchStore extends VuexModule {
   public async searchCVs(cvSearchDto: CVSearchDto): Promise<void> {
     this.context.commit("setSearching", {
       key: cvSearchDto.key,
-      searching: true
+      searching: true,
     });
 
     const results: CVSearchResult[] = await Api.post(
@@ -58,7 +74,8 @@ export class CVSearchStore extends VuexModule {
 
     this.context.commit("setSearching", {
       key: cvSearchDto.key,
-      searching: false
+      searching: false,
     });
   }
 }
+export default getModule(SearchModule);

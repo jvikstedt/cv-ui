@@ -35,11 +35,11 @@ Cypress.Commands.add(
       url: `${Cypress.env("EXTERNAL_API")}/auth/signin`,
       body: {
         username: username,
-        password: password
-      }
+        password: password,
+      },
     })
       .its("body")
-      .then(body => {
+      .then((body) => {
         window.localStorage.setItem("accessToken", body.accessToken);
       });
   }
@@ -66,13 +66,13 @@ Cypress.Commands.add(
       method: "GET",
       url: `${Cypress.env("EXTERNAL_API")}/skill_subjects`,
       headers: {
-        Authorization: `Bearer ${accessToken}`
-      }
+        Authorization: `Bearer ${accessToken}`,
+      },
     })
       .its("body")
-      .then(body => {
+      .then((body) => {
         const skillSubject = R.find(
-          s => R.equals(s.name, skillSubjectName),
+          (s) => R.equals(s.name, skillSubjectName),
           body
         );
 
@@ -80,14 +80,14 @@ Cypress.Commands.add(
           method: "POST",
           url: `${Cypress.env("EXTERNAL_API")}/cv/${cvId}/skills`,
           headers: {
-            Authorization: `Bearer ${accessToken}`
+            Authorization: `Bearer ${accessToken}`,
           },
           body: {
             skillSubjectId: skillSubject.id,
             experienceInYears,
             interestLevel,
-            highlight
-          }
+            highlight,
+          },
         });
       });
   }
@@ -102,18 +102,18 @@ Cypress.Commands.add("resetSkills", () => {
     method: "GET",
     url: `${Cypress.env("EXTERNAL_API")}/cv/${cvId}/skills`,
     headers: {
-      Authorization: `Bearer ${accessToken}`
-    }
+      Authorization: `Bearer ${accessToken}`,
+    },
   })
     .its("body")
-    .then(body => {
+    .then((body) => {
       for (const skill of body) {
         cy.request({
           method: "DELETE",
           url: `${Cypress.env("EXTERNAL_API")}/cv/${cvId}/skills/${skill.id}`,
           headers: {
-            Authorization: `Bearer ${accessToken}`
-          }
+            Authorization: `Bearer ${accessToken}`,
+          },
         });
       }
     });
@@ -140,40 +140,40 @@ Cypress.Commands.add(
       method: "GET",
       url: `${Cypress.env("EXTERNAL_API")}/skill_subjects`,
       headers: {
-        Authorization: `Bearer ${accessToken}`
-      }
+        Authorization: `Bearer ${accessToken}`,
+      },
     })
       .its("body")
-      .then(body => {
+      .then((body) => {
         return R.map(
-          name =>
-            R.find(skillSubject => R.equals(skillSubject.name, name), body),
+          (name) =>
+            R.find((skillSubject) => R.equals(skillSubject.name, name), body),
           skillSubjectNames
         );
       })
-      .then(skillSubjects => {
+      .then((skillSubjects) => {
         return cy
           .request({
             method: "GET",
             url: `${Cypress.env("EXTERNAL_API")}/project`,
             headers: {
-              Authorization: `Bearer ${accessToken}`
-            }
+              Authorization: `Bearer ${accessToken}`,
+            },
           })
           .its("body")
-          .then(body => {
+          .then((body) => {
             return {
               skillSubjects,
-              project: R.find(s => R.equals(s.name, projectName), body)
+              project: R.find((s) => R.equals(s.name, projectName), body),
             };
           });
       })
-      .then(result => {
+      .then((result) => {
         cy.request({
           method: "POST",
           url: `${Cypress.env("EXTERNAL_API")}/cv/${cvId}/project_membership`,
           headers: {
-            Authorization: `Bearer ${accessToken}`
+            Authorization: `Bearer ${accessToken}`,
           },
           body: {
             projectId: result.project.id,
@@ -183,8 +183,15 @@ Cypress.Commands.add(
             endYear,
             endMonth,
             highlight,
-            skillSubjectIds: R.map(s => s.id, result.skillSubjects)
-          }
+            membershipSkills: R.map(
+              (s) => ({
+                skillSubjectId: s.id,
+                automaticCalculation: true,
+                experienceInYears: 0,
+              }),
+              result.skillSubjects
+            ),
+          },
         });
       });
   }
@@ -199,11 +206,11 @@ Cypress.Commands.add("resetProjectMemberships", () => {
     method: "GET",
     url: `${Cypress.env("EXTERNAL_API")}/cv/${cvId}/project_membership`,
     headers: {
-      Authorization: `Bearer ${accessToken}`
-    }
+      Authorization: `Bearer ${accessToken}`,
+    },
   })
     .its("body")
-    .then(body => {
+    .then((body) => {
       for (const project of body) {
         cy.request({
           method: "DELETE",
@@ -211,8 +218,8 @@ Cypress.Commands.add("resetProjectMemberships", () => {
             project.id
           }`,
           headers: {
-            Authorization: `Bearer ${accessToken}`
-          }
+            Authorization: `Bearer ${accessToken}`,
+          },
         });
       }
     });
@@ -232,12 +239,12 @@ Cypress.Commands.add("resetUserInformation", () => {
     method: "PATCH",
     url: `${Cypress.env("EXTERNAL_API")}/users/${user.userId}`,
     headers: {
-      Authorization: `Bearer ${accessToken}`
+      Authorization: `Bearer ${accessToken}`,
     },
     body: {
       firstName: user.firstName,
-      lastName: user.lastName
-    }
+      lastName: user.lastName,
+    },
   });
 });
 
@@ -249,10 +256,10 @@ Cypress.Commands.add("resetCVInformation", () => {
     method: "PATCH",
     url: `${Cypress.env("EXTERNAL_API")}/cv/${user.cvIds[0]}`,
     headers: {
-      Authorization: `Bearer ${accessToken}`
+      Authorization: `Bearer ${accessToken}`,
     },
     body: {
-      description: ""
-    }
+      description: "",
+    },
   });
 });

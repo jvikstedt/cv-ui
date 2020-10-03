@@ -17,23 +17,18 @@
     </v-btn>
 
     <div v-if="showMore">
-      <pre style="white-space: pre-wrap;">{{ details }}</pre>
+      <pre style="white-space: pre-wrap">{{ details }}</pre>
     </div>
 
     <template v-slot:action="{ attrs }">
-      <v-btn dark text v-bind="attrs" @click="show = false">
-        Close
-      </v-btn>
+      <v-btn dark text v-bind="attrs" @click="show = false"> Close </v-btn>
     </template>
   </v-snackbar>
 </template>
 
 <script lang="ts">
 import { Component, Vue, Watch } from "vue-property-decorator";
-import { namespace } from "vuex-class";
-import { AlertInfo } from "@/alert/store";
-
-const AlertStore = namespace("AlertStore");
+import AlertModule, { AlertInfo } from "@/store/modules/alert";
 
 @Component
 export default class Alert extends Vue {
@@ -47,14 +42,12 @@ export default class Alert extends Vue {
   mode = "";
   details: string | null = null;
 
-  @AlertStore.Getter
-  newAlert!: AlertInfo | null;
-
-  @AlertStore.Mutation
-  resetAlert!: () => void;
+  get newAlert(): AlertInfo | null {
+    return AlertModule.newAlert;
+  }
 
   @Watch("newAlert")
-  async alertChanged(alert: AlertInfo | null) {
+  alertChanged(alert: AlertInfo | null): void {
     if (alert) {
       this.show = true;
       this.x = alert.x;
@@ -65,11 +58,11 @@ export default class Alert extends Vue {
       this.color = alert.color;
       this.details = alert.details;
 
-      this.resetAlert();
+      AlertModule.resetAlert();
     }
   }
 
-  onShowMore() {
+  onShowMore(): void {
     this.showMore = !this.showMore;
     if (this.showMore) {
       this.timeout = -1;

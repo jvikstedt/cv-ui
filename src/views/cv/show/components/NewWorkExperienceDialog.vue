@@ -70,13 +70,9 @@
       <v-card-actions>
         <v-spacer></v-spacer>
 
-        <v-btn color="red darken-1" text @click="onCancel">
-          Cancel
-        </v-btn>
+        <v-btn color="red darken-1" text @click="onCancel"> Cancel </v-btn>
 
-        <v-btn color="green darken-1" text type="submit">
-          Save
-        </v-btn>
+        <v-btn color="green darken-1" text type="submit"> Save </v-btn>
       </v-card-actions>
     </v-form>
   </v-card>
@@ -85,21 +81,16 @@
 <script lang="ts">
 import * as R from "ramda";
 import { Component, Prop, Watch, Mixins } from "vue-property-decorator";
-import { namespace } from "vuex-class";
-import { SearchCompanies } from "@/api/company";
-import {
-  WorkExperience,
-  CreateWorkExperienceDto
-} from "@/model/work_experience";
-import { Company } from "@/model/company";
+import CompanyModule, { Company } from "@/store/modules/company";
 import NewCompanyDialog from "@/views/company/components/NewCompanyDialog.vue";
 import { DialogFormMixin } from "@/mixins";
-
-const CVShowStore = namespace("CVShowStore");
+import WorkExperienceModule, {
+  CreateWorkExperienceDto,
+} from "@/store/modules/work_experience";
 
 @Component
 export default class NewWorkExperienceDialog extends Mixins(DialogFormMixin) {
-  @Prop({ required: true }) readonly id!: number;
+  @Prop({ required: true }) readonly cvId!: number;
 
   search = "";
   companies: Company[] = [];
@@ -112,23 +103,15 @@ export default class NewWorkExperienceDialog extends Mixins(DialogFormMixin) {
   endYear: number | null = null;
   endMonth: number | null = null;
 
-  @CVShowStore.Getter
-  getCVWorkExperiences!: (id: number) => WorkExperience[];
-
-  @CVShowStore.Action
-  createWorkExperience!: (
-    createWorkExperienceDto: CreateWorkExperienceDto
-  ) => Promise<void>;
-
   @Watch("search")
-  async searchChanged(keyword: string) {
-    this.companies = await SearchCompanies({
+  async searchChanged(keyword: string): Promise<void> {
+    this.companies = await CompanyModule.searchCompanies({
       name: keyword || "",
-      limit: 10
+      limit: 10,
     });
   }
 
-  async onSave() {
+  async onSave(): Promise<void> {
     if (
       this.form.validate() &&
       this.company &&
@@ -136,28 +119,28 @@ export default class NewWorkExperienceDialog extends Mixins(DialogFormMixin) {
       this.startMonth
     ) {
       const createWorkExperienceDto: CreateWorkExperienceDto = {
-        cvId: this.id,
+        cvId: this.cvId,
         companyId: this.company.id,
         jobTitle: this.jobTitle,
         description: this.description,
         startYear: this.startYear,
         startMonth: this.startMonth,
         endYear: R.isEmpty(this.endYear) ? null : this.endYear,
-        endMonth: R.isEmpty(this.endMonth) ? null : this.endMonth
+        endMonth: R.isEmpty(this.endMonth) ? null : this.endMonth,
       };
-      await this.createWorkExperience(createWorkExperienceDto);
+      await WorkExperienceModule.createWorkExperience(createWorkExperienceDto);
       this.popDialogComponent();
     }
   }
 
-  async newCompany() {
+  newCompany(): void {
     this.pushDialogComponent({
       component: NewCompanyDialog,
-      props: { afterCreate: this.afterCompanyCreate }
+      props: { afterCreate: this.afterCompanyCreate },
     });
   }
 
-  async afterCompanyCreate(company: Company) {
+  afterCompanyCreate(company: Company): void {
     this.companies = [...this.companies, company];
     this.company = company;
   }

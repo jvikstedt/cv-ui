@@ -30,19 +30,6 @@
               }}
               - {{ projectMembership.endMonth }}.{{ projectMembership.endYear }}
             </v-list-item-subtitle>
-
-            <div>
-              <v-chip
-                :key="skill.id"
-                class="ma-2"
-                :style="getChipStyle(skill)"
-                text-color="blue-grey darken-4"
-                v-for="skill in getSkills(projectMembership)"
-                small
-              >
-                {{ skill.skillSubject.name }}
-              </v-chip>
-            </div>
           </v-list-item-content>
         </v-list-item>
         <v-divider></v-divider>
@@ -57,58 +44,38 @@
 </template>
 
 <script lang="ts">
-import * as R from "ramda";
 import { Component, Vue, Prop } from "vue-property-decorator";
-import { namespace } from "vuex-class";
-import { ProjectMembership } from "@/model/project_membership";
-import { DialogComponent } from "@/dialog";
 import NewProjectMembershipDialog from "./components/NewProjectMembershipDialog.vue";
 import EditProjectMembershipDialog from "./components/EditProjectMembershipDialog.vue";
-import { Skill } from "@/model/skill";
-
-const CVShowStore = namespace("CVShowStore");
-const DialogStore = namespace("DialogStore");
+import DialogModule from "@/store/modules/dialog";
+import ProjectMembershipModule, {
+  ProjectMembership,
+} from "@/store/modules/project_membership";
 
 @Component
 export default class CVProjectMemberships extends Vue {
-  @Prop({ required: true }) readonly id!: number;
+  @Prop({ required: true }) readonly cvId!: number;
   @Prop({ required: true }) readonly canEdit!: boolean;
 
-  @CVShowStore.Getter
-  getCVProjectMemberships!: (id: number) => ProjectMembership[];
-
-  @CVShowStore.Getter
-  getSkill!: (skillId: number) => Skill;
-
   get projectMemberships(): ProjectMembership[] {
-    return this.getCVProjectMemberships(this.id);
+    return ProjectMembershipModule.listByCV(this.cvId);
   }
 
-  getSkills(projectMembership: ProjectMembership): Skill[] {
-    return R.reject(
-      R.isNil,
-      R.map(s => this.getSkill(s.id), projectMembership.skills)
-    );
+  async created(): Promise<void> {
+    await ProjectMembershipModule.fetchCVProjectMemberships(this.cvId);
   }
 
-  getChipStyle(skill: Skill): string {
-    return `background-color: rgb(76,175,80, ${skill.interestLevel * (1 / 3)})`;
-  }
-
-  @DialogStore.Mutation
-  pushDialogComponent!: (dialogComponent: DialogComponent) => void;
-
-  async onProjectMembershipClick(projectMembership: ProjectMembership) {
-    this.pushDialogComponent({
+  onProjectMembershipClick(projectMembership: ProjectMembership): void {
+    DialogModule.pushDialogComponent({
       component: EditProjectMembershipDialog,
-      props: { projectMembershipId: projectMembership.id }
+      props: { projectMembership },
     });
   }
 
-  async newProjectMembership() {
-    this.pushDialogComponent({
+  newProjectMembership(): void {
+    DialogModule.pushDialogComponent({
       component: NewProjectMembershipDialog,
-      props: { id: this.id }
+      props: { cvId: this.cvId },
     });
   }
 }

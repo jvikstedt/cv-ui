@@ -16,13 +16,9 @@
       <v-card-actions>
         <v-spacer></v-spacer>
 
-        <v-btn color="red darken-1" text @click="onCancel">
-          Cancel
-        </v-btn>
+        <v-btn color="red darken-1" text @click="onCancel"> Cancel </v-btn>
 
-        <v-btn color="green darken-1" text type="submit">
-          Save
-        </v-btn>
+        <v-btn color="green darken-1" text type="submit"> Save </v-btn>
       </v-card-actions>
     </v-form>
   </v-card>
@@ -30,11 +26,8 @@
 
 <script lang="ts">
 import { Component, Prop, Mixins } from "vue-property-decorator";
-import { namespace } from "vuex-class";
-import { Company, CreateCompanyDto } from "@/model/company";
 import { DialogFormMixin } from "@/mixins";
-
-const CompanyStore = namespace("CompanyStore");
+import CompanyModule, { Company } from "@/store/modules/company";
 
 @Component
 export default class NewCompanyDialog extends Mixins(DialogFormMixin) {
@@ -44,13 +37,10 @@ export default class NewCompanyDialog extends Mixins(DialogFormMixin) {
 
   name = "";
 
-  @CompanyStore.Action
-  createCompany!: (createCompanyDto: CreateCompanyDto) => Promise<Company>;
-
   async onSave(): Promise<void> {
     if (this.form.validate()) {
-      const company = await this.createCompany({
-        name: this.name
+      const company = await CompanyModule.createCompany({
+        name: this.name,
       });
 
       await this.afterCreate(company);

@@ -1,4 +1,10 @@
-import { Module, VuexModule, Mutation } from "vuex-module-decorators";
+import {
+  Module,
+  VuexModule,
+  Mutation,
+  getModule,
+} from "vuex-module-decorators";
+import store from "@/store";
 
 export class AlertInfo {
   message!: string;
@@ -14,8 +20,13 @@ export class AlertInfo {
   }
 }
 
-@Module({ namespaced: true })
-export class AlertStore extends VuexModule {
+@Module({
+  dynamic: true,
+  namespaced: true,
+  name: "alert",
+  store,
+})
+class AlertModule extends VuexModule {
   public alert: AlertInfo | null = null;
 
   get newAlert(): AlertInfo | null {
@@ -32,3 +43,5 @@ export class AlertStore extends VuexModule {
     this.alert = alert;
   }
 }
+
+export default getModule(AlertModule);

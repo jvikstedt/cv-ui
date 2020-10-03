@@ -12,11 +12,11 @@
         class="ma-2"
         :style="getChipStyle(skill)"
         text-color="blue-grey darken-4"
-        v-for="skill in getCVHighlightedSkills(id)"
+        v-for="skill in getCVHighlightedSkills"
         v-on="canEdit ? { click: () => onSkillClick(skill) } : {}"
       >
         <v-avatar left class="">
-          {{ skill.experienceInYears }}
+          {{ skill.totalExperienceInYears }}
         </v-avatar>
         {{ skill.skillSubject.name }}
         <v-icon v-if="skill.highlight" right>mdi-star</v-icon>
@@ -41,7 +41,7 @@
               v-on="canEdit ? { click: () => onSkillClick(skill) } : {}"
             >
               <v-avatar left class="">
-                {{ skill.experienceInYears }}
+                {{ skill.totalExperienceInYears }}
               </v-avatar>
               {{ skill.skillSubject.name }}
               <v-icon v-if="skill.highlight" right>mdi-star</v-icon>
@@ -59,30 +59,36 @@
 <script lang="ts">
 import * as R from "ramda";
 import { Component, Vue, Prop } from "vue-property-decorator";
-import { namespace } from "vuex-class";
-import { Skill } from "@/model/skill";
-import { DialogComponent } from "@/dialog";
 import EditSkillDialog from "./components/EditSkillDialog.vue";
 import NewSkillDialog from "./components/NewSkillDialog.vue";
-
-const CVShowStore = namespace("CVShowStore");
-const DialogStore = namespace("DialogStore");
+import DialogModule from "@/store/modules/dialog";
+import SkillModule, { Skill } from "@/store/modules/skill";
 
 @Component
 export default class CVSkills extends Vue {
-  @Prop({ required: true }) readonly id!: number;
+  @Prop({ required: true }) readonly cvId!: number;
   @Prop({ required: true }) readonly canEdit!: boolean;
 
   panel: number | null = null;
 
-  @CVShowStore.Getter
-  getCVSkillsGrouped!: (id: number) => { [key: string]: Skill[] };
+  get skills(): Skill[] {
+    return SkillModule.listByCV(this.cvId);
+  }
 
-  @CVShowStore.Getter
-  getCVHighlightedSkills!: (id: number) => Skill[];
+  get getCVHighlightedSkills(): Skill[] {
+    return R.filter((skill: Skill) => skill.highlight, this.skills);
+  }
 
-  @DialogStore.Mutation
-  pushDialogComponent!: (dialogComponent: DialogComponent) => void;
+  get getCVSkillsGrouped(): { [key: string]: Skill[] } {
+    return R.groupBy(
+      (skill: Skill) => skill.skillSubject.skillGroup.name,
+      this.skills
+    );
+  }
+
+  async created(): Promise<void> {
+    await SkillModule.fetchCVSkills(this.cvId);
+  }
 
   getChipStyle(skill: Skill): string {
     return `background-color: rgb(76,175,80, ${skill.interestLevel * (1 / 3)})`;
@@ -91,32 +97,35 @@ export default class CVSkills extends Vue {
   skillGroups(): string[] {
     return R.sort(
       (a, b) => a.localeCompare(b),
-      Object.keys(this.getCVSkillsGrouped(this.id))
+      Object.keys(this.getCVSkillsGrouped)
     );
   }
 
   skillsBySkillGroup(skillGroupName: string): Skill[] {
-    return this.getCVSkillsGrouped(this.id)[skillGroupName] || [];
+    return this.getCVSkillsGrouped[skillGroupName] || [];
   }
 
-  async onSkillClick(skill: Skill) {
-    this.pushDialogComponent({
+  onSkillClick(skill: Skill): void {
+    DialogModule.pushDialogComponent({
       component: EditSkillDialog,
-      props: { skillId: skill.id }
+      props: {
+        skill,
+      },
     });
   }
 
-  async newSkill() {
-    this.pushDialogComponent({
+  newSkill(): void {
+    DialogModule.pushDialogComponent({
       component: NewSkillDialog,
       props: {
-        id: this.id,
-        afterCreate: this.afterSkillCreate
-      }
+        cvId: this.cvId,
+        afterCreate: this.afterSkillCreate,
+        existingSkills: this.skills,
+      },
     });
   }
 
-  async afterSkillCreate(skill: Skill) {
+  afterSkillCreate(skill: Skill): void {
     const skillGroups = this.skillGroups();
     const index = R.findIndex(R.equals(skill.skillSubject.skillGroup.name))(
       skillGroups

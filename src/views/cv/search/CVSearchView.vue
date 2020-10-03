@@ -55,9 +55,7 @@
         <v-icon right>mdi-magnify</v-icon>
       </v-btn>
 
-      <v-btn color="red darken-1" text @click="onCancel">
-        Close
-      </v-btn>
+      <v-btn color="red darken-1" text @click="onCancel"> Close </v-btn>
 
       <v-list class="mt-2">
         <template v-if="results.length">
@@ -91,7 +89,7 @@
             </v-list-item>
             <v-divider
               :key="item.id + 'divider'"
-              style="border-color: rgba(0, 0, 0, 0.3);"
+              style="border-color: rgba(0, 0, 0, 0.3)"
             ></v-divider>
           </template>
         </template>
@@ -109,14 +107,13 @@ import {
   CVSearchResult,
   CVSearchDtoData,
   CVSearchDto,
-  CVSearchResultSkill
-} from "@/model/cv";
-import { namespace } from "vuex-class";
-import { SkillSubject } from "@/model/skill_subject";
-import { SearchSkillSubjects } from "@/api/skill_subject";
+  CVSearchResultSkill,
+} from "@/store/modules/cv";
+import SkillSubjectModule, {
+  SkillSubject,
+} from "@/store/modules/skill_subject";
 import { SearchMixin, DialogFormMixin } from "@/mixins";
-
-const CVSearchStore = namespace("CVSearchStore");
+import SearchModule from "@/store/modules/search";
 
 @Component
 export default class CVSearchView extends Mixins(SearchMixin, DialogFormMixin) {
@@ -126,21 +123,19 @@ export default class CVSearchView extends Mixins(SearchMixin, DialogFormMixin) {
   selectedSkillSubject: SkillSubject | null = null;
   skillSubjects: SkillSubject[] = [];
 
-  @CVSearchStore.State
-  searchData!: CVSearchDtoData;
-
-  @CVSearchStore.Mutation
-  setSearchData!: (searchData: CVSearchDtoData) => void;
+  get searchData(): CVSearchDtoData {
+    return SearchModule.searchData;
+  }
 
   getChipStyle(skill: CVSearchResultSkill): string {
     return `background-color: rgb(76,175,80, ${skill.interestLevel * (1 / 3)})`;
   }
 
   @Watch("searchInput")
-  async searchInputChanged(input: string) {
-    const skillSubjects = await SearchSkillSubjects({
+  async searchInputChanged(input: string): Promise<void> {
+    const skillSubjects = await SkillSubjectModule.searchSkillSubjects({
       name: input || "",
-      limit: 10
+      limit: 10,
     });
 
     this.skillSubjects = R.reject(
@@ -148,33 +143,33 @@ export default class CVSearchView extends Mixins(SearchMixin, DialogFormMixin) {
         !!R.find(
           (skill: CVSearchDtoSkill) =>
             R.equals(skill.skillSubjectId, skillSubject.id),
-          this.searchData.skills || []
+          SearchModule.searchData.skills || []
         ),
       skillSubjects
     );
   }
 
   @Watch("searchData")
-  async searchDataChanged() {
+  async searchDataChanged(): Promise<void> {
     await this.onSearch();
   }
 
-  async created() {
+  async created(): Promise<void> {
     await this.searchInputChanged("");
   }
 
-  commonSkills(cvSearchResult: CVSearchResult) {
+  commonSkills(cvSearchResult: CVSearchResult): CVSearchResultSkill[] {
     return R.filter(
-      resultSkill =>
+      (resultSkill) =>
         !!R.find(
-          skill => R.equals(skill.skillSubjectId, resultSkill.skillSubjectId),
+          (skill) => R.equals(skill.skillSubjectId, resultSkill.skillSubjectId),
           this.searchData.skills || []
         ),
       cvSearchResult.skills
     );
   }
 
-  onResultClick(cvSearchResult: CVSearchResult) {
+  onResultClick(cvSearchResult: CVSearchResult): void {
     this.popDialogComponent();
     const route = `/cv/${cvSearchResult.id}`;
     if (this.$route.path !== route) {
@@ -182,25 +177,25 @@ export default class CVSearchView extends Mixins(SearchMixin, DialogFormMixin) {
     }
   }
 
-  async onSearch() {
+  async onSearch(): Promise<void> {
     const cvSearchDto = new CVSearchDto({
       key: this.searchKey,
-      data: this.searchData
+      data: this.searchData,
     });
     await this.searchAndDebounce(cvSearchDto, 100);
   }
 
-  async removeSelectedSkillSubject(resultSkill: CVSearchResultSkill) {
-    this.setSearchData({
+  removeSelectedSkillSubject(resultSkill: CVSearchResultSkill): void {
+    SearchModule.setSearchData({
       ...this.searchData,
       skills: R.reject(
-        skill => R.equals(skill.skillSubjectId, resultSkill.skillSubjectId),
+        (skill) => R.equals(skill.skillSubjectId, resultSkill.skillSubjectId),
         this.searchData.skills || []
-      )
+      ),
     });
   }
 
-  async onSelect(skillSubject: SkillSubject) {
+  onSelect(skillSubject: SkillSubject): void {
     this.$nextTick(() => {
       this.selectedSkillSubject = null;
     });
@@ -209,28 +204,28 @@ export default class CVSearchView extends Mixins(SearchMixin, DialogFormMixin) {
     searchDtoSkill.skillSubjectId = skillSubject.id;
     searchDtoSkill.name = skillSubject.name;
 
-    this.setSearchData({
+    SearchModule.setSearchData({
       ...this.searchData,
-      skills: [...(this.searchData.skills || []), searchDtoSkill]
+      skills: [...(this.searchData.skills || []), searchDtoSkill],
     });
   }
 
-  setSkillRequired(required: boolean, skill: CVSearchDtoSkill) {
-    this.setSearchData({
+  setSkillRequired(required: boolean, skill: CVSearchDtoSkill): void {
+    SearchModule.setSearchData({
       ...this.searchData,
-      skills: R.map(s => {
+      skills: R.map((s) => {
         if (R.equals(s.skillSubjectId, skill.skillSubjectId)) {
           return { ...s, required };
         }
         return s;
-      }, this.searchData.skills || [])
+      }, this.searchData.skills || []),
     });
   }
 
-  setText(text: string) {
-    this.setSearchData({
+  setText(text: string): void {
+    SearchModule.setSearchData({
       ...this.searchData,
-      text
+      text,
     });
   }
 }
