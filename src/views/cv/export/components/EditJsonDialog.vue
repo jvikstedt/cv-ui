@@ -1,19 +1,13 @@
 <template>
   <v-card>
-    <v-card-title class="headline">
-      JSON Editor
-    </v-card-title>
+    <v-card-title class="headline"> JSON Editor </v-card-title>
 
     <v-card-actions>
       <v-spacer></v-spacer>
 
-      <v-btn color="red darken-1" text @click="onCancel">
-        Cancel
-      </v-btn>
+      <v-btn color="red darken-1" text @click="onCancel"> Cancel </v-btn>
 
-      <v-btn color="green darken-1" text @click="onUse">
-        Use
-      </v-btn>
+      <v-btn color="green darken-1" text @click="onUse"> Use </v-btn>
     </v-card-actions>
 
     <v-card-text>
@@ -30,35 +24,26 @@
 import JSONEditor from "jsoneditor";
 import { Component, Mixins } from "vue-property-decorator";
 import { DialogFormMixin } from "@/mixins";
-import { namespace } from "vuex-class";
-import { ExportData } from "../types";
-
-const CVExportStore = namespace("CVExportStore");
+import ExportModule from "@/store/modules/export";
 
 @Component
 export default class EditJsonDialog extends Mixins(DialogFormMixin) {
-  @CVExportStore.State
-  exportData!: ExportData | null;
-
-  @CVExportStore.Mutation
-  setCVExportData!: (exportData: ExportData) => void;
-
   editor?: JSONEditor;
 
-  mounted() {
+  mounted(): void {
     const element = document.getElementById("jsoneditor");
-    if (element && this.exportData) {
+    if (element && ExportModule.exportData) {
       this.editor = new JSONEditor(element, {
         mode: "tree",
-        search: true
+        search: true,
       });
-      this.editor.set(this.exportData);
+      this.editor.set(ExportModule.exportData);
     }
   }
 
-  onUse() {
+  onUse(): void {
     if (this.editor) {
-      this.setCVExportData(this.editor.get());
+      ExportModule.setCVExportData(this.editor.get());
     }
 
     this.popDialogComponent();

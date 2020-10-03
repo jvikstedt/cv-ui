@@ -16,52 +16,52 @@ const routes: Array<RouteConfig> = [
     name: "LoginView",
     component: LoginView,
     meta: {
-      requiresAuth: false
-    }
+      requiresAuth: false,
+    },
   },
   {
     path: "/",
     name: "Dashboard",
     component: Dashboard,
     meta: {
-      requiresAuth: true
-    }
+      requiresAuth: true,
+    },
   },
   {
     path: "/cv/:id",
     name: "CVShowView",
     component: CVShowView,
     meta: {
-      requiresAuth: true
-    }
+      requiresAuth: true,
+    },
   },
   {
     path: "/cv/:id/export",
     name: "CVExportView",
     component: CVExportView,
     meta: {
-      requiresAuth: true
-    }
+      requiresAuth: true,
+    },
   },
   {
     path: "/skill_subjects",
     name: "SkillSubjectListView",
     component: SkillSubjectListView,
     meta: {
-      requiresAuth: true
-    }
-  }
+      requiresAuth: true,
+    },
+  },
 ];
 
 const router = new VueRouter({
   mode: "history",
   base: process.env.BASE_URL,
-  routes
+  routes,
 });
 
-router.beforeEach((to, from, next) => {
-  if (to.matched.some(record => record.meta.requiresAuth)) {
-    if (store.getters["AuthStore/isLoggedIn"]) {
+router.beforeEach((to, _, next) => {
+  if (to.matched.some((record) => record.meta.requiresAuth)) {
+    if (store.getters["auth/isLoggedIn"]) {
       next();
       return;
     }

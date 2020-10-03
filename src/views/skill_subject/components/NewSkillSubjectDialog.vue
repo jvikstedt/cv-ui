@@ -32,13 +32,9 @@
       <v-card-actions>
         <v-spacer></v-spacer>
 
-        <v-btn color="red darken-1" text @click="onCancel">
-          Cancel
-        </v-btn>
+        <v-btn color="red darken-1" text @click="onCancel"> Cancel </v-btn>
 
-        <v-btn color="green darken-1" text type="submit">
-          Save
-        </v-btn>
+        <v-btn color="green darken-1" text type="submit"> Save </v-btn>
       </v-card-actions>
     </v-form>
   </v-card>
@@ -46,25 +42,18 @@
 
 <script lang="ts">
 import { Component, Prop, Watch, Mixins } from "vue-property-decorator";
-import { namespace } from "vuex-class";
-import { SkillSubject, CreateSkillSubjectDto } from "@/model/skill_subject";
-import { SkillGroup } from "@/model/skill_group";
+import SkillGroupModule, { SkillGroup } from "@/store/modules/skill_group";
 import NewSkillGroupDialog from "@/views/skill_group/components/NewSkillGroupDialog.vue";
-import { SearchSkillGroups } from "@/api/skill_group";
 import { DialogFormMixin } from "@/mixins";
-
-const SkillSubjectStore = namespace("SkillSubjectStore");
+import SkillSubjectModule, {
+  SkillSubject,
+} from "@/store/modules/skill_subject";
 
 @Component
 export default class NewSkillSubjectDialog extends Mixins(DialogFormMixin) {
   @Prop({ required: false }) readonly afterCreate!: (
     skillSubject: SkillSubject
   ) => Promise<void>;
-
-  @SkillSubjectStore.Action
-  createSkillSubject!: (
-    createSkillSubjectDto: CreateSkillSubjectDto
-  ) => Promise<SkillSubject>;
 
   name = "";
 
@@ -73,18 +62,18 @@ export default class NewSkillSubjectDialog extends Mixins(DialogFormMixin) {
   skillGroup: SkillGroup | null = null;
 
   @Watch("search")
-  async searchChanged(input: string) {
-    this.skillGroups = await SearchSkillGroups({
+  async searchChanged(input: string): Promise<void> {
+    this.skillGroups = await SkillGroupModule.searchSkillGroups({
       name: input || "",
-      limit: 10
+      limit: 10,
     });
   }
 
   async onSave(): Promise<void> {
     if (this.form.validate() && this.skillGroup) {
-      const skillSubject = await this.createSkillSubject({
+      const skillSubject = await SkillSubjectModule.createSkillSubject({
         name: this.name,
-        skillGroupId: this.skillGroup.id
+        skillGroupId: this.skillGroup.id,
       });
 
       if (this.afterCreate) {
@@ -94,14 +83,14 @@ export default class NewSkillSubjectDialog extends Mixins(DialogFormMixin) {
     }
   }
 
-  async newSkillGroup() {
+  newSkillGroup(): void {
     this.pushDialogComponent({
       component: NewSkillGroupDialog,
-      props: { afterCreate: this.afterSkillGroupCreate }
+      props: { afterCreate: this.afterSkillGroupCreate },
     });
   }
 
-  async afterSkillGroupCreate(skillGroup: SkillGroup) {
+  afterSkillGroupCreate(skillGroup: SkillGroup): void {
     this.skillGroups = [...this.skillGroups, skillGroup];
     this.skillGroup = skillGroup;
   }

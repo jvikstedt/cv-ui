@@ -38,7 +38,7 @@
 <script lang="ts">
 import * as R from "ramda";
 import { Component, Watch, Mixins } from "vue-property-decorator";
-import { CV, CVSearchDto } from "@/model/cv";
+import { CV, CVSearchDto } from "@/store/modules/cv";
 import { CVSearchView } from "@/views/cv/search";
 import { SearchMixin, DialogMixin } from "@/mixins";
 
@@ -50,23 +50,23 @@ export default class CVSearchBar extends Mixins(SearchMixin, DialogMixin) {
   searchInput = null;
 
   @Watch("searchInput")
-  async searchInputChanged(input: string) {
+  async searchInputChanged(input: string): Promise<void> {
     await this.search(input);
   }
 
-  async search(input: string) {
+  search(input: string): void {
     const cvSearchDto = new CVSearchDto({
       key: this.searchKey,
       data: {
         fullName: input || "",
-        sorts: [{ field: "updatedAt", order: "desc" }]
-      }
+        sorts: [{ field: "updatedAt", order: "desc" }],
+      },
     });
 
     this.searchAndDebounce(cvSearchDto, R.isEmpty(input || "") ? 0 : 350);
   }
 
-  async onSelect(cv: CV) {
+  onSelect(cv: CV): void {
     this.$nextTick(() => {
       this.cv = null;
     });
@@ -76,10 +76,10 @@ export default class CVSearchBar extends Mixins(SearchMixin, DialogMixin) {
     }
   }
 
-  openAdvancedSearch() {
+  openAdvancedSearch(): void {
     this.pushDialogComponent({
       component: CVSearchView,
-      props: {}
+      props: {},
     });
   }
 }

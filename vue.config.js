@@ -5,9 +5,9 @@ module.exports = {
       "/api": {
         target: "http://localhost:3000",
         changeOrigin: true,
-        secure: false
-      }
-    }
+        secure: false,
+      },
+    },
   },
 
   pluginOptions: {
@@ -15,7 +15,7 @@ module.exports = {
       locale: "en",
       fallbackLocale: "en",
       localeDir: "locales",
-      enableInSFC: true
-    }
-  }
+      enableInSFC: true,
+    },
+  },
 };

@@ -137,7 +137,7 @@
 <script lang="ts">
 import * as R from "ramda";
 import { Component, Vue, Prop, Watch } from "vue-property-decorator";
-import { Template } from "@/model/template";
+import { Template } from "@/store/modules/export";
 import { CreateFile } from "@/api/file";
 
 @Component
@@ -156,20 +156,20 @@ export default class TemplateForm extends Vue {
     "A3",
     "A4",
     "A5",
-    "A6"
+    "A6",
   ];
 
   valid = false;
   template: Template = R.clone(this.initialTemplate);
 
   @Watch("template", {
-    deep: true
+    deep: true,
   })
-  async templateChanged(template: Template) {
+  templateChanged(template: Template): void {
     this.$emit("change", template);
   }
 
-  async onFileChange(file: File) {
+  async onFileChange(file: File): Promise<void> {
     if (file) {
       const createdFile = await CreateFile({ file });
       this.template = {
@@ -178,8 +178,8 @@ export default class TemplateForm extends Vue {
           ...this.template.data,
           fileId: createdFile.id,
           fileName: createdFile.originalname,
-          fileCreatedAt: createdFile.createdAt
-        }
+          fileCreatedAt: createdFile.createdAt,
+        },
       };
     }
   }

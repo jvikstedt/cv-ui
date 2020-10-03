@@ -43,8 +43,8 @@ describe("Login", () => {
     cy.contains("Login").click();
     cy.location("pathname").should("eq", "/login");
 
-    cy.contains("Username is required");
-    cy.contains("Password is required");
+    cy.contains("is required");
+    cy.contains("is required");
   });
 
   it("Succesfully logouts when logout button is pressed", () => {
@@ -56,7 +56,7 @@ describe("Login", () => {
 
     cy.location("pathname").should("eq", "/login");
 
-    cy.window().then(window =>
+    cy.window().then((window) =>
       expect(window.localStorage.getItem("accessToken")).to.eq(null)
     );
   });

@@ -54,17 +54,11 @@
       <v-card-actions>
         <v-spacer></v-spacer>
 
-        <v-btn color="red darken-1" text @click="onSkillDelete">
-          Delete
-        </v-btn>
+        <v-btn color="red darken-1" text @click="onSkillDelete"> Delete </v-btn>
 
-        <v-btn color="red darken-1" text @click="onCancel">
-          Cancel
-        </v-btn>
+        <v-btn color="red darken-1" text @click="onCancel"> Cancel </v-btn>
 
-        <v-btn color="green darken-1" text type="submit">
-          Save
-        </v-btn>
+        <v-btn color="green darken-1" text type="submit"> Save </v-btn>
       </v-card-actions>
     </v-form>
   </v-card>
@@ -72,70 +66,43 @@
 
 <script lang="ts">
 import { Component, Prop, Mixins } from "vue-property-decorator";
-import { namespace } from "vuex-class";
-import { PatchCVDto } from "@/model/cv";
-import { Skill, PatchSkillDto, DeleteSkillDto } from "@/model/skill";
 import { DialogFormMixin } from "@/mixins";
-
-const CVShowStore = namespace("CVShowStore");
+import SkillModule, { Skill, PatchSkillDto } from "@/store/modules/skill";
 
 @Component
 export default class EditSkillDialog extends Mixins(DialogFormMixin) {
-  @Prop({ required: true }) readonly skillId!: number;
+  @Prop({ required: true }) readonly skill!: Skill;
 
   experienceInYears = 1;
   interestLevel = 1;
   highlight = false;
 
-  @CVShowStore.Action
-  patchSkill!: (patchSkillDto: PatchSkillDto) => Promise<void>;
-
-  @CVShowStore.Action
-  patchCV!: (patchCVDto: PatchCVDto) => Promise<void>;
-
-  @CVShowStore.Getter
-  getSkill!: (skillId: number) => Skill;
-
-  @CVShowStore.Action
-  deleteSkill!: (deleteSkillDto: DeleteSkillDto) => Promise<void>;
-
-  get skill(): Skill {
-    return this.getSkill(this.skillId);
-  }
-
-  created() {
+  created(): void {
     this.experienceInYears = this.skill.experienceInYears;
     this.interestLevel = this.skill.interestLevel;
     this.highlight = this.skill.highlight;
   }
 
-  async onSkillDelete() {
+  async onSkillDelete(): Promise<void> {
+    await SkillModule.deleteSkill({
+      cvId: this.skill.cvId,
+      skillId: this.skill.id,
+    });
     this.popDialogComponent();
-
-    const skill = this.getSkill(this.skillId);
-
-    const deleteSkillDto = {
-      cvId: skill.cvId,
-      skillId: skill.id
-    };
-
-    await this.deleteSkill(deleteSkillDto);
   }
 
-  async onSave() {
+  async onSave(): Promise<void> {
     if (this.form.validate()) {
-      const skill = this.getSkill(this.skillId);
-
       const patchSkillDto: PatchSkillDto = {
-        cvId: skill.cvId,
-        skillId: skill.id,
+        cvId: this.skill.cvId,
+        skillId: this.skill.id,
         data: {
           experienceInYears: this.experienceInYears,
           interestLevel: this.interestLevel,
-          highlight: this.highlight
-        }
+          highlight: this.highlight,
+        },
       };
-      await this.patchSkill(patchSkillDto);
+      await SkillModule.patchSkill(patchSkillDto);
 
       this.popDialogComponent();
     }

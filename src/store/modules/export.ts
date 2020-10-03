@@ -1,15 +1,131 @@
 import * as R from "ramda";
-import { VuexModule, Module, Mutation, Action } from "vuex-module-decorators";
+import {
+  VuexModule,
+  Module,
+  Mutation,
+  Action,
+  getModule,
+} from "vuex-module-decorators";
 import Vue from "vue";
 import Api from "@/api/api";
-import {
-  Template,
-  CreateTemplateDto,
-  PatchTemplateDto
-} from "@/model/template";
-import { Skill } from "@/model/skill";
-import { ExportPdfDto, ExportDocxDto } from "@/model/exporter";
-import { ExportData } from "./types";
+import { Skill } from "@/store/modules/skill";
+import { ExportData } from "@/views/cv/export/types";
+import store from "@/store";
+
+export class ExportPdfDto {
+  bodyTemplate? = "";
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  data?: any = {};
+
+  scale? = 1;
+
+  displayHeaderFooter? = false;
+
+  headerTemplate? = "";
+
+  footerTemplate? = "";
+
+  printBackground? = false;
+
+  landscape? = false;
+
+  pageRanges? = "";
+
+  format? = "Letter";
+
+  width? = "";
+
+  height? = "";
+
+  marginTop? = "0px";
+
+  marginRight? = "0px";
+
+  marginBottom? = "0px";
+
+  marginLeft? = "0px";
+
+  preferCSSPageSize? = false;
+}
+
+export class ExportDocxDto {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  data?: any = {};
+
+  fileId!: string;
+}
+
+export interface TemplateDto {
+  id?: number;
+
+  name: string;
+
+  exporter?: string;
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  data: any;
+}
+
+export class Template {
+  id!: number;
+
+  name!: string;
+
+  exporter!: string;
+
+  userId!: number;
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  data!: any;
+
+  createdAt!: Date;
+
+  updatedAt!: Date;
+}
+
+export class PatchTemplateDtoData {
+  name!: string;
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  data!: any;
+}
+
+export class PatchTemplateDto {
+  id!: number;
+  data!: PatchTemplateDtoData;
+}
+
+export class CreateTemplateDto {
+  name!: string;
+
+  exporter!: string;
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  data!: any;
+}
+
+export class File {
+  id!: string;
+
+  originalname!: string;
+
+  encoding!: string;
+
+  mimetype!: string;
+
+  destination!: string;
+
+  filename!: string;
+
+  path!: string;
+
+  size!: number;
+
+  createdAt!: string;
+
+  updatedAt!: string;
+}
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const buildCVExportData = (responses: any[]): ExportData => {
@@ -18,7 +134,7 @@ const buildCVExportData = (responses: any[]): ExportData => {
     skills,
     educations,
     workExperiences,
-    projectMemberships
+    projectMemberships,
   ] = responses;
 
   return {
@@ -35,10 +151,10 @@ const buildCVExportData = (responses: any[]): ExportData => {
       phone: cv.user.phone,
       location: cv.user.location,
       workExperienceInYears: cv.user.workExperienceInYears,
-      email: cv.user.email
+      email: cv.user.email,
     },
     skills: R.map(
-      skill => ({
+      (skill) => ({
         id: skill.id,
         experienceInYears: skill.experienceInYears,
         interestLevel: skill.interestLevel,
@@ -47,12 +163,12 @@ const buildCVExportData = (responses: any[]): ExportData => {
         skillGroupId: skill.skillSubject.skillGroup.id,
         skillGroupName: skill.skillSubject.skillGroup.name,
         highlight: skill.highlight,
-        disabled: false
+        disabled: false,
       }),
       skills
     ),
     educations: R.map(
-      education => ({
+      (education) => ({
         schoolId: education.school.id,
         schoolName: education.school.name,
         startYear: education.startYear,
@@ -61,12 +177,12 @@ const buildCVExportData = (responses: any[]): ExportData => {
         fieldOfStudy: education.fieldOfStudy,
         description: education.description,
         highlight: education.highlight,
-        disabled: false
+        disabled: false,
       }),
       educations
     ),
     jobs: R.map(
-      workExperience => ({
+      (workExperience) => ({
         companyId: workExperience.company.id,
         companyName: workExperience.company.name,
         startYear: workExperience.startYear,
@@ -75,12 +191,12 @@ const buildCVExportData = (responses: any[]): ExportData => {
         endMonth: workExperience.endMonth,
         description: workExperience.description,
         jobTitle: workExperience.jobTitle,
-        disabled: false
+        disabled: false,
       }),
       workExperiences
     ),
     projects: R.map(
-      projectMembership => ({
+      (projectMembership) => ({
         projectId: projectMembership.project.id,
         projectName: projectMembership.project.name,
         companyId: projectMembership.project.company.id,
@@ -91,15 +207,20 @@ const buildCVExportData = (responses: any[]): ExportData => {
         endMonth: projectMembership.endMonth,
         description: projectMembership.description,
         highlight: projectMembership.highlight,
-        disabled: false
+        disabled: false,
       }),
       projectMemberships
-    )
+    ),
   };
 };
 
-@Module({ namespaced: true })
-export class CVExportStore extends VuexModule {
+@Module({
+  dynamic: true,
+  namespaced: true,
+  name: "export",
+  store,
+})
+class ExportModule extends VuexModule {
   public fetching = false;
   public exportData: ExportData | null = null;
   public templates: { [key: number]: Template } = {};
@@ -152,8 +273,8 @@ export class CVExportStore extends VuexModule {
       Api.get(`/cv/${id}/skills`),
       Api.get(`/cv/${id}/educations`),
       Api.get(`/cv/${id}/work_experience`),
-      Api.get(`/cv/${id}/project_membership`)
-    ]).then(responses => {
+      Api.get(`/cv/${id}/project_membership`),
+    ]).then((responses) => {
       this.context.commit("setCVExportData", buildCVExportData(responses));
     });
 
@@ -182,7 +303,7 @@ export class CVExportStore extends VuexModule {
   @Action
   public async patchTemplate({ id, data }: PatchTemplateDto): Promise<void> {
     const savedTemplate: Template = await Api.patch(`/templates/${id}`, {
-      data
+      data,
     });
     this.context.commit("addTemplates", [savedTemplate]);
     this.context.commit("setSelectedTemplate", savedTemplate);
@@ -194,8 +315,8 @@ export class CVExportStore extends VuexModule {
     const pdf = await Api.post("/exporters/pdf/export", exportPdfDto, {
       responseType: "arraybuffer",
       headers: {
-        Accept: "application/pdf"
-      }
+        Accept: "application/pdf",
+      },
     });
 
     const blob = new Blob([pdf], { type: "application/pdf" });
@@ -212,13 +333,13 @@ export class CVExportStore extends VuexModule {
       responseType: "arraybuffer",
       headers: {
         Accept:
-          "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-      }
+          "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+      },
     });
 
     const blob = new Blob([response], {
       type:
-        "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+        "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
     });
     const docxURL = window.URL.createObjectURL(blob);
 
@@ -226,3 +347,5 @@ export class CVExportStore extends VuexModule {
     this.context.commit("setFetching", false);
   }
 }
+
+export default getModule(ExportModule);

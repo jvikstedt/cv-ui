@@ -14,21 +14,21 @@
 
 <script lang="ts">
 import { Component, Vue } from "vue-property-decorator";
-import { namespace } from "vuex-class";
-import { DialogComponent } from "./store";
-
-const DialogStore = namespace("DialogStore");
+import { DialogComponent } from "@/store/modules/dialog";
+import DialogModule from "@/store/modules/dialog";
 
 @Component
 export default class Dialog extends Vue {
-  @DialogStore.State
-  isOpen!: boolean;
+  // @DialogStore.State
+  // isOpen!: boolean;
 
-  @DialogStore.State
-  dialogComponents!: DialogComponent[];
+  // @DialogStore.State
+  get dialogComponents(): DialogComponent[] {
+    return DialogModule.dialogComponents;
+  }
 
-  @DialogStore.Mutation
-  popDialogComponent!: () => void;
+  // @DialogStore.Mutation
+  // popDialogComponent!: () => void;
 
   get dialog(): boolean {
     return true;
@@ -36,7 +36,7 @@ export default class Dialog extends Vue {
 
   set dialog(dialog: boolean) {
     if (!dialog) {
-      this.popDialogComponent();
+      DialogModule.popDialogComponent();
     }
   }
 }

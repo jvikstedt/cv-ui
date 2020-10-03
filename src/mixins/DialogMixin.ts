@@ -1,14 +1,9 @@
 import { Component, Vue } from "vue-property-decorator";
-import { namespace } from "vuex-class";
-import { DialogComponent } from "@/dialog";
-
-const DialogStore = namespace("DialogStore");
+import DialogModule from "@/store/modules/dialog";
 
 @Component
 export default class DialogMixin extends Vue {
-  @DialogStore.Mutation
-  popDialogComponent!: () => void;
+  popDialogComponent = DialogModule.popDialogComponent;
 
-  @DialogStore.Mutation
-  pushDialogComponent!: (dialogComponent: DialogComponent) => void;
+  pushDialogComponent = DialogModule.pushDialogComponent;
 }

@@ -1,8 +1,28 @@
 import * as R from "ramda";
-import { VuexModule, Module, Mutation, Action } from "vuex-module-decorators";
+import {
+  VuexModule,
+  Module,
+  Mutation,
+  Action,
+  getModule,
+} from "vuex-module-decorators";
 import jwt from "jwt-decode";
 import Api from "@/api/api";
-import { TokenData, AuthCredentialsDto } from "@/model/user";
+import store from "@/store";
+
+export class TokenData {
+  cvIds!: number[];
+  firstName!: string;
+  lastName!: string;
+  userId!: number;
+  templateIds!: number[];
+  username!: string;
+}
+
+export class AuthCredentialsDto {
+  username!: string;
+  password!: string;
+}
 
 const getUserFromLocalStorage = (): TokenData => {
   const accessToken = localStorage.getItem("accessToken");
@@ -12,8 +32,13 @@ const getUserFromLocalStorage = (): TokenData => {
   return new TokenData();
 };
 
-@Module({ namespaced: true })
-export class AuthStore extends VuexModule {
+@Module({
+  dynamic: true,
+  namespaced: true,
+  name: "auth",
+  store,
+})
+class AuthModule extends VuexModule {
   public accessToken = localStorage.getItem("accessToken") || "";
   public tokenData = getUserFromLocalStorage();
   public status = "";
@@ -61,13 +86,13 @@ export class AuthStore extends VuexModule {
   @Action
   public async signIn({
     username,
-    password
+    password,
   }: AuthCredentialsDto): Promise<void> {
     this.context.commit("setStatus", "loading");
     try {
       const { accessToken } = await Api.post("/auth/signin", {
         username,
-        password
+        password,
       });
       localStorage.setItem("accessToken", accessToken);
       this.context.commit("authSuccess", accessToken);
@@ -82,7 +107,7 @@ export class AuthStore extends VuexModule {
     this.context.commit("setStatus", "loading");
     try {
       const { accessToken } = await Api.post("/auth/google/signin", {
-        idToken
+        idToken,
       });
       localStorage.setItem("accessToken", accessToken);
       this.context.commit("authSuccess", accessToken);
@@ -98,3 +123,5 @@ export class AuthStore extends VuexModule {
     this.context.commit("logout");
   }
 }
+
+export default getModule(AuthModule);

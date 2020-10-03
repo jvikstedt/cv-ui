@@ -73,13 +73,9 @@
       <v-card-actions>
         <v-spacer></v-spacer>
 
-        <v-btn color="red darken-1" text @click="onCancel">
-          Cancel
-        </v-btn>
+        <v-btn color="red darken-1" text @click="onCancel"> Cancel </v-btn>
 
-        <v-btn color="green darken-1" text type="submit">
-          Save
-        </v-btn>
+        <v-btn color="green darken-1" text type="submit"> Save </v-btn>
       </v-card-actions>
     </v-form>
   </v-card>
@@ -88,22 +84,23 @@
 <script lang="ts">
 import * as R from "ramda";
 import { Component, Prop, Watch, Mixins } from "vue-property-decorator";
-import { namespace } from "vuex-class";
-import { Skill, CreateSkillDto } from "@/model/skill";
-import { SkillSubject } from "@/model/skill_subject";
-import { SearchSkillSubjects } from "@/api/skill_subject";
+import SkillSubjectModule, {
+  SkillSubject,
+} from "@/store/modules/skill_subject";
 import NewSkillSubjectDialog from "@/views/skill_subject/components/NewSkillSubjectDialog.vue";
 import { DialogFormMixin } from "@/mixins";
-
-const CVShowStore = namespace("CVShowStore");
+import SkillModule, { Skill, CreateSkillDto } from "@/store/modules/skill";
 
 @Component({
   components: {
-    NewSkillSubjectDialog
-  }
+    NewSkillSubjectDialog,
+  },
 })
 export default class NewSkillDialog extends Mixins(DialogFormMixin) {
-  @Prop({ required: true }) readonly id!: number;
+  @Prop({ required: true }) readonly cvId!: number;
+  @Prop({ required: true, default: [] })
+  readonly existingSkills!: Skill[];
+
   @Prop({ required: false }) readonly afterCreate!: (
     skill: Skill
   ) => Promise<void>;
@@ -115,38 +112,32 @@ export default class NewSkillDialog extends Mixins(DialogFormMixin) {
   skillSubjects: SkillSubject[] = [];
   skillSubject: SkillSubject | null = null;
 
-  @CVShowStore.Getter
-  getCVSkills!: (id: number) => Skill[];
-
-  @CVShowStore.Action
-  createSkill!: (createSkillDto: CreateSkillDto) => Promise<Skill>;
-
   @Watch("search")
-  async searchChanged(keyword: string) {
-    const skillSubjects = await SearchSkillSubjects({
+  async searchChanged(keyword: string): Promise<void> {
+    const skillSubjects = await SkillSubjectModule.searchSkillSubjects({
       name: keyword || "",
-      limit: 10
+      limit: 10,
     });
     this.skillSubjects = R.reject(
       (skillSubject: SkillSubject) =>
         !!R.find(
           (skill: Skill) => R.equals(skillSubject.id, skill.skillSubject.id),
-          this.getCVSkills(this.id)
+          this.existingSkills
         ),
       skillSubjects
     );
   }
 
-  async onSave() {
+  async onSave(): Promise<void> {
     if (this.form.validate() && this.skillSubject) {
       const createSkillDto: CreateSkillDto = {
-        cvId: this.id,
+        cvId: this.cvId,
         experienceInYears: this.experienceInYears,
         interestLevel: this.interestLevel,
         highlight: this.highlight,
-        skillSubjectId: this.skillSubject.id
+        skillSubjectId: this.skillSubject.id,
       };
-      const skill = await this.createSkill(createSkillDto);
+      const skill = await SkillModule.createSkill(createSkillDto);
 
       if (this.afterCreate) {
         await this.afterCreate(skill);
@@ -156,14 +147,14 @@ export default class NewSkillDialog extends Mixins(DialogFormMixin) {
     }
   }
 
-  async newSkillSubject() {
+  newSkillSubject(): void {
     this.pushDialogComponent({
       component: NewSkillSubjectDialog,
-      props: { afterCreate: this.afterSkillSubjectCreate }
+      props: { afterCreate: this.afterSkillSubjectCreate },
     });
   }
 
-  async afterSkillSubjectCreate(skillSubject: SkillSubject) {
+  afterSkillSubjectCreate(skillSubject: SkillSubject): void {
     this.skillSubjects = [...this.skillSubjects, skillSubject];
     this.skillSubject = skillSubject;
   }

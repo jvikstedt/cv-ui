@@ -69,33 +69,15 @@
           label="Highlight"
         ></v-checkbox>
 
-        <v-autocomplete
-          name="skillSubjects"
-          v-model="selectedSkillSubjects"
-          :items="skillSubjects"
-          :search-input.sync="searchSkillSubjects"
-          item-text="name"
-          item-value="id"
-          label="Skills"
-          placeholder="Start typing to search"
-          multiple
-          return-object
-          chips
-          deletable-chips
-          cache-items
-        />
+        <MembershipSkillsField v-model="membershipSkills" />
       </v-card-text>
 
       <v-card-actions>
         <v-spacer></v-spacer>
 
-        <v-btn color="red darken-1" text @click="onCancel">
-          Cancel
-        </v-btn>
+        <v-btn color="red darken-1" text @click="onCancel"> Cancel </v-btn>
 
-        <v-btn color="green darken-1" text type="submit">
-          Save
-        </v-btn>
+        <v-btn color="green darken-1" text type="submit"> Save </v-btn>
       </v-card-actions>
     </v-form>
   </v-card>
@@ -104,32 +86,28 @@
 <script lang="ts">
 import * as R from "ramda";
 import { Component, Prop, Watch, Mixins } from "vue-property-decorator";
-import { namespace } from "vuex-class";
-import { SearchProjects } from "@/api/project";
-import { Project } from "@/model/project";
-import { SkillSubject } from "@/model/skill_subject";
-import { SearchSkillSubjects } from "@/api/skill_subject";
-import {
-  ProjectMembership,
-  CreateProjectMembershipDto
-} from "@/model/project_membership";
+import ProjectModule, { Project } from "@/store/modules/project";
 import NewProjectDialog from "@/views/project/components/NewProjectDialog.vue";
 import { DialogFormMixin } from "@/mixins";
+import ProjectMembershipModule, {
+  CreateProjectMembershipDto,
+} from "@/store/modules/project_membership";
+import { MembershipSkillDto } from "@/store/modules/membership_skill";
+import MembershipSkillsField from "./MembershipSkillsField.vue";
 
-const CVShowStore = namespace("CVShowStore");
-
-@Component
+@Component({
+  components: {
+    MembershipSkillsField,
+  },
+})
 export default class NewProjectMembershipDialog extends Mixins(
   DialogFormMixin
 ) {
-  @Prop({ required: true }) readonly id!: number;
+  @Prop({ required: true }) readonly cvId!: number;
 
   search = "";
-  searchSkillSubjects = "";
   projects: Project[] = [];
   project: Project | null = null;
-  skillSubjects: SkillSubject[] = [];
-  selectedSkillSubjects: SkillSubject[] = [];
 
   description = "";
   startYear: number | null = null;
@@ -137,32 +115,17 @@ export default class NewProjectMembershipDialog extends Mixins(
   endYear: number | null = null;
   endMonth: number | null = null;
   highlight = false;
-
-  @CVShowStore.Getter
-  getCVProjectMemberships!: (id: number) => ProjectMembership[];
-
-  @CVShowStore.Action
-  createProjectMembership!: (
-    createProjectMembershipDto: CreateProjectMembershipDto
-  ) => Promise<void>;
+  membershipSkills: MembershipSkillDto[] = [];
 
   @Watch("search")
-  async searchChanged(keyword: string) {
-    this.projects = await SearchProjects({
+  async searchChanged(keyword: string): Promise<void> {
+    this.projects = await ProjectModule.searchProjects({
       name: keyword || "",
-      limit: 10
+      limit: 10,
     });
   }
 
-  @Watch("searchSkillSubjects")
-  async searchSkillSubjectsChanged(keyword: string) {
-    this.skillSubjects = await SearchSkillSubjects({
-      name: keyword || "",
-      limit: 10
-    });
-  }
-
-  async onSave() {
+  async onSave(): Promise<void> {
     if (
       this.form.validate() &&
       this.project &&
@@ -170,7 +133,7 @@ export default class NewProjectMembershipDialog extends Mixins(
       this.startMonth
     ) {
       const createProjectMembershipDto: CreateProjectMembershipDto = {
-        cvId: this.id,
+        cvId: this.cvId,
         projectId: this.project.id,
         description: this.description,
         startYear: this.startYear,
@@ -178,21 +141,23 @@ export default class NewProjectMembershipDialog extends Mixins(
         endYear: R.isEmpty(this.endYear) ? null : this.endYear,
         endMonth: R.isEmpty(this.endMonth) ? null : this.endMonth,
         highlight: this.highlight,
-        skillSubjectIds: R.map(s => s.id, this.selectedSkillSubjects)
+        membershipSkills: this.membershipSkills,
       };
-      await this.createProjectMembership(createProjectMembershipDto);
+      await ProjectMembershipModule.createProjectMembership(
+        createProjectMembershipDto
+      );
       this.popDialogComponent();
     }
   }
 
-  async newProject() {
+  newProject(): void {
     this.pushDialogComponent({
       component: NewProjectDialog,
-      props: { afterCreate: this.afterProjectCreate }
+      props: { afterCreate: this.afterProjectCreate },
     });
   }
 
-  async afterProjectCreate(project: Project) {
+  afterProjectCreate(project: Project): void {
     this.projects = [...this.projects, project];
     this.project = project;
   }

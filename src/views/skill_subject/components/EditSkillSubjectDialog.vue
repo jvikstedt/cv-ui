@@ -24,13 +24,9 @@
         <v-card-actions>
           <v-spacer></v-spacer>
 
-          <v-btn color="red darken-1" text @click="onCancel">
-            Cancel
-          </v-btn>
+          <v-btn color="red darken-1" text @click="onCancel"> Cancel </v-btn>
 
-          <v-btn color="green darken-1" text type="submit">
-            Save
-          </v-btn>
+          <v-btn color="green darken-1" text type="submit"> Save </v-btn>
         </v-card-actions>
       </v-form>
 
@@ -62,66 +58,49 @@
 
 <script lang="ts">
 import { Component, Prop, Mixins } from "vue-property-decorator";
-import { namespace } from "vuex-class";
 import { DialogFormMixin, SearchMixin } from "@/mixins";
-import { SkillSubject, PatchSkillSubjectDto } from "@/model/skill_subject";
-import { CVSearchDto } from "../../../model/cv";
-
-const SkillSubjectStore = namespace("SkillSubjectStore");
+import { CVSearchDto } from "@/store/modules/cv";
+import SkillSubjectModule, {
+  SkillSubject,
+  PatchSkillSubjectDto,
+} from "@/store/modules/skill_subject";
 
 @Component
 export default class EditSkillSubjectDialog extends Mixins(
   SearchMixin,
   DialogFormMixin
 ) {
-  @Prop({ required: true }) readonly skillSubjectId!: number;
+  @Prop({ required: true }) readonly skillSubject!: SkillSubject;
   searchKey = "SkillSearchKey";
 
   name = "";
 
-  @SkillSubjectStore.State
-  fetching!: boolean;
-
-  @SkillSubjectStore.Getter
-  getSkillSubject!: (skillSubjectId: number) => SkillSubject;
-
-  @SkillSubjectStore.Action
-  fetchSkillSubject!: (skillSubjectId: number) => Promise<SkillSubject>;
-
-  @SkillSubjectStore.Action
-  patchSkillSubject!: (
-    patchSkillSubjectDto: PatchSkillSubjectDto
-  ) => Promise<void>;
-
-  get skillSubject(): SkillSubject {
-    return this.getSkillSubject(this.skillSubjectId);
+  get fetching(): boolean {
+    return SkillSubjectModule.fetching;
   }
 
-  async created() {
-    const skillSubject = await this.fetchSkillSubject(this.skillSubjectId);
-    this.name = skillSubject.name;
+  async created(): Promise<void> {
+    this.name = this.skillSubject.name;
 
     const cvSearchDto = new CVSearchDto({
       key: this.searchKey,
       data: {
-        skills: [{ required: true, skillSubjectId: this.skillSubjectId }],
-        limit: 5
-      }
+        skills: [{ required: true, skillSubjectId: this.skillSubject.id }],
+        limit: 5,
+      },
     });
     await this.searchCVs(cvSearchDto);
   }
 
-  async onSave() {
+  async onSave(): Promise<void> {
     if (this.form.validate()) {
-      const skillSubject = this.getSkillSubject(this.skillSubjectId);
-
       const patchSkillSubjectDto: PatchSkillSubjectDto = {
-        skillSubjectId: skillSubject.id,
+        skillSubjectId: this.skillSubject.id,
         data: {
-          name: this.name
-        }
+          name: this.name,
+        },
       };
-      await this.patchSkillSubject(patchSkillSubjectDto);
+      await SkillSubjectModule.patchSkillSubject(patchSkillSubjectDto);
 
       this.popDialogComponent();
     }

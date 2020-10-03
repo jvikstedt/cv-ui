@@ -6,7 +6,7 @@ import store from "./store";
 import vuetify from "./plugins/vuetify";
 import i18n from "./i18n";
 
-// eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 import GSignInButton from "vue-google-signin-button";
 
@@ -21,5 +21,5 @@ new Vue({
   store,
   vuetify,
   i18n,
-  render: h => h(App)
+  render: (h) => h(App),
 }).$mount("#app");

@@ -36,71 +36,57 @@
 
 <script lang="ts">
 import { Component, Vue, Watch } from "vue-property-decorator";
-import { namespace } from "vuex-class";
 import EditJsonDialog from "./components/EditJsonDialog.vue";
-import { DialogComponent } from "@/dialog";
-import { Template } from "@/model/template";
-import { ExportPdfDto, ExportDocxDto } from "@/model/exporter";
+import { Template } from "@/store/modules/export";
 import EditTemplateDialog from "./components/EditTemplateDialog.vue";
 import { ExportData } from "./types";
-
-const CVExportStore = namespace("CVExportStore");
-const DialogStore = namespace("DialogStore");
+import DialogModule from "@/store/modules/dialog";
+import ExportModule from "@/store/modules/export";
 
 @Component
 export default class CVExportView extends Vue {
   id: number | null = null;
 
-  @CVExportStore.State
-  fetching!: boolean;
+  get fetching(): boolean {
+    return ExportModule.fetching;
+  }
 
-  @CVExportStore.State
-  pdf!: string | null;
+  get pdf(): string | null {
+    return ExportModule.pdf;
+  }
 
-  @CVExportStore.State
-  docx!: string | null;
+  get docx(): string | null {
+    return ExportModule.docx;
+  }
 
-  @CVExportStore.State
-  exportData!: ExportData | null;
+  get exportData(): ExportData | null {
+    return ExportModule.exportData;
+  }
 
-  @CVExportStore.State
-  selectedTemplate!: Template | null;
-
-  @CVExportStore.Action
-  fetchCV!: (id: number) => Promise<void>;
-
-  @CVExportStore.Action
-  fetchTemplates!: () => Promise<void>;
-
-  @CVExportStore.Action
-  exportPDF!: (exportPdfDto: ExportPdfDto) => Promise<void>;
-
-  @CVExportStore.Action
-  exportDocx!: (exportDocxDto: ExportDocxDto) => Promise<void>;
-
-  @DialogStore.Mutation
-  pushDialogComponent!: (dialogComponent: DialogComponent) => void;
+  get selectedTemplate(): Template | null {
+    return ExportModule.selectedTemplate;
+  }
 
   async created(): Promise<void> {
     const idStr = this.$route.params.id;
     this.id = parseInt(idStr, 10);
 
-    await this.fetchCV(this.id);
-    await this.fetchTemplates();
+    await ExportModule.fetchCV(this.id);
+    await ExportModule.fetchTemplates();
   }
 
-  editData() {
-    this.pushDialogComponent({
+  editData(): void {
+    DialogModule.pushDialogComponent({
       component: EditJsonDialog,
       props: {},
-      maxWidth: 1200
+      maxWidth: 1200,
     });
   }
 
-  editTemplate() {
-    this.pushDialogComponent({
+  editTemplate(): void {
+    DialogModule.pushDialogComponent({
       component: EditTemplateDialog,
-      props: {}
+      props: {},
     });
   }
 
@@ -108,15 +94,15 @@ export default class CVExportView extends Vue {
     if (this.selectedTemplate && this.exportData) {
       switch (this.selectedTemplate.exporter) {
         case "pdf":
-          await this.exportPDF({
+          await ExportModule.exportPDF({
             ...this.selectedTemplate.data,
-            data: this.exportData
+            data: this.exportData,
           });
           break;
         case "docx":
-          await this.exportDocx({
+          await ExportModule.exportDocx({
             ...this.selectedTemplate.data,
-            data: this.exportData
+            data: this.exportData,
           });
           break;
         default:
@@ -128,12 +114,12 @@ export default class CVExportView extends Vue {
   }
 
   @Watch("selectedTemplate")
-  async selectedTemplateChanged() {
+  async selectedTemplateChanged(): Promise<void> {
     await this.print();
   }
 
   @Watch("exportData")
-  async cvExportDataChanged() {
+  async cvExportDataChanged(): Promise<void> {
     await this.print();
   }
 

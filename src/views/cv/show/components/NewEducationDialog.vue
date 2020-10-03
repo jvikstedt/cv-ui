@@ -66,13 +66,9 @@
       <v-card-actions>
         <v-spacer></v-spacer>
 
-        <v-btn color="red darken-1" text @click="onCancel">
-          Cancel
-        </v-btn>
+        <v-btn color="red darken-1" text @click="onCancel"> Cancel </v-btn>
 
-        <v-btn color="green darken-1" text type="submit">
-          Save
-        </v-btn>
+        <v-btn color="green darken-1" text type="submit"> Save </v-btn>
       </v-card-actions>
     </v-form>
   </v-card>
@@ -81,22 +77,23 @@
 <script lang="ts">
 import * as R from "ramda";
 import { Component, Prop, Watch, Mixins } from "vue-property-decorator";
-import { namespace } from "vuex-class";
-import { Education, CreateEducationDto } from "@/model/education";
-import { School } from "@/model/school";
-import { SearchSchools } from "@/api/school";
 import NewSchoolDialog from "@/views/school/components/NewSchoolDialog.vue";
 import { DialogFormMixin } from "@/mixins";
-
-const CVShowStore = namespace("CVShowStore");
+import EducationModule, {
+  Education,
+  CreateEducationDto,
+} from "@/store/modules/education";
+import SchoolModule, { School } from "@/store/modules/school";
 
 @Component({
   components: {
-    NewSchoolDialog
-  }
+    NewSchoolDialog,
+  },
 })
 export default class NewEducationDialog extends Mixins(DialogFormMixin) {
-  @Prop({ required: true }) readonly id!: number;
+  @Prop({ required: true }) readonly cvId!: number;
+  @Prop({ required: true, default: [] })
+  readonly existingEducations!: Education[];
 
   search = "";
   schools: School[] = [];
@@ -109,53 +106,47 @@ export default class NewEducationDialog extends Mixins(DialogFormMixin) {
   endYear: number | null = null;
   highlight = false;
 
-  @CVShowStore.Getter
-  getCVEducations!: (id: number) => Education[];
-
-  @CVShowStore.Action
-  createEducation!: (createEducationDto: CreateEducationDto) => Promise<void>;
-
   @Watch("search")
-  async searchChanged(keyword: string) {
-    const schools = await SearchSchools({
+  async searchChanged(keyword: string): Promise<void> {
+    const schools = await SchoolModule.searchSchools({
       name: keyword || "",
-      limit: 10
+      limit: 10,
     });
     this.schools = R.reject(
       (school: School) =>
         !!R.find(
           (education: Education) => R.equals(school.id, education.school.id),
-          this.getCVEducations(this.id)
+          this.existingEducations
         ),
       schools
     );
   }
 
-  async onSave() {
+  async onSave(): Promise<void> {
     if (this.form.validate() && this.school && this.startYear) {
       const createEducationDto: CreateEducationDto = {
-        cvId: this.id,
+        cvId: this.cvId,
         schoolId: this.school.id,
         degree: this.degree,
         fieldOfStudy: this.fieldOfStudy,
         description: this.description,
         startYear: this.startYear,
         endYear: R.isEmpty(this.endYear) ? null : this.endYear,
-        highlight: this.highlight
+        highlight: this.highlight,
       };
-      await this.createEducation(createEducationDto);
+      await EducationModule.createEducation(createEducationDto);
       this.popDialogComponent();
     }
   }
 
-  async newSchool() {
+  newSchool(): void {
     this.pushDialogComponent({
       component: NewSchoolDialog,
-      props: { afterCreate: this.afterSchoolCreate }
+      props: { afterCreate: this.afterSchoolCreate },
     });
   }
 
-  async afterSchoolCreate(school: School) {
+  afterSchoolCreate(school: School): void {
     this.schools = [...this.schools, school];
     this.school = school;
   }

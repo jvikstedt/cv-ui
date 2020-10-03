@@ -1,0 +1,258 @@
+import * as R from "ramda";
+import Vue from "vue";
+import {
+  Module,
+  Mutation,
+  Action,
+  getModule,
+  VuexModule,
+  MutationAction,
+} from "vuex-module-decorators";
+import Api from "@/api/api";
+import store from "@/store";
+import { normalize, schema } from "normalizr";
+import ProjectModule, { Project } from "@/store/modules/project";
+import CompanyModule from "@/store/modules/company";
+import MembershipSkillModule, {
+  MembershipSkill,
+  MembershipSkillDto,
+} from "@/store/modules/membership_skill";
+import SkillModule from "@/store/modules/skill";
+import SkillSubjectModule from "@/store/modules/skill_subject";
+import SkillGroupModule from "@/store/modules/skill_group";
+
+export interface ProjectMembership {
+  id: number;
+  description: string;
+  startYear: number;
+  startMonth: number;
+  endYear: number;
+  endMonth: number;
+  highlight: boolean;
+  cvId: number;
+  project: Project;
+  projectId: number;
+  membershipSkills: MembershipSkill[];
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface PatchProjectMembershipDtoData {
+  description?: string;
+  startYear?: number;
+  startMonth?: number;
+  endYear?: number | null;
+  endMonth?: number | null;
+  highlight?: boolean;
+  membershipSkills?: MembershipSkillDto[];
+}
+
+export interface PatchProjectMembershipDto {
+  cvId: number;
+  projectMembershipId: number;
+  data: PatchProjectMembershipDtoData;
+}
+
+export interface DeleteProjectMembershipDto {
+  cvId: number;
+  projectMembershipId: number;
+}
+
+export interface CreateProjectMembershipDto {
+  cvId: number;
+  projectId: number;
+  description: string;
+  startYear: number;
+  startMonth: number;
+  endYear?: number | null;
+  endMonth?: number | null;
+  highlight: boolean;
+  membershipSkills: MembershipSkillDto[];
+}
+
+const CompanySchema = new schema.Entity("companies");
+
+const ProjectSchema = new schema.Entity("projects", {
+  company: CompanySchema,
+});
+
+const SkillGroupSchema = new schema.Entity("skillGroups");
+
+const SkillSubjectSchema = new schema.Entity("skillSubjects", {
+  skillGroup: SkillGroupSchema,
+});
+
+const SkillSchema = new schema.Entity("skills", {
+  skillSubject: SkillSubjectSchema,
+});
+
+const MembershipSkillSchema = new schema.Entity("membershipSkills", {
+  skill: SkillSchema,
+});
+
+const ProjectMembershipSchema = new schema.Entity("projectMemberships", {
+  project: ProjectSchema,
+  membershipSkills: [MembershipSkillSchema],
+});
+
+@Module({
+  dynamic: true,
+  namespaced: true,
+  name: "project_membership",
+  store,
+})
+class ProjectMembershipModule extends VuexModule {
+  fetching = false;
+  byId: { [key: number]: ProjectMembership } = {};
+  cvProjectMembershipIds: { [key: number]: number[] } = {};
+
+  get find() {
+    return (id: number): ProjectMembership | undefined => {
+      const projectMembership = this.byId[id];
+      if (!projectMembership) {
+        return undefined;
+      }
+
+      const project = ProjectModule.find(projectMembership.projectId);
+      if (!project) {
+        return undefined;
+      }
+
+      const membershipSkills = R.reject(
+        R.isNil,
+        R.map(
+          (n: unknown) => MembershipSkillModule.find(n as number),
+          projectMembership.membershipSkills
+        )
+      ) as MembershipSkill[];
+
+      return {
+        ...projectMembership,
+        project,
+        membershipSkills,
+      };
+    };
+  }
+
+  get listByCV() {
+    return (cvId: number): ProjectMembership[] => {
+      const ids = this.cvProjectMembershipIds[cvId] || [];
+      return R.reject(
+        R.isNil,
+        R.map((id) => this.find(id), ids)
+      ) as ProjectMembership[];
+    };
+  }
+
+  @Mutation
+  public add(projectMemberships: ProjectMembership[]): void {
+    for (const projectMembership of projectMemberships) {
+      Vue.set(this.byId, projectMembership.id, projectMembership);
+
+      const ids = this.cvProjectMembershipIds[projectMembership.cvId] || [];
+      if (ids.includes(projectMembership.id)) continue;
+      Vue.set(this.cvProjectMembershipIds, projectMembership.cvId, [
+        ...ids,
+        projectMembership.id,
+      ]);
+    }
+  }
+
+  @Mutation
+  public delete(ids: number[]): void {
+    for (const id of ids) {
+      const projectMembership = this.byId[id];
+      if (projectMembership) {
+        Vue.delete(this.byId, id);
+        const cvProjectMembershipIds =
+          this.cvProjectMembershipIds[projectMembership.cvId] || [];
+        Vue.set(
+          this.cvProjectMembershipIds,
+          projectMembership.cvId,
+          R.reject(
+            (projectMembershipId) => R.equals(projectMembershipId, id),
+            cvProjectMembershipIds
+          )
+        );
+      }
+    }
+  }
+
+  @MutationAction({ mutate: ["fetching"] })
+  async setFetching(fetching: boolean) {
+    return { fetching };
+  }
+
+  @Action({ rawError: true })
+  public async fetchCVProjectMemberships(cvId: number): Promise<void> {
+    await this.setFetching(true);
+    const projectMemberships: ProjectMembership[] = await Api.get(
+      `/cv/${cvId}/project_membership`
+    );
+
+    await this.saveProjectMemberships(projectMemberships);
+    await this.setFetching(false);
+  }
+
+  @Action
+  public async patchProjectMembership({
+    cvId,
+    projectMembershipId,
+    data,
+  }: PatchProjectMembershipDto): Promise<void> {
+    const projectMembership: ProjectMembership = await Api.patch(
+      `/cv/${cvId}/project_membership/${projectMembershipId}`,
+      data
+    );
+
+    await this.saveProjectMemberships([projectMembership]);
+  }
+
+  @Action
+  public async deleteProjectMembership(
+    deleteProjectMembershipDto: DeleteProjectMembershipDto
+  ): Promise<void> {
+    await Api.delete(
+      `/cv/${deleteProjectMembershipDto.cvId}/project_membership/${deleteProjectMembershipDto.projectMembershipId}`
+    );
+    this.delete([deleteProjectMembershipDto.projectMembershipId]);
+  }
+
+  @Action
+  public async createProjectMembership(
+    createProjectMembershipDto: CreateProjectMembershipDto
+  ): Promise<ProjectMembership> {
+    const projectMembership: ProjectMembership = await Api.post(
+      `/cv/${createProjectMembershipDto.cvId}/project_membership`,
+      createProjectMembershipDto
+    );
+    await this.saveProjectMemberships([projectMembership]);
+
+    return projectMembership;
+  }
+
+  @Action
+  private async saveProjectMemberships(
+    data: ProjectMembership[]
+  ): Promise<void> {
+    const normalizedData = normalize(data, [ProjectMembershipSchema]);
+    const {
+      projects,
+      projectMemberships,
+      companies,
+      skillGroups,
+      skillSubjects,
+      skills,
+      membershipSkills,
+    } = normalizedData.entities;
+    CompanyModule.add(R.values(companies || {}));
+    ProjectModule.add(R.values(projects || {}));
+    SkillGroupModule.add(R.values(skillGroups || {}));
+    SkillSubjectModule.add(R.values(skillSubjects || {}));
+    SkillModule.add(R.values(skills || {}));
+    MembershipSkillModule.add(R.values(membershipSkills || {}));
+    this.add(R.values(projectMemberships || {}));
+  }
+}
+
+export default getModule(ProjectMembershipModule);

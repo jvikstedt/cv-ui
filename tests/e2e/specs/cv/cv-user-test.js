@@ -3,7 +3,7 @@ describe("CV user", () => {
 
   beforeEach(() => {
     cy.login();
-    cy.getUser().then(u => (user = u));
+    cy.getUser().then((u) => (user = u));
   });
 
   afterEach(() => {
@@ -27,9 +27,7 @@ describe("CV user", () => {
       `${user.firstName} ${user.lastName}`
     );
 
-    cy.get("input[name=firstName]")
-      .clear()
-      .type("John");
+    cy.get("input[name=firstName]").clear().type("John");
 
     cy.contains("Save").click();
 
@@ -48,9 +46,7 @@ describe("CV user", () => {
 
     cy.get(".v-dialog .v-card__title").contains("Edit CV");
 
-    cy.get("textarea[name=description]")
-      .clear()
-      .type("new description");
+    cy.get("textarea[name=description]").clear().type("new description");
 
     cy.contains("Save").click();
 

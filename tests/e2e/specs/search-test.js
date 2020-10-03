@@ -1,9 +1,9 @@
-describe("Login", () => {
+describe("Search", () => {
   let user;
 
   beforeEach(() => {
     cy.login();
-    cy.getUser().then(u => (user = u));
+    cy.getUser().then((u) => (user = u));
   });
 
   afterEach(() => {
@@ -13,16 +13,11 @@ describe("Login", () => {
   it("Searches bobtest -user and verifies it opens correct cv", () => {
     cy.visit("/");
 
-    cy.get("input[name=searchbar]")
-      .first()
-      .type("bob test");
+    cy.get("input[name=searchbar]").first().type("bob test");
 
     cy.get(".v-menu__content .v-list-item__content").contains("Bob Test");
 
-    cy.get("input[name=searchbar]")
-      .first()
-      .clear()
-      .type("john");
+    cy.get("input[name=searchbar]").first().clear().type("john");
 
     cy.get(".v-menu__content .v-list-item__content")
       .contains("Bob Test")
@@ -38,34 +33,22 @@ describe("Login", () => {
 
     cy.contains("Advanced Search").click();
 
-    cy.get("input[name=skill]")
-      .first()
-      .type("Docker");
+    cy.get("input[name=skill]").first().type("Docker");
 
-    cy.get(".v-list-item__mask")
-      .contains("Docker")
-      .click();
+    cy.get(".v-list-item__mask").contains("Docker").click();
 
-    cy.get("input[name=skill]")
-      .first()
-      .type("Ruby");
+    cy.get("input[name=skill]").first().type("Ruby");
 
-    cy.get(".v-list-item__mask")
-      .contains("Ruby")
-      .click();
+    cy.get(".v-list-item__mask").contains("Ruby").click();
 
-    cy.get("input[name=skill]")
-      .first()
-      .type("Typescript");
+    cy.get("input[name=skill]").first().type("Typescript");
 
-    cy.get(".v-list-item__mask")
-      .contains("Typescript")
-      .click();
+    cy.get(".v-list-item__mask").contains("Typescript").click();
 
     cy.waitUntil(
       () => {
         cy.get("#search-view-search-btn").click();
-        return cy.get(".v-dialog").then(dialog => {
+        return cy.get(".v-dialog").then((dialog) => {
           if (dialog.text().includes("Bob Test")) {
             return true;
           }
@@ -75,9 +58,7 @@ describe("Login", () => {
       { interval: 1000 }
     );
 
-    cy.get(".v-dialog .v-list-item__content")
-      .contains("Bob Test")
-      .click();
+    cy.get(".v-dialog .v-list-item__content").contains("Bob Test").click();
 
     cy.url().should("include", `/cv/${user.cvIds[0]}`);
 

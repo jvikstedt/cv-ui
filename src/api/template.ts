@@ -1,5 +1,5 @@
 import Api from "@/api/api";
-import { Template, TemplateDto } from "@/model/template";
+import { Template, TemplateDto } from "@/store/modules/export";
 
 export const CreateTemplate = async (
   templateDto: TemplateDto

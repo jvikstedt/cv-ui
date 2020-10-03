@@ -51,13 +51,9 @@
           Delete
         </v-btn>
 
-        <v-btn color="red darken-1" text @click="onCancel">
-          Cancel
-        </v-btn>
+        <v-btn color="red darken-1" text @click="onCancel"> Cancel </v-btn>
 
-        <v-btn color="green darken-1" text type="submit">
-          Save
-        </v-btn>
+        <v-btn color="green darken-1" text type="submit"> Save </v-btn>
       </v-card-actions>
     </v-form>
   </v-card>
@@ -66,19 +62,15 @@
 <script lang="ts">
 import * as R from "ramda";
 import { Component, Prop, Mixins } from "vue-property-decorator";
-import { namespace } from "vuex-class";
-import {
+import { DialogFormMixin } from "@/mixins";
+import EducationModule, {
   Education,
   PatchEducationDto,
-  DeleteEducationDto
-} from "@/model/education";
-import { DialogFormMixin } from "@/mixins";
-
-const CVShowStore = namespace("CVShowStore");
+} from "@/store/modules/education";
 
 @Component
 export default class EditEducationDialog extends Mixins(DialogFormMixin) {
-  @Prop({ required: true }) readonly educationId!: number;
+  @Prop({ required: true }) readonly education!: Education;
 
   degree = "";
   fieldOfStudy = "";
@@ -87,20 +79,7 @@ export default class EditEducationDialog extends Mixins(DialogFormMixin) {
   endYear: number | null = null;
   highlight = false;
 
-  @CVShowStore.Action
-  patchEducation!: (patchEducationDto: PatchEducationDto) => Promise<void>;
-
-  @CVShowStore.Getter
-  getEducation!: (educationId: number) => Education;
-
-  @CVShowStore.Action
-  deleteEducation!: (deleteEducationDto: DeleteEducationDto) => Promise<void>;
-
-  get education(): Education {
-    return this.getEducation(this.educationId);
-  }
-
-  created() {
+  created(): void {
     this.degree = this.education.degree;
     this.fieldOfStudy = this.education.fieldOfStudy;
     this.description = this.education.description;
@@ -109,36 +88,32 @@ export default class EditEducationDialog extends Mixins(DialogFormMixin) {
     this.highlight = this.education.highlight;
   }
 
-  async onEducationDelete() {
+  async onEducationDelete(): Promise<void> {
     this.popDialogComponent();
 
-    const education = this.getEducation(this.educationId);
-
     const deleteEducationDto = {
-      cvId: education.cvId,
-      educationId: education.id
+      cvId: this.education.cvId,
+      educationId: this.education.id,
     };
 
-    await this.deleteEducation(deleteEducationDto);
+    await EducationModule.deleteEducation(deleteEducationDto);
   }
 
-  async onSave() {
+  async onSave(): Promise<void> {
     if (this.form.validate()) {
-      const education = this.getEducation(this.educationId);
-
       const patchEducationDto: PatchEducationDto = {
-        cvId: education.cvId,
-        educationId: education.id,
+        cvId: this.education.cvId,
+        educationId: this.education.id,
         data: {
           degree: this.degree,
           fieldOfStudy: this.fieldOfStudy,
           description: this.description,
           startYear: this.startYear,
           endYear: R.isEmpty(this.endYear) ? null : this.endYear,
-          highlight: this.highlight
-        }
+          highlight: this.highlight,
+        },
       };
-      await this.patchEducation(patchEducationDto);
+      await EducationModule.patchEducation(patchEducationDto);
 
       this.popDialogComponent();
     }

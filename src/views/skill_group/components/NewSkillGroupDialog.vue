@@ -5,7 +5,7 @@
     <v-form ref="form" v-model="valid" lazy-validation @submit.prevent="onSave">
       <v-card-text>
         <v-text-field
-          v-model="createSkillGroupDto.name"
+          v-model="name"
           :counter="255"
           :rules="isRequiredRule"
           label="Name"
@@ -16,13 +16,9 @@
       <v-card-actions>
         <v-spacer></v-spacer>
 
-        <v-btn color="red darken-1" text @click="onCancel">
-          Cancel
-        </v-btn>
+        <v-btn color="red darken-1" text @click="onCancel"> Cancel </v-btn>
 
-        <v-btn color="green darken-1" text type="submit">
-          Save
-        </v-btn>
+        <v-btn color="green darken-1" text type="submit"> Save </v-btn>
       </v-card-actions>
     </v-form>
   </v-card>
@@ -30,11 +26,8 @@
 
 <script lang="ts">
 import { Component, Prop, Mixins } from "vue-property-decorator";
-import { namespace } from "vuex-class";
-import { SkillGroup, CreateSkillGroupDto } from "@/model/skill_group";
 import { DialogFormMixin } from "@/mixins";
-
-const SkillGroupStore = namespace("SkillGroupStore");
+import SkillGroupModule, { SkillGroup } from "@/store/modules/skill_group";
 
 @Component
 export default class NewSkillGroupDialog extends Mixins(DialogFormMixin) {
@@ -42,16 +35,13 @@ export default class NewSkillGroupDialog extends Mixins(DialogFormMixin) {
     skillGroup: SkillGroup
   ) => Promise<void>;
 
-  @SkillGroupStore.Action
-  createSkillGroup!: (
-    createSkillGroupDto: CreateSkillGroupDto
-  ) => Promise<SkillGroup>;
-
-  createSkillGroupDto = new CreateSkillGroupDto();
+  name = "";
 
   async onSave(): Promise<void> {
     if (this.form.validate()) {
-      const skillGroup = await this.createSkillGroup(this.createSkillGroupDto);
+      const skillGroup = await SkillGroupModule.createSkillGroup({
+        name: this.name,
+      });
 
       await this.afterCreate(skillGroup);
       this.popDialogComponent();

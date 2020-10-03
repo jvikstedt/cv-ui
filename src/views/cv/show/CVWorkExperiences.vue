@@ -41,41 +41,41 @@
 
 <script lang="ts">
 import { Component, Vue, Prop } from "vue-property-decorator";
-import { namespace } from "vuex-class";
-import { WorkExperience } from "@/model/work_experience";
-import { DialogComponent } from "@/dialog";
 import NewWorkExperienceDialog from "./components/NewWorkExperienceDialog.vue";
 import EditWorkExperienceDialog from "./components/EditWorkExperienceDialog.vue";
-
-const CVShowStore = namespace("CVShowStore");
-const DialogStore = namespace("DialogStore");
+import DialogModule from "@/store/modules/dialog";
+import WorkExperienceModule, {
+  WorkExperience,
+} from "@/store/modules/work_experience";
 
 @Component
 export default class CVWorkExperiences extends Vue {
-  @Prop({ required: true }) readonly id!: number;
+  @Prop({ required: true }) readonly cvId!: number;
   @Prop({ required: true }) readonly canEdit!: boolean;
 
-  @CVShowStore.Getter
-  getCVWorkExperiences!: (id: number) => WorkExperience[];
-
   get workExperiences(): WorkExperience[] {
-    return this.getCVWorkExperiences(this.id);
+    return WorkExperienceModule.listByCV(this.cvId);
   }
 
-  @DialogStore.Mutation
-  pushDialogComponent!: (dialogComponent: DialogComponent) => void;
+  async created(): Promise<void> {
+    await WorkExperienceModule.fetchCVWorkExperiences(this.cvId);
+  }
 
-  async onWorkExperienceClick(workExperience: WorkExperience) {
-    this.pushDialogComponent({
+  onWorkExperienceClick(workExperience: WorkExperience): void {
+    DialogModule.pushDialogComponent({
       component: EditWorkExperienceDialog,
-      props: { workExperienceId: workExperience.id }
+      props: {
+        workExperience,
+      },
     });
   }
 
-  async newWorkExperience() {
-    this.pushDialogComponent({
+  newWorkExperience(): void {
+    DialogModule.pushDialogComponent({
       component: NewWorkExperienceDialog,
-      props: { id: this.id }
+      props: {
+        cvId: this.cvId,
+      },
     });
   }
 }

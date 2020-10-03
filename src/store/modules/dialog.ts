@@ -1,5 +1,11 @@
 import * as R from "ramda";
-import { VuexModule, Module, Mutation } from "vuex-module-decorators";
+import {
+  Module,
+  VuexModule,
+  Mutation,
+  getModule,
+} from "vuex-module-decorators";
+import store from "@/store";
 
 export class DialogComponent {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -11,8 +17,13 @@ export class DialogComponent {
   maxWidth?: number;
 }
 
-@Module({ namespaced: true })
-export class DialogStore extends VuexModule {
+@Module({
+  dynamic: true,
+  namespaced: true,
+  name: "dialog",
+  store,
+})
+class DialogModule extends VuexModule {
   public dialogComponents: DialogComponent[] = [];
 
   get currentDialogComponent(): DialogComponent | null {
@@ -33,3 +44,4 @@ export class DialogStore extends VuexModule {
     );
   }
 }
+export default getModule(DialogModule);

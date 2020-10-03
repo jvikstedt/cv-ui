@@ -1,24 +1,19 @@
 import * as R from "ramda";
 import { Component, Vue } from "vue-property-decorator";
-import { namespace } from "vuex-class";
-import { CVSearchDto, CVSearchResult } from "@/model/cv";
-
-const CVSearchStore = namespace("CVSearchStore");
+import { CVSearchDto, CVSearchResult } from "@/store/modules/cv";
+import SearchModule from "@/store/modules/search";
 
 @Component
 export default class SearchMixin extends Vue {
   searchKey = "Default";
 
-  @CVSearchStore.Getter
-  searchingByKey!: (key: string) => boolean;
-
-  @CVSearchStore.Getter
-  resultsByKey!: (key: string) => CVSearchResult[];
-
-  @CVSearchStore.Action
-  searchCVs!: (cvSearchDto: CVSearchDto) => Promise<void>;
-
   debounce = 0;
+
+  searchingByKey = SearchModule.searchingByKey;
+
+  resultsByKey = SearchModule.resultsByKey;
+
+  searchCVs = SearchModule.searchCVs;
 
   searchAndDebounce(cvSearchDto: CVSearchDto, debounce = 350): void {
     clearTimeout(this.debounce);
@@ -36,7 +31,7 @@ export default class SearchMixin extends Vue {
     return this.searchingByKey(this.searchKey);
   }
 
-  onResultClick(cvSearchResult: CVSearchResult) {
+  onResultClick(cvSearchResult: CVSearchResult): void {
     const route = `/cv/${cvSearchResult.id}`;
     if (this.$route.path !== route) {
       this.$router.push(route);

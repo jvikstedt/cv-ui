@@ -59,48 +59,38 @@
 
 <script lang="ts">
 import { Component, Mixins } from "vue-property-decorator";
-import { namespace } from "vuex-class";
-import { DialogComponent } from "@/dialog";
-import { CVSearchDto } from "@/model/cv";
-import { TokenData } from "@/model/user";
+import { CVSearchDto } from "@/store/modules/cv";
 import { SearchMixin } from "@/mixins";
 import { CVSearchView } from "@/views/cv/search";
 import { FormatDateTime } from "@/helpers";
-
-const AuthStore = namespace("AuthStore");
-const DialogStore = namespace("DialogStore");
+import AuthModule from "@/store/modules/auth";
+import DialogModule from "@/store/modules/dialog";
 
 @Component
 export default class Dashboard extends Mixins(SearchMixin) {
   searchKey = "Dashboard";
 
-  @AuthStore.Getter
-  user!: TokenData;
-
   formatDateTime = FormatDateTime;
 
-  @DialogStore.Mutation
-  pushDialogComponent!: (dialogComponent: DialogComponent) => void;
-
-  async created() {
+  async created(): Promise<void> {
     const cvSearchDto = new CVSearchDto({
       key: this.searchKey,
       data: {
-        sorts: [{ field: "updatedAt", order: "desc" }]
-      }
+        sorts: [{ field: "updatedAt", order: "desc" }],
+      },
     });
     await this.searchCVs(cvSearchDto);
   }
 
-  async openMyCV() {
-    const cvId = this.user.cvIds[0];
+  openMyCV(): void {
+    const cvId = AuthModule.user.cvIds[0];
     this.$router.push(`/cv/${cvId}`);
   }
 
-  search() {
-    this.pushDialogComponent({
+  search(): void {
+    DialogModule.pushDialogComponent({
       component: CVSearchView,
-      props: {}
+      props: {},
     });
   }
 }

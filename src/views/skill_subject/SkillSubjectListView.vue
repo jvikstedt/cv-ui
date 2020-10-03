@@ -28,48 +28,42 @@
 
 <script lang="ts">
 import { Component, Vue, Watch } from "vue-property-decorator";
-import { namespace } from "vuex-class";
 import NewSkillSubjectDialog from "./components/NewSkillSubjectDialog.vue";
-import { DialogComponent } from "@/dialog";
-import { SkillSubject } from "@/model/skill_subject";
-import { SearchSkillSubjects } from "@/api/skill_subject";
+import { SkillSubject } from "@/store/modules/skill_subject";
 import EditSkillSubjectDialog from "./components/EditSkillSubjectDialog.vue";
-
-const DialogStore = namespace("DialogStore");
+import DialogModule from "@/store/modules/dialog";
+import SkillSubjectModule from "@/store/modules/skill_subject";
 
 @Component
 export default class SkillSubjectListView extends Vue {
-  @DialogStore.Mutation
-  pushDialogComponent!: (dialogComponent: DialogComponent) => void;
-
   search = "";
   skillSubjects: SkillSubject[] = [];
   skillSubject: SkillSubject | null = null;
 
   @Watch("search")
-  async searchChanged(newValue: string) {
-    const skillSubjects = await SearchSkillSubjects({
+  async searchChanged(newValue: string): Promise<void> {
+    const skillSubjects = await SkillSubjectModule.searchSkillSubjects({
       name: newValue || "",
-      limit: 10
+      limit: 10,
     });
     this.skillSubjects = skillSubjects;
   }
 
-  newSkillSubject() {
-    this.pushDialogComponent({
+  newSkillSubject(): void {
+    DialogModule.pushDialogComponent({
       component: NewSkillSubjectDialog,
-      props: {}
+      props: {},
     });
   }
 
-  async onSelect(skillSubject: SkillSubject) {
+  onSelect(skillSubject: SkillSubject): void {
     this.$nextTick(() => {
       this.skillSubject = null;
     });
 
-    this.pushDialogComponent({
+    DialogModule.pushDialogComponent({
       component: EditSkillSubjectDialog,
-      props: { skillSubjectId: skillSubject.id }
+      props: { skillSubject: skillSubject },
     });
   }
 }
