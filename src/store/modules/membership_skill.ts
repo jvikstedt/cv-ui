@@ -8,12 +8,16 @@ import {
 } from "vuex-module-decorators";
 import store from "@/store";
 import SkillModule, { Skill } from "@/store/modules/skill";
+import ProjectMembershipModule, {
+  ProjectMembership,
+} from "@/store/modules/project_membership";
 
 export interface MembershipSkill {
   id: number;
   experienceInYears: number;
   automaticCalculation: boolean;
   projectMembershipId: number;
+  projectMembership?: ProjectMembership;
   skill: Skill;
   skillId: number;
   createdAt: Date;
@@ -53,6 +57,30 @@ class MembershipSkillModule extends VuexModule {
         ...memberhipSkill,
         skill,
       };
+    };
+  }
+
+  get findBySkill() {
+    return (skillID: number): MembershipSkill[] => {
+      const membershipSkills = R.filter(
+        (m) => R.equals(m.skillId, skillID),
+        this.list
+      );
+
+      return R.map((memberhipSkill) => {
+        const projectMembership = ProjectMembershipModule.find(
+          memberhipSkill.projectMembershipId,
+          ["project"]
+        );
+        if (!projectMembership) {
+          return memberhipSkill;
+        }
+
+        return {
+          ...memberhipSkill,
+          projectMembership,
+        };
+      }, membershipSkills);
     };
   }
 

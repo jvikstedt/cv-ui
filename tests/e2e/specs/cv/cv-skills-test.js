@@ -33,7 +33,7 @@ describe("CV skills", () => {
   });
 
   it("Edit existing skill", () => {
-    cy.createSkill("Java", 1);
+    cy.createSkill("Java", 0);
     cy.visit(`/cv/${user.cvIds[0]}`);
 
     cy.get(".v-expansion-panel-header").contains("Programming").click();

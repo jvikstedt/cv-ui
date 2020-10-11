@@ -104,7 +104,7 @@ export default class EditProjectMembershipDialog extends Mixins(
         automaticCalculation: membershipSkill.automaticCalculation,
         experienceInYears: membershipSkill.experienceInYears,
       }),
-      this.projectMembership.membershipSkills
+      this.projectMembership.membershipSkills || []
     );
   }
 

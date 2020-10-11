@@ -42,7 +42,11 @@
               />
             </td>
             <td>
-              <v-btn icon @click.prevent="deleteRow(m)">
+              <v-btn
+                icon
+                @click.prevent="deleteRow(m)"
+                class="remove-skill-btn"
+              >
                 <v-icon>mdi-delete</v-icon>
               </v-btn>
             </td>
@@ -164,13 +168,15 @@ export default class MembershipSkillsField extends Vue {
     );
   }
 
-  updateExperienceInYears(row: MembershipSkillRow, val: number): void {
+  updateExperienceInYears(row: MembershipSkillRow, val: string): void {
+    const experienceInYears = parseFloat(val);
+
     this.updateValue(
       R.map((m) => {
         if (R.equals(m.skillSubjectId, row.skillSubjectId)) {
           return {
             ...m,
-            experienceInYears: val,
+            experienceInYears,
           };
         }
         return m;

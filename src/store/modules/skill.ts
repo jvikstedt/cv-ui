@@ -1,5 +1,6 @@
 import * as R from "ramda";
 import Vue from "vue";
+import { DateTime } from "luxon";
 import {
   Module,
   Mutation,
@@ -15,6 +16,9 @@ import SkillSubjectModule, {
   SkillSubject,
 } from "@/store/modules/skill_subject";
 import SkillGroupModule from "@/store/modules/skill_group";
+import MembershipSkillModule, {
+  MembershipSkill,
+} from "@/store/modules/membership_skill";
 
 export interface PatchSkillDtoData {
   experienceInYears?: number;
@@ -44,8 +48,6 @@ export interface CreateSkillDto {
 export interface Skill {
   id: number;
   experienceInYears: number;
-  projectExperienceInYears: number;
-  totalExperienceInYears: number;
   interestLevel: number;
   highlight: boolean;
   cvId: number;
@@ -53,6 +55,21 @@ export interface Skill {
   skillSubjectId: number;
   createdAt: Date;
   updatedAt: Date;
+}
+
+export interface SkillExperienceProject {
+  automaticCalculation: boolean;
+  experience: number;
+  projectName: string;
+  companyName: string;
+}
+
+export interface SkillExperience {
+  totalExperience: number;
+  extraExperience: number;
+  projectExperience: number;
+
+  projects: SkillExperienceProject[];
 }
 
 const SkillGroupSchema = new schema.Entity("skillGroups");
@@ -64,6 +81,35 @@ const SkillSubjectSchema = new schema.Entity("skillSubjects", {
 const SkillSchema = new schema.Entity("skills", {
   skillSubject: SkillSubjectSchema,
 });
+
+const calculateMembershipSkillExperience = (
+  membershipSkill: MembershipSkill
+): number => {
+  const projectMembership = membershipSkill.projectMembership;
+
+  if (!membershipSkill.automaticCalculation) {
+    return membershipSkill.experienceInYears;
+  }
+
+  if (!projectMembership) {
+    return 0;
+  }
+
+  const diff = (DateTime.utc(
+    projectMembership.endYear || DateTime.utc().year,
+    projectMembership.endMonth || DateTime.utc().month
+  ).diff(
+    DateTime.utc(projectMembership.startYear, projectMembership.startMonth),
+    ["years"]
+  ) as unknown) as any; // eslint-disable-line @typescript-eslint/no-explicit-any
+
+  if (R.isNil(diff["values"]) || R.isNil(diff["values"].years)) {
+    return 0;
+  }
+
+  const experience = diff["values"].years;
+  return Math.round(experience * 100) / 100;
+};
 
 @Module({
   dynamic: true,
@@ -102,6 +148,42 @@ class SkillModule extends VuexModule {
         R.isNil,
         R.map((id) => this.find(id), ids)
       ) as Skill[];
+    };
+  }
+
+  get skillExperience() {
+    return (id: number): SkillExperience | undefined => {
+      const skill = this.byId[id];
+      if (!skill) {
+        return undefined;
+      }
+      const membershipSkills = MembershipSkillModule.findBySkill(id);
+
+      const skillExperienceProjects: SkillExperienceProject[] = R.map(
+        (memberhipSkill) => {
+          return {
+            experience: calculateMembershipSkillExperience(memberhipSkill),
+            automaticCalculation: memberhipSkill.automaticCalculation,
+            projectName:
+              memberhipSkill.projectMembership?.project?.name || "Unknown",
+            companyName:
+              memberhipSkill.projectMembership?.project?.company?.name ||
+              "Unknown",
+          };
+        },
+        membershipSkills
+      );
+
+      const projectExperience = R.sum(
+        R.map((project) => project.experience, skillExperienceProjects)
+      );
+
+      return {
+        totalExperience: projectExperience + skill.experienceInYears,
+        extraExperience: skill.experienceInYears,
+        projectExperience,
+        projects: skillExperienceProjects,
+      };
     };
   }
 
