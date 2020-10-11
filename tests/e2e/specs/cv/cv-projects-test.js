@@ -22,13 +22,8 @@ describe("CV projects", () => {
 
     cy.get("input[name=description]").type("foo");
 
-    cy.get("input[name=startYear]").type("2000");
-
-    cy.get("input[name=startMonth]").type("1");
-
-    cy.get("input[name=endYear]").type("2002");
-
-    cy.get("input[name=endMonth]").type("5");
+    cy.pickMonthAndYear("startYearMonth", "2000", "Jan");
+    cy.pickMonthAndYear("endYearMonth", "2002", "May");
 
     cy.get("input[name=skill]").first().type("Ansible");
     cy.get(".v-list-item__content").last().click();

@@ -21,33 +21,17 @@
           required
         ></v-text-field>
 
-        <v-text-field
-          v-model.number="startYear"
-          label="Start year"
+        <MonthPicker
+          v-model="startYearMonth"
+          name="startYearMonth"
           :rules="isRequiredRule"
-          type="number"
-          required
-        ></v-text-field>
-
-        <v-text-field
-          v-model.number="startMonth"
-          label="Start month"
-          :rules="isRequiredRule"
-          type="number"
-          required
-        ></v-text-field>
-
-        <v-text-field
-          v-model.number="endYear"
-          label="End year"
-          type="number"
-        ></v-text-field>
-
-        <v-text-field
-          v-model.number="endMonth"
-          label="End month"
-          type="number"
-        ></v-text-field>
+          label="Start year and month"
+        />
+        <MonthPicker
+          v-model="endYearMonth"
+          name="endYearMonth"
+          label="End year and month"
+        />
       </v-card-text>
 
       <v-card-actions>
@@ -66,32 +50,39 @@
 </template>
 
 <script lang="ts">
-import * as R from "ramda";
 import { Component, Prop, Mixins } from "vue-property-decorator";
 import { DialogFormMixin } from "@/mixins";
 import WorkExperienceModule, {
   WorkExperience,
   PatchWorkExperienceDto,
 } from "@/store/modules/work_experience";
+import { MonthPicker } from "@/components/form";
+import { YearMonth } from "@/components/form/MonthPicker.vue";
 
-@Component
+@Component({
+  components: {
+    MonthPicker,
+  },
+})
 export default class EditWorkExperienceDialog extends Mixins(DialogFormMixin) {
   @Prop({ required: true }) readonly workExperience!: WorkExperience;
 
   jobTitle = "";
   description = "";
-  startYear!: number;
-  startMonth!: number;
-  endYear: number | null = null;
-  endMonth: number | null = null;
+  startYearMonth = new YearMonth();
+  endYearMonth = new YearMonth();
 
   created(): void {
     this.jobTitle = this.workExperience.jobTitle;
     this.description = this.workExperience.description;
-    this.startYear = this.workExperience.startYear;
-    this.startMonth = this.workExperience.startMonth;
-    this.endYear = this.workExperience.endYear;
-    this.endMonth = this.workExperience.endMonth;
+    this.startYearMonth = {
+      year: this.workExperience.startYear,
+      month: this.workExperience.startMonth,
+    };
+    this.endYearMonth = {
+      year: this.workExperience.endYear,
+      month: this.workExperience.endMonth,
+    };
   }
 
   async onWorkExperienceDelete(): Promise<void> {
@@ -106,17 +97,21 @@ export default class EditWorkExperienceDialog extends Mixins(DialogFormMixin) {
   }
 
   async onSave(): Promise<void> {
-    if (this.form.validate()) {
+    if (
+      this.form.validate() &&
+      this.startYearMonth.year &&
+      this.startYearMonth.month
+    ) {
       const patchWorkExperienceDto: PatchWorkExperienceDto = {
         cvId: this.workExperience.cvId,
         workExperienceId: this.workExperience.id,
         data: {
           jobTitle: this.jobTitle,
           description: this.description,
-          startYear: this.startYear,
-          startMonth: this.startMonth,
-          endYear: R.isEmpty(this.endYear) ? null : this.endYear,
-          endMonth: R.isEmpty(this.endMonth) ? null : this.endMonth,
+          startYear: this.startYearMonth.year,
+          startMonth: this.startYearMonth.month,
+          endYear: this.endYearMonth.year,
+          endMonth: this.endYearMonth.month,
         },
       };
       await WorkExperienceModule.patchWorkExperience(patchWorkExperienceDto);
