@@ -16,12 +16,12 @@
               {{ projectMembership.project.name }}
               <v-btn
                 class="edit-project-membership-btn"
-                v-if="canEdit"
                 icon
                 small
                 @click="onProjectMembershipClick(projectMembership)"
               >
-                <v-icon>mdi-pencil</v-icon>
+                <v-icon v-if="canEdit">mdi-pencil</v-icon>
+                <v-icon v-else>mdi-information-outline</v-icon>
               </v-btn>
             </v-list-item-title>
             <v-list-item-subtitle>
@@ -85,7 +85,10 @@ export default class CVProjectMemberships extends Vue {
   onProjectMembershipClick(projectMembership: ProjectMembership): void {
     DialogModule.pushDialogComponent({
       component: EditProjectMembershipDialog,
-      props: { projectMembership },
+      props: {
+        projectMembership,
+        canEdit: this.canEdit,
+      },
     });
   }
 

@@ -10,13 +10,9 @@
           <v-list-item-content>
             <v-list-item-title class="headline mb-2">
               {{ workExperience.company.name }}
-              <v-btn
-                v-if="canEdit"
-                icon
-                small
-                @click="onWorkExperienceClick(workExperience)"
-              >
-                <v-icon>mdi-pencil</v-icon>
+              <v-btn icon small @click="onWorkExperienceClick(workExperience)">
+                <v-icon v-if="canEdit">mdi-pencil</v-icon>
+                <v-icon v-else>mdi-information-outline</v-icon>
               </v-btn>
             </v-list-item-title>
             <div class="mb-2">
@@ -66,6 +62,7 @@ export default class CVWorkExperiences extends Vue {
       component: EditWorkExperienceDialog,
       props: {
         workExperience,
+        canEdit: this.canEdit,
       },
     });
   }

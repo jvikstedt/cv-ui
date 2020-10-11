@@ -11,6 +11,13 @@
         lazy-validation
         @submit.prevent="onSave"
       >
+        <v-card-actions>
+          <v-spacer></v-spacer>
+
+          <v-btn color="red darken-1" text @click="onCancel"> Cancel </v-btn>
+
+          <v-btn color="green darken-1" text type="submit"> Save </v-btn>
+        </v-card-actions>
         <v-card-text>
           <v-text-field
             v-model="name"
@@ -20,14 +27,6 @@
             required
           ></v-text-field>
         </v-card-text>
-
-        <v-card-actions>
-          <v-spacer></v-spacer>
-
-          <v-btn color="red darken-1" text @click="onCancel"> Cancel </v-btn>
-
-          <v-btn color="green darken-1" text type="submit"> Save </v-btn>
-        </v-card-actions>
       </v-form>
 
       <v-card-text>

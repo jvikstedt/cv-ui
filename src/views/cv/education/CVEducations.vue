@@ -10,13 +10,9 @@
           <v-list-item-content>
             <v-list-item-title class="headline mb-2">
               {{ education.school.name }}
-              <v-btn
-                v-if="canEdit"
-                icon
-                small
-                @click="onEducationClick(education)"
-              >
-                <v-icon>mdi-pencil</v-icon>
+              <v-btn icon small @click="onEducationClick(education)">
+                <v-icon v-if="canEdit">mdi-pencil</v-icon>
+                <v-icon v-else>mdi-information-outline</v-icon>
               </v-btn>
             </v-list-item-title>
             <div class="mb-2">
@@ -61,7 +57,10 @@ export default class CVEducations extends Vue {
   onEducationClick(education: Education): void {
     DialogModule.pushDialogComponent({
       component: EditEducationDialog,
-      props: { education },
+      props: {
+        education,
+        canEdit: this.canEdit,
+      },
     });
   }
 

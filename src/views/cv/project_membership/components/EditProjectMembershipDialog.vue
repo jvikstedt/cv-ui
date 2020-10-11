@@ -5,6 +5,24 @@
     }}</v-card-title>
 
     <v-form ref="form" v-model="valid" lazy-validation @submit.prevent="onSave">
+      <v-card-actions>
+        <v-spacer></v-spacer>
+
+        <v-btn
+          v-if="canEdit"
+          color="red darken-1"
+          text
+          @click="onProjectMembershipDelete"
+        >
+          Delete
+        </v-btn>
+
+        <v-btn color="red darken-1" text @click="onCancel"> Cancel </v-btn>
+
+        <v-btn v-if="canEdit" color="green darken-1" text type="submit">
+          Save
+        </v-btn>
+      </v-card-actions>
       <v-card-text>
         <v-text-field
           v-model="description"
@@ -12,6 +30,7 @@
           :rules="isRequiredRule"
           label="Description"
           required
+          :readonly="!canEdit"
         ></v-text-field>
 
         <MonthPicker
@@ -19,29 +38,26 @@
           name="startYearMonth"
           :rules="isRequiredRule"
           label="Start year and month"
+          :readonly="!canEdit"
         />
         <MonthPicker
           v-model="endYearMonth"
           name="endYearMonth"
           label="End year and month"
+          :readonly="!canEdit"
         />
 
-        <v-checkbox v-model="highlight" label="Highlight"></v-checkbox>
+        <v-checkbox
+          :readonly="!canEdit"
+          v-model="highlight"
+          label="Highlight"
+        ></v-checkbox>
 
-        <MembershipSkillsField v-model="membershipSkills" />
+        <MembershipSkillsField
+          :readonly="!canEdit"
+          v-model="membershipSkills"
+        />
       </v-card-text>
-
-      <v-card-actions>
-        <v-spacer></v-spacer>
-
-        <v-btn color="red darken-1" text @click="onProjectMembershipDelete">
-          Delete
-        </v-btn>
-
-        <v-btn color="red darken-1" text @click="onCancel"> Cancel </v-btn>
-
-        <v-btn color="green darken-1" text type="submit"> Save </v-btn>
-      </v-card-actions>
     </v-form>
   </v-card>
 </template>
@@ -69,6 +85,7 @@ export default class EditProjectMembershipDialog extends Mixins(
   DialogFormMixin
 ) {
   @Prop({ required: true }) readonly projectMembership!: ProjectMembership;
+  @Prop({ required: false }) readonly canEdit!: boolean;
 
   description = "";
   startYearMonth = new YearMonth();

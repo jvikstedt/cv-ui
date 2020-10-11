@@ -5,6 +5,24 @@
     }}</v-card-title>
 
     <v-form ref="form" v-model="valid" lazy-validation @submit.prevent="onSave">
+      <v-card-actions>
+        <v-spacer></v-spacer>
+
+        <v-btn
+          v-if="canEdit"
+          color="red darken-1"
+          text
+          @click="onWorkExperienceDelete"
+        >
+          Delete
+        </v-btn>
+
+        <v-btn color="red darken-1" text @click="onCancel"> Cancel </v-btn>
+
+        <v-btn v-if="canEdit" color="green darken-1" text type="submit">
+          Save
+        </v-btn>
+      </v-card-actions>
       <v-card-text>
         <v-text-field
           v-model="jobTitle"
@@ -12,6 +30,7 @@
           :rules="isRequiredRule"
           label="Job title"
           required
+          :readonly="!canEdit"
         ></v-text-field>
 
         <v-text-field
@@ -19,6 +38,7 @@
           :counter="255"
           label="Description"
           required
+          :readonly="!canEdit"
         ></v-text-field>
 
         <MonthPicker
@@ -26,25 +46,15 @@
           name="startYearMonth"
           :rules="isRequiredRule"
           label="Start year and month"
+          :readonly="!canEdit"
         />
         <MonthPicker
           v-model="endYearMonth"
           name="endYearMonth"
           label="End year and month"
+          :readonly="!canEdit"
         />
       </v-card-text>
-
-      <v-card-actions>
-        <v-spacer></v-spacer>
-
-        <v-btn color="red darken-1" text @click="onWorkExperienceDelete">
-          Delete
-        </v-btn>
-
-        <v-btn color="red darken-1" text @click="onCancel"> Cancel </v-btn>
-
-        <v-btn color="green darken-1" text type="submit"> Save </v-btn>
-      </v-card-actions>
     </v-form>
   </v-card>
 </template>
