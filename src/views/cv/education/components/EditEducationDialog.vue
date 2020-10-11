@@ -3,6 +3,24 @@
     <v-card-title class="headline">{{ education.school.name }}</v-card-title>
 
     <v-form ref="form" v-model="valid" lazy-validation @submit.prevent="onSave">
+      <v-card-actions>
+        <v-spacer></v-spacer>
+
+        <v-btn
+          v-if="canEdit"
+          color="red darken-1"
+          text
+          @click="onEducationDelete"
+        >
+          Delete
+        </v-btn>
+
+        <v-btn color="red darken-1" text @click="onCancel"> Cancel </v-btn>
+
+        <v-btn v-if="canEdit" color="green darken-1" text type="submit">
+          Save
+        </v-btn>
+      </v-card-actions>
       <v-card-text>
         <v-text-field
           v-model="degree"
@@ -10,6 +28,7 @@
           :rules="isRequiredRule"
           label="Degree"
           required
+          :readonly="!canEdit"
         ></v-text-field>
 
         <v-text-field
@@ -18,6 +37,7 @@
           :rules="isRequiredRule"
           label="Field of study"
           required
+          :readonly="!canEdit"
         ></v-text-field>
 
         <v-text-field
@@ -25,6 +45,7 @@
           :counter="255"
           label="Description"
           required
+          :readonly="!canEdit"
         ></v-text-field>
 
         <v-text-field
@@ -33,28 +54,22 @@
           :rules="isRequiredRule"
           type="number"
           required
+          :readonly="!canEdit"
         ></v-text-field>
 
         <v-text-field
           v-model.number="endYear"
           label="End year"
           type="number"
+          :readonly="!canEdit"
         ></v-text-field>
 
-        <v-checkbox v-model="highlight" label="Highlight"></v-checkbox>
+        <v-checkbox
+          v-model="highlight"
+          label="Highlight"
+          :readonly="!canEdit"
+        ></v-checkbox>
       </v-card-text>
-
-      <v-card-actions>
-        <v-spacer></v-spacer>
-
-        <v-btn color="red darken-1" text @click="onEducationDelete">
-          Delete
-        </v-btn>
-
-        <v-btn color="red darken-1" text @click="onCancel"> Cancel </v-btn>
-
-        <v-btn color="green darken-1" text type="submit"> Save </v-btn>
-      </v-card-actions>
     </v-form>
   </v-card>
 </template>
@@ -71,6 +86,7 @@ import EducationModule, {
 @Component
 export default class EditEducationDialog extends Mixins(DialogFormMixin) {
   @Prop({ required: true }) readonly education!: Education;
+  @Prop({ required: false }) readonly canEdit!: boolean;
 
   degree = "";
   fieldOfStudy = "";

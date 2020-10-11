@@ -3,14 +3,6 @@
     <v-card-title class="headline"> Edit CV </v-card-title>
 
     <v-form ref="form" v-model="valid" lazy-validation @submit.prevent="onSave">
-      <v-card-text>
-        <v-textarea
-          name="description"
-          v-model="description"
-          label="Description"
-        />
-      </v-card-text>
-
       <v-card-actions>
         <v-spacer></v-spacer>
 
@@ -18,6 +10,13 @@
 
         <v-btn color="green darken-1" text type="submit"> Save </v-btn>
       </v-card-actions>
+      <v-card-text>
+        <v-textarea
+          name="description"
+          v-model="description"
+          label="Description"
+        />
+      </v-card-text>
     </v-form>
   </v-card>
 </template>

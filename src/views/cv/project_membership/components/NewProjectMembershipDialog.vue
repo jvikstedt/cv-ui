@@ -3,6 +3,13 @@
     <v-card-title class="headline">New project</v-card-title>
 
     <v-form ref="form" v-model="valid" lazy-validation @submit.prevent="onSave">
+      <v-card-actions>
+        <v-spacer></v-spacer>
+
+        <v-btn color="red darken-1" text @click="onCancel"> Cancel </v-btn>
+
+        <v-btn color="green darken-1" text type="submit"> Save </v-btn>
+      </v-card-actions>
       <v-card-text>
         <v-autocomplete
           name="project"
@@ -51,14 +58,6 @@
 
         <MembershipSkillsField v-model="membershipSkills" />
       </v-card-text>
-
-      <v-card-actions>
-        <v-spacer></v-spacer>
-
-        <v-btn color="red darken-1" text @click="onCancel"> Cancel </v-btn>
-
-        <v-btn color="green darken-1" text type="submit"> Save </v-btn>
-      </v-card-actions>
     </v-form>
   </v-card>
 </template>

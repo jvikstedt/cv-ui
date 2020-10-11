@@ -174,9 +174,10 @@ class SkillModule extends VuexModule {
         membershipSkills
       );
 
-      const projectExperience = R.sum(
+      let projectExperience = R.sum(
         R.map((project) => project.experience, skillExperienceProjects)
       );
+      projectExperience = Math.round(projectExperience * 100) / 100;
 
       return {
         totalExperience: projectExperience + skill.experienceInYears,

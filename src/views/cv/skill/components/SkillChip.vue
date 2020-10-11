@@ -4,7 +4,7 @@
     class="ma-2"
     :style="getChipStyle(skill)"
     text-color="blue-grey darken-4"
-    v-on="canEdit ? { click: () => onSkillClick(skill) } : {}"
+    v-on="{ click: () => onSkillClick(skill) }"
   >
     <v-avatar left class="">
       {{ Math.ceil(skillExperience.totalExperience) }}
@@ -38,6 +38,7 @@ export default class SkillChip extends Vue {
       component: EditSkillDialog,
       props: {
         skill,
+        canEdit: this.canEdit,
       },
     });
   }

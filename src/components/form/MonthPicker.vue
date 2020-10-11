@@ -15,10 +15,16 @@
         v-bind="attrs"
         v-on="on"
         :rules="rules"
-        clearable
+        :clearable="!readonly"
       ></v-text-field>
     </template>
-    <v-date-picker v-model="date" type="month" scrollable v-if="modal">
+    <v-date-picker
+      v-model="date"
+      type="month"
+      scrollable
+      v-if="modal"
+      :readonly="readonly"
+    >
       <v-spacer></v-spacer>
       <v-btn text color="primary" @click="modal = false">Cancel</v-btn>
       <v-btn text color="primary" @click="$refs.dialog.save(date)">OK</v-btn>
@@ -41,6 +47,7 @@ export default class MonthPicker extends Vue {
   @Prop({ required: true }) readonly label!: string;
   @Prop({ required: true }) readonly name!: string;
   @Prop({ required: false }) readonly rules!: InputValidationRules;
+  @Prop({ required: false }) readonly readonly!: boolean;
 
   date: string | null = null;
   menu = false;

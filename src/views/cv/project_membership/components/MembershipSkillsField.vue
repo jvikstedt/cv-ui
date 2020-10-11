@@ -11,6 +11,7 @@
       placeholder="Start typing to search"
       return-object
       @change="onSelect"
+      v-if="!readonly"
     ></v-autocomplete>
 
     <v-simple-table>
@@ -30,6 +31,7 @@
                 :input-value="m.automaticCalculation"
                 @change="updateAutomaticCalculation(m, $event)"
                 label="Auto"
+                readonly="readonly"
               ></v-checkbox>
 
               <v-text-field
@@ -39,6 +41,7 @@
                 type="number"
                 v-if="!m.automaticCalculation"
                 @change="updateExperienceInYears(m, $event)"
+                readonly="readonly"
               />
             </td>
             <td>
@@ -46,6 +49,7 @@
                 icon
                 @click.prevent="deleteRow(m)"
                 class="remove-skill-btn"
+                v-if="!readonly"
               >
                 <v-icon>mdi-delete</v-icon>
               </v-btn>
@@ -76,6 +80,7 @@ interface MembershipSkillRow {
 @Component
 export default class MembershipSkillsField extends Vue {
   @Prop({ required: true }) readonly value!: MembershipSkillDto[];
+  @Prop({ required: false }) readonly readonly!: boolean;
 
   searchInput = null;
   selectedSkillSubject: SkillSubject | null = null;
