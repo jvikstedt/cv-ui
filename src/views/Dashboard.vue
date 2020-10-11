@@ -61,7 +61,7 @@
 import { Component, Mixins } from "vue-property-decorator";
 import { CVSearchDto } from "@/store/modules/cv";
 import { SearchMixin } from "@/mixins";
-import { CVSearchView } from "@/views/cv/search";
+import { CVSearchView } from "@/components/search";
 import { FormatDateTime } from "@/helpers";
 import AuthModule from "@/store/modules/auth";
 import DialogModule from "@/store/modules/dialog";

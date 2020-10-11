@@ -19,16 +19,9 @@ import DialogModule from "@/store/modules/dialog";
 
 @Component
 export default class Dialog extends Vue {
-  // @DialogStore.State
-  // isOpen!: boolean;
-
-  // @DialogStore.State
   get dialogComponents(): DialogComponent[] {
     return DialogModule.dialogComponents;
   }
-
-  // @DialogStore.Mutation
-  // popDialogComponent!: () => void;
 
   get dialog(): boolean {
     return true;

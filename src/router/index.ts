@@ -3,7 +3,7 @@ import VueRouter, { RouteConfig } from "vue-router";
 import Dashboard from "@/views/Dashboard.vue";
 import store from "@/store";
 
-import { CVShowView } from "@/views/cv/show";
+import { CVShowView } from "@/views/cv";
 import { CVExportView } from "@/views/cv/export";
 import { LoginView } from "@/views/auth";
 import { SkillSubjectListView } from "@/views/skill_subject";

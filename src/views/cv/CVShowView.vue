@@ -10,11 +10,11 @@
 
 <script lang="ts">
 import { Component, Vue, Watch } from "vue-property-decorator";
-import CVDetails from "./CVDetails.vue";
-import CVSkills from "./CVSkills.vue";
-import CVEducations from "./CVEducations.vue";
-import CVWorkExperiences from "./CVWorkExperiences.vue";
-import CVProjectMemberships from "./CVProjectMemberships.vue";
+import CVDetails from "./user/CVDetails.vue";
+import CVSkills from "./skill/CVSkills.vue";
+import CVEducations from "./education/CVEducations.vue";
+import CVWorkExperiences from "./work_experience/CVWorkExperiences.vue";
+import CVProjectMemberships from "./project_membership/CVProjectMemberships.vue";
 import AuthModule from "@/store/modules/auth";
 
 @Component({
