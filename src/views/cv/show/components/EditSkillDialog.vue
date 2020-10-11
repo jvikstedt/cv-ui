@@ -4,19 +4,18 @@
 
     <v-form ref="form" v-model="valid" lazy-validation @submit.prevent="onSave">
       <v-card-text>
-        <v-subheader>Experience in years</v-subheader>
+        <v-subheader>Extra experience in years</v-subheader>
         <v-slider
           v-model="experienceInYears"
           class="align-center"
           :max="10"
-          :min="1"
+          :min="0"
           hide-details
         >
           <template v-slot:append>
             <v-text-field
               name="experienceInYears"
               v-model="experienceInYears"
-              :rules="isRequiredRule"
               class="mt-0 pt-0"
               hide-details
               single-line
@@ -49,6 +48,47 @@
         </v-slider>
 
         <v-checkbox v-model="highlight" label="Highlight"></v-checkbox>
+
+        <v-subheader>
+          Total experience: ~
+          {{
+            Math.ceil(
+              skillExperience.totalExperience +
+                (experienceInYears - skill.experienceInYears)
+            )
+          }}
+          years ( {{ experienceInYears }} +
+          {{ skillExperience.projectExperience }} =
+          {{
+            Math.round(
+              (skillExperience.totalExperience +
+                (experienceInYears - skill.experienceInYears)) *
+                100
+            ) / 100
+          }}
+          )
+        </v-subheader>
+        <v-simple-table>
+          <template v-slot:default>
+            <thead>
+              <tr>
+                <th class="text-left">Project name</th>
+                <th class="text-left">Auto calculation</th>
+                <th class="text-left">Experience</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="m in skillExperience.projects" :key="m.id">
+                <td>
+                  {{ m.companyName }} /
+                  {{ m.projectName }}
+                </td>
+                <td>{{ `${m.automaticCalculation ? "Yes" : "No"}` }}</td>
+                <td>{{ m.experience }} years</td>
+              </tr>
+            </tbody>
+          </template>
+        </v-simple-table>
       </v-card-text>
 
       <v-card-actions>
@@ -67,7 +107,11 @@
 <script lang="ts">
 import { Component, Prop, Mixins } from "vue-property-decorator";
 import { DialogFormMixin } from "@/mixins";
-import SkillModule, { Skill, PatchSkillDto } from "@/store/modules/skill";
+import SkillModule, {
+  Skill,
+  PatchSkillDto,
+  SkillExperience,
+} from "@/store/modules/skill";
 
 @Component
 export default class EditSkillDialog extends Mixins(DialogFormMixin) {
@@ -76,6 +120,10 @@ export default class EditSkillDialog extends Mixins(DialogFormMixin) {
   experienceInYears = 1;
   interestLevel = 1;
   highlight = false;
+
+  get skillExperience(): SkillExperience | undefined {
+    return SkillModule.skillExperience(this.skill.id);
+  }
 
   created(): void {
     this.experienceInYears = this.skill.experienceInYears;

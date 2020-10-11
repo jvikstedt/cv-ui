@@ -79,7 +79,7 @@
                     v-for="skill in commonSkills(item)"
                   >
                     <v-avatar left class="">
-                      {{ skill.experienceInYears }}
+                      {{ Math.ceil(skill.experienceInYears) }}
                     </v-avatar>
                     {{ skill.name }}
                     <v-icon v-if="skill.highlight" right>mdi-star</v-icon>

@@ -126,7 +126,7 @@ Cypress.Commands.add(
     description = "foo",
     startYear = 2000,
     startMonth = 1,
-    endYear = 2015,
+    endYear = 2002,
     endMonth = 12,
     highlight = false,
     skillSubjectNames = ["Ansible"]

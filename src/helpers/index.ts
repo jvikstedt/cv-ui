@@ -1,8 +1,8 @@
-import moment from "moment";
+import { DateTime } from "luxon";
 import * as validator from "./validator";
 
-const FormatDateTime = (date: Date): string => {
-  return moment(date).format("MMMM Do YYYY, h:mm a");
+const FormatDateTime = (date: string): string => {
+  return DateTime.fromISO(date).toFormat("dd MMMM yyyy, h:mm a");
 };
 
 export { validator, FormatDateTime };

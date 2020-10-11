@@ -7,20 +7,12 @@
 
     <v-card-text>
       <v-subheader class="pa-0">Highlighted skills</v-subheader>
-      <v-chip
-        :key="skill.id"
-        class="ma-2"
-        :style="getChipStyle(skill)"
-        text-color="blue-grey darken-4"
+      <SkillChip
         v-for="skill in getCVHighlightedSkills"
-        v-on="canEdit ? { click: () => onSkillClick(skill) } : {}"
-      >
-        <v-avatar left class="">
-          {{ skill.totalExperienceInYears }}
-        </v-avatar>
-        {{ skill.skillSubject.name }}
-        <v-icon v-if="skill.highlight" right>mdi-star</v-icon>
-      </v-chip>
+        :key="skill.id"
+        :skill="skill"
+        :canEdit="canEdit"
+      />
 
       <v-subheader class="pa-0">Skill categories</v-subheader>
       <v-expansion-panels v-model="panel">
@@ -32,20 +24,12 @@
             `${skillGroupName} (${skillsBySkillGroup(skillGroupName).length})`
           }}</v-expansion-panel-header>
           <v-expansion-panel-content>
-            <v-chip
-              :key="skill.id"
-              class="ma-2"
-              :style="getChipStyle(skill)"
-              text-color="blue-grey darken-4"
+            <SkillChip
               v-for="skill in skillsBySkillGroup(skillGroupName)"
-              v-on="canEdit ? { click: () => onSkillClick(skill) } : {}"
-            >
-              <v-avatar left class="">
-                {{ skill.totalExperienceInYears }}
-              </v-avatar>
-              {{ skill.skillSubject.name }}
-              <v-icon v-if="skill.highlight" right>mdi-star</v-icon>
-            </v-chip>
+              :key="skill.id"
+              :skill="skill"
+              :canEdit="canEdit"
+            />
           </v-expansion-panel-content>
         </v-expansion-panel>
       </v-expansion-panels>
@@ -59,12 +43,16 @@
 <script lang="ts">
 import * as R from "ramda";
 import { Component, Vue, Prop } from "vue-property-decorator";
-import EditSkillDialog from "./components/EditSkillDialog.vue";
 import NewSkillDialog from "./components/NewSkillDialog.vue";
 import DialogModule from "@/store/modules/dialog";
 import SkillModule, { Skill } from "@/store/modules/skill";
+import SkillChip from "./components/SkillChip.vue";
 
-@Component
+@Component({
+  components: {
+    SkillChip,
+  },
+})
 export default class CVSkills extends Vue {
   @Prop({ required: true }) readonly cvId!: number;
   @Prop({ required: true }) readonly canEdit!: boolean;
@@ -90,10 +78,6 @@ export default class CVSkills extends Vue {
     await SkillModule.fetchCVSkills(this.cvId);
   }
 
-  getChipStyle(skill: Skill): string {
-    return `background-color: rgb(76,175,80, ${skill.interestLevel * (1 / 3)})`;
-  }
-
   skillGroups(): string[] {
     return R.sort(
       (a, b) => a.localeCompare(b),
@@ -103,15 +87,6 @@ export default class CVSkills extends Vue {
 
   skillsBySkillGroup(skillGroupName: string): Skill[] {
     return this.getCVSkillsGrouped[skillGroupName] || [];
-  }
-
-  onSkillClick(skill: Skill): void {
-    DialogModule.pushDialogComponent({
-      component: EditSkillDialog,
-      props: {
-        skill,
-      },
-    });
   }
 
   newSkill(): void {

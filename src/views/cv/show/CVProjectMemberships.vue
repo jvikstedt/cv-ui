@@ -30,6 +30,18 @@
               }}
               - {{ projectMembership.endMonth }}.{{ projectMembership.endYear }}
             </v-list-item-subtitle>
+            <div>
+              <v-chip
+                :key="membershipSkill.id"
+                class="ma-2"
+                :style="getChipStyle(membershipSkill.skill)"
+                text-color="blue-grey darken-4"
+                v-for="membershipSkill in projectMembership.membershipSkills"
+                small
+              >
+                {{ membershipSkill.skill.skillSubject.name }}
+              </v-chip>
+            </div>
           </v-list-item-content>
         </v-list-item>
         <v-divider></v-divider>
@@ -51,6 +63,7 @@ import DialogModule from "@/store/modules/dialog";
 import ProjectMembershipModule, {
   ProjectMembership,
 } from "@/store/modules/project_membership";
+import { Skill } from "@/store/modules/skill";
 
 @Component
 export default class CVProjectMemberships extends Vue {
@@ -63,6 +76,10 @@ export default class CVProjectMemberships extends Vue {
 
   async created(): Promise<void> {
     await ProjectMembershipModule.fetchCVProjectMemberships(this.cvId);
+  }
+
+  getChipStyle(skill: Skill): string {
+    return `background-color: rgb(76,175,80, ${skill.interestLevel * (1 / 3)})`;
   }
 
   onProjectMembershipClick(projectMembership: ProjectMembership): void {

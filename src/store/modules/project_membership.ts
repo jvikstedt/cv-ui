@@ -30,9 +30,9 @@ export interface ProjectMembership {
   endMonth: number;
   highlight: boolean;
   cvId: number;
-  project: Project;
+  project?: Project;
   projectId: number;
-  membershipSkills: MembershipSkill[];
+  membershipSkills?: MembershipSkill[];
   createdAt: Date;
   updatedAt: Date;
 }
@@ -107,24 +107,34 @@ class ProjectMembershipModule extends VuexModule {
   cvProjectMembershipIds: { [key: number]: number[] } = {};
 
   get find() {
-    return (id: number): ProjectMembership | undefined => {
+    return (
+      id: number,
+      relations: string[] = ["project", "membershipSkills"]
+    ): ProjectMembership | undefined => {
       const projectMembership = this.byId[id];
       if (!projectMembership) {
         return undefined;
       }
 
-      const project = ProjectModule.find(projectMembership.projectId);
-      if (!project) {
-        return undefined;
+      let project: Project | undefined;
+      let membershipSkills: MembershipSkill[] | undefined;
+
+      if (R.includes("project", relations)) {
+        project = ProjectModule.find(projectMembership.projectId);
+        if (!project) {
+          return undefined;
+        }
       }
 
-      const membershipSkills = R.reject(
-        R.isNil,
-        R.map(
-          (n: unknown) => MembershipSkillModule.find(n as number),
-          projectMembership.membershipSkills
-        )
-      ) as MembershipSkill[];
+      if (R.includes("membershipSkills", relations)) {
+        membershipSkills = R.reject(
+          R.isNil,
+          R.map(
+            (n: unknown) => MembershipSkillModule.find(n as number),
+            projectMembership.membershipSkills
+          )
+        ) as MembershipSkill[];
+      }
 
       return {
         ...projectMembership,
@@ -139,7 +149,7 @@ class ProjectMembershipModule extends VuexModule {
       const ids = this.cvProjectMembershipIds[cvId] || [];
       return R.reject(
         R.isNil,
-        R.map((id) => this.find(id), ids)
+        R.map((id) => this.find(id, ["project", "membershipSkills"]), ids)
       ) as ProjectMembership[];
     };
   }
@@ -174,6 +184,10 @@ class ProjectMembershipModule extends VuexModule {
             cvProjectMembershipIds
           )
         );
+
+        MembershipSkillModule.delete(
+          (projectMembership.membershipSkills as unknown) as number[]
+        );
       }
     }
   }
@@ -205,6 +219,10 @@ class ProjectMembershipModule extends VuexModule {
       data
     );
 
+    // ProjectMembership is deleted to force deletion of membershipSkills
+    // This is because backend does the same and will return membershipSkills
+    // with different ids
+    this.delete([projectMembershipId]);
     await this.saveProjectMemberships([projectMembership]);
   }
 

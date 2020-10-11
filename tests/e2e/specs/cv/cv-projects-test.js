@@ -26,25 +26,27 @@ describe("CV projects", () => {
 
     cy.get("input[name=startMonth]").type("1");
 
-    // cy.get("input[name=skillSubjects]")
-    //   .first()
-    //   .type("Ansible", { force: true });
+    cy.get("input[name=endYear]").type("2002");
 
-    // cy.get(".v-list-item__content")
-    //   .last()
-    //   .click();
+    cy.get("input[name=endMonth]").type("5");
 
-    // cy.get("input[name=skillSubjects]")
-    //   .first()
-    //   .type("{esc}", { force: true });
+    cy.get("input[name=skill]").first().type("Ansible");
+    cy.get(".v-list-item__content").last().click();
 
     cy.contains("Save").click();
 
     cy.get("#cv-projects").contains("Test company / Test project");
-    // cy.get("#cv-projects").contains("Ansible");
+    cy.get("#cv-projects").contains("Ansible");
+    cy.get(".v-expansion-panel-header").contains("Other").click();
+    cy.get(".v-chip__content").contains("Ansible");
+    cy.get(".v-chip__content").contains("3");
+
     cy.reload();
     cy.get("#cv-projects").contains("Test company / Test project");
-    // cy.get("#cv-projects").contains("Ansible");
+    cy.get("#cv-projects").contains("Ansible");
+    cy.get(".v-expansion-panel-header").contains("Other").click();
+    cy.get(".v-chip__content").contains("Ansible");
+    cy.get(".v-chip__content").contains("3");
   });
 
   it("Edit existing project", () => {
@@ -53,27 +55,20 @@ describe("CV projects", () => {
 
     cy.get("#cv-projects .edit-project-membership-btn").first().click();
 
-    // cy.get("input[name=skillSubjects]")
-    //   .first()
-    //   .type("Python", { force: true });
-
-    // cy.get(".v-list-item__content")
-    //   .last()
-    //   .click();
-
-    // cy.get("input[name=skillSubjects]")
-    //   .first()
-    //   .type("{esc}", { force: true });
+    cy.get("input[name=skill]").first().type("Python");
+    cy.get(".v-list-item__content").last().click();
 
     cy.contains("Save").click();
 
     cy.get("#cv-projects").contains("Test company / Test project");
-    // cy.get("#cv-projects").contains("Ansible");
-    // cy.get("#cv-projects").contains("Python");
+    cy.get(".v-expansion-panel-header").contains("Other").click();
+    cy.get(".v-chip__content").contains("Python");
+    cy.get(".v-chip__content").contains("3");
     cy.reload();
     cy.get("#cv-projects").contains("Test company / Test project");
-    // cy.get("#cv-projects").contains("Ansible");
-    // cy.get("#cv-projects").contains("Python");
+    cy.get(".v-expansion-panel-header").contains("Other").click();
+    cy.get(".v-chip__content").contains("Python");
+    cy.get(".v-chip__content").contains("3");
   });
 
   it("Delete existing project", () => {
@@ -89,30 +84,22 @@ describe("CV projects", () => {
     cy.contains("Test company / Test project").should("not.exist");
   });
 
-  // it("Delete existing project skill", () => {
-  //   cy.createProjectMembership();
-  //   cy.visit(`/cv/${user.cvIds[0]}`);
+  it("Delete existing project skill", () => {
+    cy.createProjectMembership();
+    cy.visit(`/cv/${user.cvIds[0]}`);
 
-  //   cy.get("#cv-projects").contains("Ansible");
+    cy.get("#cv-projects").contains("Ansible");
 
-  //   cy.get("#cv-projects .edit-project-membership-btn")
-  //     .first()
-  //     .click();
+    cy.get("#cv-projects .edit-project-membership-btn").first().click();
 
-  //   cy.contains("Ansible")
-  //     .get(".v-chip__close")
-  //     .click();
+    cy.get(".remove-skill-btn").first().click();
 
-  //   cy.contains("Save").click();
+    cy.contains("Save").click();
 
-  //   cy.get("#cv-projects").contains("Test company / Test project");
-  //   cy.get("#cv-projects")
-  //     .contains("Ansible")
-  //     .should("not.exist");
-  //   cy.reload();
-  //   cy.get("#cv-projects").contains("Test company / Test project");
-  //   cy.get("#cv-projects")
-  //     .contains("Ansible")
-  //     .should("not.exist");
-  // });
+    cy.get("#cv-projects").contains("Test company / Test project");
+    cy.get("#cv-projects").contains("Ansible").should("not.exist");
+    cy.reload();
+    cy.get("#cv-projects").contains("Test company / Test project");
+    cy.get("#cv-projects").contains("Ansible").should("not.exist");
+  });
 });

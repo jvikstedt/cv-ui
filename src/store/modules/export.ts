@@ -6,11 +6,13 @@ import {
   Action,
   getModule,
 } from "vuex-module-decorators";
+import { DateTime } from "luxon";
 import Vue from "vue";
 import Api from "@/api/api";
 import { Skill } from "@/store/modules/skill";
 import { ExportData } from "@/views/cv/export/types";
 import store from "@/store";
+import { MembershipSkill } from "./membership_skill";
 
 export class ExportPdfDto {
   bodyTemplate? = "";
@@ -127,6 +129,47 @@ export class File {
   updatedAt!: string;
 }
 
+const calculateTotalSkillExperience = (
+  skill: Skill,
+  membershipSkills: MembershipSkill[]
+): number => {
+  const experience = R.reduce(
+    (sum: number, membershipSkill) => {
+      const projectMembership = membershipSkill.projectMembership;
+      if (!projectMembership) {
+        return sum;
+      }
+
+      if (!membershipSkill.automaticCalculation) {
+        return sum + membershipSkill.experienceInYears;
+      }
+
+      const diff = (DateTime.utc(
+        projectMembership.endYear || DateTime.utc().year,
+        projectMembership.endMonth || DateTime.utc().month
+      ).diff(
+        DateTime.utc(projectMembership.startYear, projectMembership.startMonth),
+        ["years"]
+      ) as unknown) as any; // eslint-disable-line @typescript-eslint/no-explicit-any
+
+      if (R.isNil(diff["values"]) || R.isNil(diff["values"].years)) {
+        return sum;
+      }
+
+      return sum + diff["values"].years;
+    },
+    0,
+    membershipSkills
+  );
+
+  const projectExperience = Math.round(experience * 100) / 100;
+
+  const totalExperience =
+    Math.round((projectExperience + skill.experienceInYears) * 100) / 100;
+
+  return totalExperience;
+};
+
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const buildCVExportData = (responses: any[]): ExportData => {
   const [
@@ -136,6 +179,34 @@ const buildCVExportData = (responses: any[]): ExportData => {
     workExperiences,
     projectMemberships,
   ] = responses;
+
+  const allMembershipSkills = R.flatten(
+    R.map((m) => m.membershipSkills, projectMemberships)
+  );
+  const calculatedSkills = R.map((skill) => {
+    let membershipSkills = R.filter(
+      (m) => R.equals(m.skillId, skill.id),
+      allMembershipSkills
+    );
+
+    membershipSkills = R.map((m) => {
+      const projectMembership = R.find(
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (p: any) => R.equals(p.id, m.projectMembershipId),
+        projectMemberships
+      );
+
+      return {
+        ...m,
+        projectMembership,
+      };
+    }, membershipSkills);
+
+    return {
+      ...skill,
+      experienceInYears: calculateTotalSkillExperience(skill, membershipSkills),
+    };
+  }, skills);
 
   return {
     user: {
@@ -165,7 +236,7 @@ const buildCVExportData = (responses: any[]): ExportData => {
         highlight: skill.highlight,
         disabled: false,
       }),
-      skills
+      calculatedSkills
     ),
     educations: R.map(
       (education) => ({
