@@ -67,9 +67,9 @@
 <script lang="ts">
 import axios from "axios";
 import { Component, Vue } from "vue-property-decorator";
-import { Dialog } from "@/dialog";
-import { CVSearchView, CVSearchBar } from "@/views/cv/search";
-import { Alert } from "@/alert";
+import { Dialog } from "@/components/dialog";
+import { CVSearchView, CVSearchBar } from "@/components/search";
+import { Alert } from "@/components/alert";
 import AlertModule, { AlertInfo } from "@/store/modules/alert";
 import AuthModule from "@/store/modules/auth";
 import DialogModule from "@/store/modules/dialog";

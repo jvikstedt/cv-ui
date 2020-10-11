@@ -39,7 +39,7 @@
 import * as R from "ramda";
 import { Component, Watch, Mixins } from "vue-property-decorator";
 import { CV, CVSearchDto } from "@/store/modules/cv";
-import { CVSearchView } from "@/views/cv/search";
+import { CVSearchView } from "@/components/search";
 import { SearchMixin, DialogMixin } from "@/mixins";
 
 @Component
