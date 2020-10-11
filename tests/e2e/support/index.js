@@ -16,7 +16,8 @@
 import "cypress-wait-until";
 
 // Import commands.js using ES2015 syntax:
-import "./commands";
+import "./api";
+import "./ui_helpers";
 
 // Alternatively you can use CommonJS syntax:
 // require('./commands')

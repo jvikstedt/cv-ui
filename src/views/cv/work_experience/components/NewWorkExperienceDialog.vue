@@ -38,33 +38,17 @@
           required
         ></v-text-field>
 
-        <v-text-field
-          v-model.number="startYear"
-          label="Start year"
+        <MonthPicker
+          v-model="startYearMonth"
+          name="startYearMonth"
           :rules="isRequiredRule"
-          type="number"
-          required
-        ></v-text-field>
-
-        <v-text-field
-          v-model.number="startMonth"
-          label="Start month"
-          :rules="isRequiredRule"
-          type="number"
-          required
-        ></v-text-field>
-
-        <v-text-field
-          v-model.number="endYear"
-          label="End year"
-          type="number"
-        ></v-text-field>
-
-        <v-text-field
-          v-model.number="endMonth"
-          label="End month"
-          type="number"
-        ></v-text-field>
+          label="Start year and month"
+        />
+        <MonthPicker
+          v-model="endYearMonth"
+          name="endYearMonth"
+          label="End year and month"
+        />
       </v-card-text>
 
       <v-card-actions>
@@ -79,7 +63,6 @@
 </template>
 
 <script lang="ts">
-import * as R from "ramda";
 import { Component, Prop, Watch, Mixins } from "vue-property-decorator";
 import CompanyModule, { Company } from "@/store/modules/company";
 import NewCompanyDialog from "@/views/company/components/NewCompanyDialog.vue";
@@ -87,8 +70,14 @@ import { DialogFormMixin } from "@/mixins";
 import WorkExperienceModule, {
   CreateWorkExperienceDto,
 } from "@/store/modules/work_experience";
+import { MonthPicker } from "@/components/form";
+import { YearMonth } from "@/components/form/MonthPicker.vue";
 
-@Component
+@Component({
+  components: {
+    MonthPicker,
+  },
+})
 export default class NewWorkExperienceDialog extends Mixins(DialogFormMixin) {
   @Prop({ required: true }) readonly cvId!: number;
 
@@ -98,10 +87,8 @@ export default class NewWorkExperienceDialog extends Mixins(DialogFormMixin) {
 
   jobTitle = "";
   description = "";
-  startYear: number | null = null;
-  startMonth: number | null = null;
-  endYear: number | null = null;
-  endMonth: number | null = null;
+  startYearMonth = new YearMonth();
+  endYearMonth = new YearMonth();
 
   @Watch("search")
   async searchChanged(keyword: string): Promise<void> {
@@ -115,18 +102,18 @@ export default class NewWorkExperienceDialog extends Mixins(DialogFormMixin) {
     if (
       this.form.validate() &&
       this.company &&
-      this.startYear &&
-      this.startMonth
+      this.startYearMonth.year &&
+      this.startYearMonth.month
     ) {
       const createWorkExperienceDto: CreateWorkExperienceDto = {
         cvId: this.cvId,
         companyId: this.company.id,
         jobTitle: this.jobTitle,
         description: this.description,
-        startYear: this.startYear,
-        startMonth: this.startMonth,
-        endYear: R.isEmpty(this.endYear) ? null : this.endYear,
-        endMonth: R.isEmpty(this.endMonth) ? null : this.endMonth,
+        startYear: this.startYearMonth.year,
+        startMonth: this.startYearMonth.month,
+        endYear: this.endYearMonth.year,
+        endMonth: this.endYearMonth.month,
       };
       await WorkExperienceModule.createWorkExperience(createWorkExperienceDto);
       this.popDialogComponent();

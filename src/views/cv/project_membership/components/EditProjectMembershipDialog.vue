@@ -14,33 +14,17 @@
           required
         ></v-text-field>
 
-        <v-text-field
-          v-model.number="startYear"
-          label="Start year"
+        <MonthPicker
+          v-model="startYearMonth"
+          name="startYearMonth"
           :rules="isRequiredRule"
-          type="number"
-          required
-        ></v-text-field>
-
-        <v-text-field
-          v-model.number="startMonth"
-          label="Start month"
-          :rules="isRequiredRule"
-          type="number"
-          required
-        ></v-text-field>
-
-        <v-text-field
-          v-model.number="endYear"
-          label="End year"
-          type="number"
-        ></v-text-field>
-
-        <v-text-field
-          v-model.number="endMonth"
-          label="End month"
-          type="number"
-        ></v-text-field>
+          label="Start year and month"
+        />
+        <MonthPicker
+          v-model="endYearMonth"
+          name="endYearMonth"
+          label="End year and month"
+        />
 
         <v-checkbox v-model="highlight" label="Highlight"></v-checkbox>
 
@@ -72,10 +56,13 @@ import ProjectMembershipModule, {
 import { MembershipSkillDto } from "@/store/modules/membership_skill";
 import { DialogFormMixin } from "@/mixins";
 import MembershipSkillsField from "./MembershipSkillsField.vue";
+import { MonthPicker } from "@/components/form";
+import { YearMonth } from "@/components/form/MonthPicker.vue";
 
 @Component({
   components: {
     MembershipSkillsField,
+    MonthPicker,
   },
 })
 export default class EditProjectMembershipDialog extends Mixins(
@@ -84,19 +71,21 @@ export default class EditProjectMembershipDialog extends Mixins(
   @Prop({ required: true }) readonly projectMembership!: ProjectMembership;
 
   description = "";
-  startYear = 2010;
-  startMonth = 1;
-  endYear = 2014;
-  endMonth = 12;
+  startYearMonth = new YearMonth();
+  endYearMonth = new YearMonth();
   highlight = false;
   membershipSkills: MembershipSkillDto[] = [];
 
   created(): void {
     this.description = this.projectMembership.description;
-    this.startYear = this.projectMembership.startYear;
-    this.startMonth = this.projectMembership.startMonth;
-    this.endYear = this.projectMembership.endYear;
-    this.endMonth = this.projectMembership.endMonth;
+    this.startYearMonth = {
+      year: this.projectMembership.startYear,
+      month: this.projectMembership.startMonth,
+    };
+    this.endYearMonth = {
+      year: this.projectMembership.endYear,
+      month: this.projectMembership.endMonth,
+    };
     this.highlight = this.projectMembership.highlight;
     this.membershipSkills = R.map(
       (membershipSkill) => ({
@@ -121,16 +110,20 @@ export default class EditProjectMembershipDialog extends Mixins(
   }
 
   async onSave(): Promise<void> {
-    if (this.form.validate()) {
+    if (
+      this.form.validate() &&
+      this.startYearMonth.year &&
+      this.startYearMonth.month
+    ) {
       const patchProjectMembershipDto: PatchProjectMembershipDto = {
         cvId: this.projectMembership.cvId,
         projectMembershipId: this.projectMembership.id,
         data: {
           description: this.description,
-          startYear: this.startYear,
-          startMonth: this.startMonth,
-          endYear: R.isEmpty(this.endYear) ? null : this.endYear,
-          endMonth: R.isEmpty(this.endMonth) ? null : this.endMonth,
+          startYear: this.startYearMonth.year,
+          startMonth: this.startYearMonth.month,
+          endYear: this.endYearMonth.year,
+          endMonth: this.endYearMonth.month,
           highlight: this.highlight,
           membershipSkills: this.membershipSkills,
         },
