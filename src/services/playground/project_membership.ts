@@ -70,7 +70,8 @@ export default class ProjectMembershipService extends ApiService {
     projectMembership.startYear = data.startYear || projectMembership.startYear;
     projectMembership.startMonth =
       data.startMonth || projectMembership.startMonth;
-    projectMembership.endYear = data.endYear || projectMembership.endYear;
+    projectMembership.endYear = data.endYear;
+    projectMembership.endMonth = data.endMonth;
     projectMembership.highlight = data.highlight || projectMembership.highlight;
 
     // ProjectMembership is deleted to force deletion of membershipSkills
