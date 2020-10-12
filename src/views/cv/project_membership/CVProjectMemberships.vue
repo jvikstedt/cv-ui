@@ -11,7 +11,7 @@
       >
         <v-list-item three-line style="background-color: white">
           <v-list-item-content>
-            <v-list-item-title class="headline mb-2">
+            <v-list-item-title class="headline mb-2 text-wrap">
               {{ projectMembership.project.company.name }} /
               {{ projectMembership.project.name }}
               <v-btn

@@ -8,7 +8,7 @@
       <div v-for="workExperience in workExperiences" :key="workExperience.id">
         <v-list-item three-line style="background-color: white">
           <v-list-item-content>
-            <v-list-item-title class="headline mb-2">
+            <v-list-item-title class="headline mb-2 text-wrap">
               {{ workExperience.company.name }}
               <v-btn icon small @click="onWorkExperienceClick(workExperience)">
                 <v-icon v-if="canEdit">mdi-pencil</v-icon>
