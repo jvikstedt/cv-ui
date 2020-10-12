@@ -48,12 +48,13 @@
         <MonthPicker
           v-model="startYearMonth"
           name="startYearMonth"
-          :rules="isRequiredRule"
+          :rules="startYearMonthRules"
           label="Start year and month"
         />
         <MonthPicker
           v-model="endYearMonth"
           name="endYearMonth"
+          :rules="endYearMonthRules"
           label="End year and month"
         />
       </v-card-text>
@@ -69,6 +70,9 @@ import { DialogFormMixin } from "@/mixins";
 import { MonthPicker } from "@/components/form";
 import { YearMonth } from "@/components/form/MonthPicker.vue";
 import { ServiceManager, WorkExperienceService } from "@/services";
+import { InputValidationRules } from "vuetify";
+import { IsRequired, DateAfter, DateBefore } from "@/helpers/validator";
+import { DateTime } from "luxon";
 
 @Component({
   components: {
@@ -86,6 +90,19 @@ export default class NewWorkExperienceDialog extends Mixins(DialogFormMixin) {
   description = "";
   startYearMonth = new YearMonth();
   endYearMonth = new YearMonth();
+
+  startYearMonthRules: InputValidationRules = [
+    IsRequired(),
+    DateBefore(DateTime.local()),
+  ];
+  endYearMonthRules: InputValidationRules = [];
+
+  @Watch("startYearMonth")
+  async startYearMonthChanged(ym: YearMonth): Promise<void> {
+    this.endYearMonthRules = [
+      DateAfter(DateTime.fromFormat(`${ym.year}-${ym.month}`, "yyyy-M")),
+    ];
+  }
 
   @Watch("search")
   async searchChanged(keyword: string): Promise<void> {

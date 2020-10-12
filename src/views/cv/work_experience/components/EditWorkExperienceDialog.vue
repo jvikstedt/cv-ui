@@ -44,13 +44,14 @@
         <MonthPicker
           v-model="startYearMonth"
           name="startYearMonth"
-          :rules="isRequiredRule"
+          :rules="startYearMonthRules"
           label="Start year and month"
           :readonly="!canEdit"
         />
         <MonthPicker
           v-model="endYearMonth"
           name="endYearMonth"
+          :rules="endYearMonthRules"
           label="End year and month"
           :readonly="!canEdit"
         />
@@ -60,12 +61,15 @@
 </template>
 
 <script lang="ts">
-import { Component, Prop, Mixins } from "vue-property-decorator";
+import { Component, Prop, Mixins, Watch } from "vue-property-decorator";
 import { DialogFormMixin } from "@/mixins";
 import { WorkExperience } from "@/store/modules/work_experience";
 import { MonthPicker } from "@/components/form";
 import { YearMonth } from "@/components/form/MonthPicker.vue";
 import { ServiceManager, WorkExperienceService } from "@/services";
+import { InputValidationRules } from "vuetify";
+import { DateAfter, DateBefore, IsRequired } from "@/helpers/validator";
+import { DateTime } from "luxon";
 
 @Component({
   components: {
@@ -80,6 +84,19 @@ export default class EditWorkExperienceDialog extends Mixins(DialogFormMixin) {
   description = "";
   startYearMonth = new YearMonth();
   endYearMonth = new YearMonth();
+
+  startYearMonthRules: InputValidationRules = [
+    IsRequired(),
+    DateBefore(DateTime.local()),
+  ];
+  endYearMonthRules: InputValidationRules = [];
+
+  @Watch("startYearMonth")
+  async startYearMonthChanged(ym: YearMonth): Promise<void> {
+    this.endYearMonthRules = [
+      DateAfter(DateTime.fromFormat(`${ym.year}-${ym.month}`, "yyyy-M")),
+    ];
+  }
 
   created(): void {
     this.jobTitle = this.workExperience.jobTitle;
