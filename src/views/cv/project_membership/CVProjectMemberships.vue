@@ -28,7 +28,12 @@
               {{ projectMembership.startMonth }}.{{
                 projectMembership.startYear
               }}
-              - {{ projectMembership.endMonth }}.{{ projectMembership.endYear }}
+              -
+              <span
+                v-if="projectMembership.endMonth || projectMembership.endYear"
+              >
+                {{ projectMembership.endMonth }}.{{ projectMembership.endYear }}
+              </span>
             </v-list-item-subtitle>
             <div>
               <v-chip

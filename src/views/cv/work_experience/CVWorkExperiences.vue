@@ -20,7 +20,9 @@
             </div>
             <v-list-item-subtitle>
               {{ workExperience.startMonth }}.{{ workExperience.startYear }} -
-              {{ workExperience.endMonth }}.{{ workExperience.endYear }}
+              <span v-if="workExperience.endMonth || workExperience.endYear">
+                {{ workExperience.endMonth }}.{{ workExperience.endYear }}
+              </span>
             </v-list-item-subtitle>
           </v-list-item-content>
         </v-list-item>
