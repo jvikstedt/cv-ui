@@ -44,6 +44,7 @@ import WorkExperienceModule, {
   WorkExperience,
 } from "@/store/modules/work_experience";
 import { ServiceManager } from "@/services";
+import { SortArr } from "@/helpers";
 
 @Component
 export default class CVWorkExperiences extends Vue {
@@ -51,7 +52,7 @@ export default class CVWorkExperiences extends Vue {
   @Prop({ required: true }) readonly canEdit!: boolean;
 
   get workExperiences(): WorkExperience[] {
-    return WorkExperienceModule.listByCV(this.cvId);
+    return SortArr(WorkExperienceModule.listByCV(this.cvId));
   }
 
   async created(): Promise<void> {

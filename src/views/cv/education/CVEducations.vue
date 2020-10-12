@@ -41,6 +41,7 @@ import EditEducationDialog from "./components/EditEducationDialog.vue";
 import DialogModule from "@/store/modules/dialog";
 import EducationModule, { Education } from "@/store/modules/education";
 import { ServiceManager } from "@/services";
+import { SortArr } from "@/helpers";
 
 @Component
 export default class CVEducations extends Vue {
@@ -48,7 +49,7 @@ export default class CVEducations extends Vue {
   @Prop({ required: true }) readonly canEdit!: boolean;
 
   get educations(): Education[] {
-    return EducationModule.listByCV(this.cvId);
+    return SortArr(EducationModule.listByCV(this.cvId));
   }
 
   async created(): Promise<void> {
