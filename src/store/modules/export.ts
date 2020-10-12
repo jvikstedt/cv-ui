@@ -1,4 +1,3 @@
-import * as R from "ramda";
 import {
   VuexModule,
   Module,
@@ -6,13 +5,10 @@ import {
   Action,
   getModule,
 } from "vuex-module-decorators";
-import { DateTime } from "luxon";
 import Vue from "vue";
 import Api from "@/api/api";
 import { Skill } from "@/store/modules/skill";
-import { ExportData } from "@/views/cv/export/types";
 import store from "@/store";
-import { MembershipSkill } from "./membership_skill";
 
 export class ExportPdfDto {
   bodyTemplate? = "";
@@ -129,162 +125,6 @@ export class File {
   updatedAt!: string;
 }
 
-const calculateTotalSkillExperience = (
-  skill: Skill,
-  membershipSkills: MembershipSkill[]
-): number => {
-  const experience = R.reduce(
-    (sum: number, membershipSkill) => {
-      const projectMembership = membershipSkill.projectMembership;
-      if (!projectMembership) {
-        return sum;
-      }
-
-      if (!membershipSkill.automaticCalculation) {
-        return sum + membershipSkill.experienceInYears;
-      }
-
-      const diff = (DateTime.utc(
-        projectMembership.endYear || DateTime.utc().year,
-        projectMembership.endMonth || DateTime.utc().month
-      ).diff(
-        DateTime.utc(projectMembership.startYear, projectMembership.startMonth),
-        ["years"]
-      ) as unknown) as any; // eslint-disable-line @typescript-eslint/no-explicit-any
-
-      if (R.isNil(diff["values"]) || R.isNil(diff["values"].years)) {
-        return sum;
-      }
-
-      return sum + diff["values"].years;
-    },
-    0,
-    membershipSkills
-  );
-
-  const projectExperience = Math.round(experience * 100) / 100;
-
-  const totalExperience =
-    Math.round((projectExperience + skill.experienceInYears) * 100) / 100;
-
-  return totalExperience;
-};
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const buildCVExportData = (responses: any[]): ExportData => {
-  const [
-    cv,
-    skills,
-    educations,
-    workExperiences,
-    projectMemberships,
-  ] = responses;
-
-  const allMembershipSkills = R.flatten(
-    R.map((m) => m.membershipSkills, projectMemberships)
-  );
-  const calculatedSkills = R.map((skill) => {
-    let membershipSkills = R.filter(
-      (m) => R.equals(m.skillId, skill.id),
-      allMembershipSkills
-    );
-
-    membershipSkills = R.map((m) => {
-      const projectMembership = R.find(
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (p: any) => R.equals(p.id, m.projectMembershipId),
-        projectMemberships
-      );
-
-      return {
-        ...m,
-        projectMembership,
-      };
-    }, membershipSkills);
-
-    return {
-      ...skill,
-      experienceInYears: calculateTotalSkillExperience(skill, membershipSkills),
-    };
-  }, skills);
-
-  return {
-    user: {
-      cvId: cv.id,
-      description: cv.description,
-      updatedAt: cv.updatedAt,
-      userId: cv.userId,
-      username: cv.user.username,
-      avatarId: cv.user.avatarId,
-      firstName: cv.user.firstName,
-      lastName: cv.user.lastName,
-      jobTitle: cv.user.jobTitle,
-      phone: cv.user.phone,
-      location: cv.user.location,
-      workExperienceInYears: cv.user.workExperienceInYears,
-      email: cv.user.email,
-    },
-    skills: R.map(
-      (skill) => ({
-        id: skill.id,
-        experienceInYears: skill.experienceInYears,
-        interestLevel: skill.interestLevel,
-        skillSubjectId: skill.skillSubject.id,
-        name: skill.skillSubject.name,
-        skillGroupId: skill.skillSubject.skillGroup.id,
-        skillGroupName: skill.skillSubject.skillGroup.name,
-        highlight: skill.highlight,
-        disabled: false,
-      }),
-      calculatedSkills
-    ),
-    educations: R.map(
-      (education) => ({
-        schoolId: education.school.id,
-        schoolName: education.school.name,
-        startYear: education.startYear,
-        endYear: education.endYear,
-        degree: education.degree,
-        fieldOfStudy: education.fieldOfStudy,
-        description: education.description,
-        highlight: education.highlight,
-        disabled: false,
-      }),
-      educations
-    ),
-    jobs: R.map(
-      (workExperience) => ({
-        companyId: workExperience.company.id,
-        companyName: workExperience.company.name,
-        startYear: workExperience.startYear,
-        startMonth: workExperience.startMonth,
-        endYear: workExperience.endYear,
-        endMonth: workExperience.endMonth,
-        description: workExperience.description,
-        jobTitle: workExperience.jobTitle,
-        disabled: false,
-      }),
-      workExperiences
-    ),
-    projects: R.map(
-      (projectMembership) => ({
-        projectId: projectMembership.project.id,
-        projectName: projectMembership.project.name,
-        companyId: projectMembership.project.company.id,
-        companyName: projectMembership.project.company.name,
-        startYear: projectMembership.startYear,
-        startMonth: projectMembership.startMonth,
-        endYear: projectMembership.endYear,
-        endMonth: projectMembership.endMonth,
-        description: projectMembership.description,
-        highlight: projectMembership.highlight,
-        disabled: false,
-      }),
-      projectMemberships
-    ),
-  };
-};
-
 @Module({
   dynamic: true,
   namespaced: true,
@@ -293,7 +133,6 @@ const buildCVExportData = (responses: any[]): ExportData => {
 })
 class ExportModule extends VuexModule {
   public fetching = false;
-  public exportData: ExportData | null = null;
   public templates: { [key: number]: Template } = {};
   public selectedTemplate: Template | null = null;
   public pdf: string | null = null;
@@ -328,28 +167,6 @@ class ExportModule extends VuexModule {
   @Mutation
   public setFetching(fetching: boolean): void {
     this.fetching = fetching;
-  }
-
-  @Mutation
-  public setCVExportData(exportData: ExportData): void {
-    this.exportData = exportData;
-  }
-
-  @Action
-  public async fetchCV(id: number): Promise<void> {
-    this.context.commit("setFetching", true);
-
-    await Promise.all([
-      Api.get(`/cv/${id}`),
-      Api.get(`/cv/${id}/skills`),
-      Api.get(`/cv/${id}/educations`),
-      Api.get(`/cv/${id}/work_experience`),
-      Api.get(`/cv/${id}/project_membership`),
-    ]).then((responses) => {
-      this.context.commit("setCVExportData", buildCVExportData(responses));
-    });
-
-    this.context.commit("setFetching", false);
   }
 
   @Action

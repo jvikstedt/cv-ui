@@ -31,7 +31,7 @@
                 :input-value="m.automaticCalculation"
                 @change="updateAutomaticCalculation(m, $event)"
                 label="Auto"
-                readonly="readonly"
+                :readonly="readonly"
               ></v-checkbox>
 
               <v-text-field
@@ -41,7 +41,7 @@
                 type="number"
                 v-if="!m.automaticCalculation"
                 @change="updateExperienceInYears(m, $event)"
-                readonly="readonly"
+                :readonly="readonly"
               />
             </td>
             <td>
@@ -69,6 +69,7 @@ import SkillSubjectModule, {
   SkillSubject,
 } from "@/store/modules/skill_subject";
 import { IsRequired } from "@/helpers/validator";
+import { ServiceManager } from "@/services";
 
 interface MembershipSkillRow {
   skillSubjectId: number;
@@ -116,10 +117,12 @@ export default class MembershipSkillsField extends Vue {
 
   @Watch("searchInput")
   async searchInputChanged(input: string): Promise<void> {
-    const skillSubjects = await SkillSubjectModule.searchSkillSubjects({
-      name: input || "",
-      limit: 10,
-    });
+    const skillSubjects = await ServiceManager.skillSubject.searchSkillSubjects(
+      {
+        name: input || "",
+        limit: 10,
+      }
+    );
 
     this.skillSubjects = R.reject(
       (skillSubject: SkillSubject) =>

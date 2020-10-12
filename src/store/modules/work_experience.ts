@@ -8,9 +8,8 @@ import {
   VuexModule,
   MutationAction,
 } from "vuex-module-decorators";
-import Api from "@/api/api";
 import store from "@/store";
-import { normalize, schema, Schema } from "normalizr";
+import { normalize, schema } from "normalizr";
 import CompanyModule, { Company } from "@/store/modules/company";
 
 export interface WorkExperience {
@@ -19,44 +18,13 @@ export interface WorkExperience {
   description: string;
   startYear: number;
   startMonth: number;
-  endYear: number;
-  endMonth: number;
+  endYear?: number | null;
+  endMonth?: number | null;
   cvId: number;
   company: Company;
   companyId: number;
   createdAt: Date;
   updatedAt: Date;
-}
-
-export interface PatchWorkExperienceDtoData {
-  jobTitle?: string;
-  description?: string;
-  startYear?: number;
-  startMonth?: number;
-  endYear?: number | null;
-  endMonth?: number | null;
-}
-
-export interface PatchWorkExperienceDto {
-  cvId: number;
-  workExperienceId: number;
-  data: PatchWorkExperienceDtoData;
-}
-
-export interface DeleteWorkExperienceDto {
-  cvId: number;
-  workExperienceId: number;
-}
-
-export interface CreateWorkExperienceDto {
-  cvId: number;
-  companyId: number;
-  jobTitle: string;
-  description: string;
-  startYear: number;
-  startMonth: number;
-  endYear?: number | null;
-  endMonth?: number | null;
 }
 
 const CompanySchema = new schema.Entity("companies");
@@ -139,74 +107,19 @@ class WorkExperienceModule extends VuexModule {
     }
   }
 
+  @Action
+  public resetCV(cvId: number): void {
+    this.delete(this.cvWorkExperienceIds[cvId] || []);
+  }
+
   @MutationAction({ mutate: ["fetching"] })
   async setFetching(fetching: boolean) {
     return { fetching };
   }
 
   @Action
-  public async fetchCVWorkExperiences(cvId: number): Promise<void> {
-    await this.setFetching(true);
-    const workExperiences: WorkExperience[] = await Api.get(
-      `/cv/${cvId}/work_experience`
-    );
-
-    await this.saveWorkExperiences({
-      entity: workExperiences,
-      schema: [WorkExperienceSchema],
-    });
-    await this.setFetching(false);
-  }
-
-  @Action
-  public async patchWorkExperience({
-    cvId,
-    workExperienceId,
-    data,
-  }: PatchWorkExperienceDto): Promise<void> {
-    const workExperience: WorkExperience = await Api.patch(
-      `/cv/${cvId}/work_experience/${workExperienceId}`,
-      data
-    );
-
-    await this.saveWorkExperiences({
-      entity: workExperience,
-      schema: WorkExperienceSchema,
-    });
-  }
-
-  @Action
-  public async deleteWorkExperience(
-    deleteWorkExperienceDto: DeleteWorkExperienceDto
-  ): Promise<void> {
-    await Api.delete(
-      `/cv/${deleteWorkExperienceDto.cvId}/work_experience/${deleteWorkExperienceDto.workExperienceId}`
-    );
-    this.delete([deleteWorkExperienceDto.workExperienceId]);
-  }
-
-  @Action
-  public async createWorkExperience(
-    createWorkExperienceDto: CreateWorkExperienceDto
-  ): Promise<WorkExperience> {
-    const workExperience: WorkExperience = await Api.post(
-      `/cv/${createWorkExperienceDto.cvId}/work_experience`,
-      createWorkExperienceDto
-    );
-    await this.saveWorkExperiences({
-      entity: workExperience,
-      schema: WorkExperienceSchema,
-    });
-
-    return workExperience;
-  }
-
-  @Action
-  private async saveWorkExperiences(data: {
-    entity: WorkExperience | WorkExperience[];
-    schema: Schema;
-  }): Promise<void> {
-    const normalizedData = normalize(data.entity, data.schema);
+  public async saveWorkExperiences(data: WorkExperience[]): Promise<void> {
+    const normalizedData = normalize(data, [WorkExperienceSchema]);
     const { companies, workExperiences } = normalizedData.entities;
     CompanyModule.add(R.values(companies || {}));
     this.add(R.values(workExperiences || {}));

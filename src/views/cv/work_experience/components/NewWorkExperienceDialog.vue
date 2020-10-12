@@ -63,14 +63,12 @@
 
 <script lang="ts">
 import { Component, Prop, Watch, Mixins } from "vue-property-decorator";
-import CompanyModule, { Company } from "@/store/modules/company";
+import { Company } from "@/store/modules/company";
 import NewCompanyDialog from "@/views/company/components/NewCompanyDialog.vue";
 import { DialogFormMixin } from "@/mixins";
-import WorkExperienceModule, {
-  CreateWorkExperienceDto,
-} from "@/store/modules/work_experience";
 import { MonthPicker } from "@/components/form";
 import { YearMonth } from "@/components/form/MonthPicker.vue";
+import { ServiceManager, WorkExperienceService } from "@/services";
 
 @Component({
   components: {
@@ -91,7 +89,7 @@ export default class NewWorkExperienceDialog extends Mixins(DialogFormMixin) {
 
   @Watch("search")
   async searchChanged(keyword: string): Promise<void> {
-    this.companies = await CompanyModule.searchCompanies({
+    this.companies = await ServiceManager.company.searchCompanies({
       name: keyword || "",
       limit: 10,
     });
@@ -104,7 +102,7 @@ export default class NewWorkExperienceDialog extends Mixins(DialogFormMixin) {
       this.startYearMonth.year &&
       this.startYearMonth.month
     ) {
-      const createWorkExperienceDto: CreateWorkExperienceDto = {
+      const createWorkExperienceDto: WorkExperienceService.CreateWorkExperienceDto = {
         cvId: this.cvId,
         companyId: this.company.id,
         jobTitle: this.jobTitle,
@@ -114,7 +112,9 @@ export default class NewWorkExperienceDialog extends Mixins(DialogFormMixin) {
         endYear: this.endYearMonth.year,
         endMonth: this.endYearMonth.month,
       };
-      await WorkExperienceModule.createWorkExperience(createWorkExperienceDto);
+      await ServiceManager.workExperience.createWorkExperience(
+        createWorkExperienceDto
+      );
       this.popDialogComponent();
     }
   }

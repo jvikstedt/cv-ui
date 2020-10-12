@@ -61,8 +61,8 @@ import { DialogFormMixin, SearchMixin } from "@/mixins";
 import { CVSearchDto } from "@/store/modules/cv";
 import SkillSubjectModule, {
   SkillSubject,
-  PatchSkillSubjectDto,
 } from "@/store/modules/skill_subject";
+import { ServiceManager, SkillSubjectService } from "@/services";
 
 @Component
 export default class EditSkillSubjectDialog extends Mixins(
@@ -93,13 +93,13 @@ export default class EditSkillSubjectDialog extends Mixins(
 
   async onSave(): Promise<void> {
     if (this.form.validate()) {
-      const patchSkillSubjectDto: PatchSkillSubjectDto = {
+      const patchSkillSubjectDto: SkillSubjectService.PatchSkillSubjectDto = {
         skillSubjectId: this.skillSubject.id,
         data: {
           name: this.name,
         },
       };
-      await SkillSubjectModule.patchSkillSubject(patchSkillSubjectDto);
+      await ServiceManager.skillSubject.patchSkillSubject(patchSkillSubjectDto);
 
       this.popDialogComponent();
     }

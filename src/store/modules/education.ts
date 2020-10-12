@@ -8,9 +8,8 @@ import {
   VuexModule,
   MutationAction,
 } from "vuex-module-decorators";
-import Api from "@/api/api";
 import store from "@/store";
-import { normalize, schema, Schema } from "normalizr";
+import { normalize, schema } from "normalizr";
 import SchoolModule, { School } from "@/store/modules/school";
 
 export interface Education {
@@ -19,44 +18,13 @@ export interface Education {
   fieldOfStudy: string;
   description: string;
   startYear: number;
-  endYear: number;
+  endYear?: number | null;
   highlight: boolean;
   cvId: number;
   school: School;
   schoolId: number;
   createdAt: Date;
   updatedAt: Date;
-}
-
-export interface PatchEducationDtoData {
-  degree?: string;
-  fieldOfStudy?: string;
-  description?: string;
-  startYear?: number;
-  endYear?: number | null;
-  highlight?: boolean;
-}
-
-export interface PatchEducationDto {
-  cvId: number;
-  educationId: number;
-  data: PatchEducationDtoData;
-}
-
-export interface DeleteEducationDto {
-  cvId: number;
-  educationId: number;
-}
-
-export interface CreateEducationDto {
-  cvId: number;
-  schoolId: number;
-  degree: string;
-  fieldOfStudy: string;
-  description: string;
-  startYear: number;
-  endYear?: number | null;
-  highlight: boolean;
 }
 
 const SchoolSchema = new schema.Entity("schools");
@@ -132,66 +100,19 @@ class EducationModule extends VuexModule {
     }
   }
 
+  @Action
+  public resetCV(cvId: number): void {
+    this.delete(this.cvEducationIds[cvId] || []);
+  }
+
   @MutationAction({ mutate: ["fetching"] })
   async setFetching(fetching: boolean) {
     return { fetching };
   }
 
   @Action
-  public async fetchCVEducations(cvId: number): Promise<void> {
-    await this.setFetching(true);
-    const educations: Education[] = await Api.get(`/cv/${cvId}/educations`);
-
-    await this.saveEducations({
-      entity: educations,
-      schema: [EducationSchema],
-    });
-    await this.setFetching(false);
-  }
-
-  @Action
-  public async patchEducation({
-    cvId,
-    educationId,
-    data,
-  }: PatchEducationDto): Promise<void> {
-    const education: Education = await Api.patch(
-      `/cv/${cvId}/educations/${educationId}`,
-      data
-    );
-
-    await this.saveEducations({ entity: education, schema: EducationSchema });
-  }
-
-  @Action
-  public async deleteEducation(
-    deleteEducationDto: DeleteEducationDto
-  ): Promise<void> {
-    await Api.delete(
-      `/cv/${deleteEducationDto.cvId}/educations/${deleteEducationDto.educationId}`
-    );
-    this.delete([deleteEducationDto.educationId]);
-  }
-
-  @Action
-  public async createEducation(
-    createEducationDto: CreateEducationDto
-  ): Promise<Education> {
-    const education: Education = await Api.post(
-      `/cv/${createEducationDto.cvId}/educations`,
-      createEducationDto
-    );
-    await this.saveEducations({ entity: education, schema: EducationSchema });
-
-    return education;
-  }
-
-  @Action
-  private async saveEducations(data: {
-    entity: Education | Education[];
-    schema: Schema;
-  }): Promise<void> {
-    const normalizedData = normalize(data.entity, data.schema);
+  public async saveEducations(data: Education[]): Promise<void> {
+    const normalizedData = normalize(data, [EducationSchema]);
     const { schools, educations } = normalizedData.entities;
     SchoolModule.add(R.values(schools || {}));
     this.add(R.values(educations || {}));

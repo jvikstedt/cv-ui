@@ -40,6 +40,7 @@ import NewEducationDialog from "./components/NewEducationDialog.vue";
 import EditEducationDialog from "./components/EditEducationDialog.vue";
 import DialogModule from "@/store/modules/dialog";
 import EducationModule, { Education } from "@/store/modules/education";
+import { ServiceManager } from "@/services";
 
 @Component
 export default class CVEducations extends Vue {
@@ -51,7 +52,7 @@ export default class CVEducations extends Vue {
   }
 
   async created(): Promise<void> {
-    await EducationModule.fetchCVEducations(this.cvId);
+    await ServiceManager.education.fetchCVEducations(this.cvId);
   }
 
   onEducationClick(education: Education): void {

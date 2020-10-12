@@ -65,15 +65,13 @@
 <script lang="ts">
 import * as R from "ramda";
 import { Component, Prop, Mixins } from "vue-property-decorator";
-import ProjectMembershipModule, {
-  ProjectMembership,
-  PatchProjectMembershipDto,
-} from "@/store/modules/project_membership";
+import { ProjectMembership } from "@/store/modules/project_membership";
 import { MembershipSkillDto } from "@/store/modules/membership_skill";
 import { DialogFormMixin } from "@/mixins";
 import MembershipSkillsField from "./MembershipSkillsField.vue";
 import { MonthPicker } from "@/components/form";
 import { YearMonth } from "@/components/form/MonthPicker.vue";
+import { ServiceManager, ProjectMembershipService } from "@/services";
 
 @Component({
   components: {
@@ -100,8 +98,8 @@ export default class EditProjectMembershipDialog extends Mixins(
       month: this.projectMembership.startMonth,
     };
     this.endYearMonth = {
-      year: this.projectMembership.endYear,
-      month: this.projectMembership.endMonth,
+      year: this.projectMembership.endYear || null,
+      month: this.projectMembership.endMonth || null,
     };
     this.highlight = this.projectMembership.highlight;
     this.membershipSkills = R.map(
@@ -120,7 +118,7 @@ export default class EditProjectMembershipDialog extends Mixins(
       projectMembershipId: this.projectMembership.id,
     };
 
-    await ProjectMembershipModule.deleteProjectMembership(
+    await ServiceManager.projectMembership.deleteProjectMembership(
       deleteProjectMembershipDto
     );
     this.popDialogComponent();
@@ -132,7 +130,7 @@ export default class EditProjectMembershipDialog extends Mixins(
       this.startYearMonth.year &&
       this.startYearMonth.month
     ) {
-      const patchProjectMembershipDto: PatchProjectMembershipDto = {
+      const patchProjectMembershipDto: ProjectMembershipService.PatchProjectMembershipDto = {
         cvId: this.projectMembership.cvId,
         projectMembershipId: this.projectMembership.id,
         data: {
@@ -145,7 +143,7 @@ export default class EditProjectMembershipDialog extends Mixins(
           membershipSkills: this.membershipSkills,
         },
       };
-      await ProjectMembershipModule.patchProjectMembership(
+      await ServiceManager.projectMembership.patchProjectMembership(
         patchProjectMembershipDto
       );
 

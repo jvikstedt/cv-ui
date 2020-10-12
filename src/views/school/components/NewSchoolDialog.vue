@@ -26,7 +26,8 @@
 <script lang="ts">
 import { Component, Prop, Mixins } from "vue-property-decorator";
 import { DialogFormMixin } from "@/mixins";
-import SchoolModule, { School } from "@/store/modules/school";
+import { School } from "@/store/modules/school";
+import { ServiceManager } from "@/services";
 
 @Component
 export default class NewSchoolDialog extends Mixins(DialogFormMixin) {
@@ -38,7 +39,7 @@ export default class NewSchoolDialog extends Mixins(DialogFormMixin) {
 
   async onSave(): Promise<void> {
     if (this.form.validate()) {
-      const school = await SchoolModule.createSchool({
+      const school = await ServiceManager.school.createSchool({
         name: this.name,
       });
 

@@ -26,7 +26,8 @@
 <script lang="ts">
 import { Component, Prop, Mixins } from "vue-property-decorator";
 import { DialogFormMixin } from "@/mixins";
-import SkillGroupModule, { SkillGroup } from "@/store/modules/skill_group";
+import { SkillGroup } from "@/store/modules/skill_group";
+import { ServiceManager } from "@/services";
 
 @Component
 export default class NewSkillGroupDialog extends Mixins(DialogFormMixin) {
@@ -38,7 +39,7 @@ export default class NewSkillGroupDialog extends Mixins(DialogFormMixin) {
 
   async onSave(): Promise<void> {
     if (this.form.validate()) {
-      const skillGroup = await SkillGroupModule.createSkillGroup({
+      const skillGroup = await ServiceManager.skillGroup.createSkillGroup({
         name: this.name,
       });
 

@@ -70,46 +70,48 @@
           :readonly="!canEdit"
         ></v-checkbox>
 
-        <v-subheader>
-          Total experience: ~
-          {{
-            Math.ceil(
-              skillExperience.totalExperience +
-                (experienceInYears - skill.experienceInYears)
+        <div v-if="skillExperience">
+          <v-subheader>
+            Total experience: ~
+            {{
+              Math.ceil(
+                skillExperience.totalExperience +
+                  (experienceInYears - skill.experienceInYears)
+              )
+            }}
+            years ( {{ experienceInYears }} +
+            {{ skillExperience.projectExperience }} =
+            {{
+              Math.round(
+                (skillExperience.totalExperience +
+                  (experienceInYears - skill.experienceInYears)) *
+                  100
+              ) / 100
+            }}
             )
-          }}
-          years ( {{ experienceInYears }} +
-          {{ skillExperience.projectExperience }} =
-          {{
-            Math.round(
-              (skillExperience.totalExperience +
-                (experienceInYears - skill.experienceInYears)) *
-                100
-            ) / 100
-          }}
-          )
-        </v-subheader>
-        <v-simple-table>
-          <template v-slot:default>
-            <thead>
-              <tr>
-                <th class="text-left">Project name</th>
-                <th class="text-left">Auto calculation</th>
-                <th class="text-left">Experience</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-for="m in skillExperience.projects" :key="m.id">
-                <td>
-                  {{ m.companyName }} /
-                  {{ m.projectName }}
-                </td>
-                <td>{{ `${m.automaticCalculation ? "Yes" : "No"}` }}</td>
-                <td>{{ m.experience }} years</td>
-              </tr>
-            </tbody>
-          </template>
-        </v-simple-table>
+          </v-subheader>
+          <v-simple-table>
+            <template v-slot:default>
+              <thead>
+                <tr>
+                  <th class="text-left">Project name</th>
+                  <th class="text-left">Auto calculation</th>
+                  <th class="text-left">Experience</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="m in skillExperience.projects" :key="m.id">
+                  <td>
+                    {{ m.companyName }} /
+                    {{ m.projectName }}
+                  </td>
+                  <td>{{ `${m.automaticCalculation ? "Yes" : "No"}` }}</td>
+                  <td>{{ m.experience }} years</td>
+                </tr>
+              </tbody>
+            </template>
+          </v-simple-table>
+        </div>
       </v-card-text>
     </v-form>
   </v-card>
@@ -118,11 +120,8 @@
 <script lang="ts">
 import { Component, Prop, Mixins } from "vue-property-decorator";
 import { DialogFormMixin } from "@/mixins";
-import SkillModule, {
-  Skill,
-  PatchSkillDto,
-  SkillExperience,
-} from "@/store/modules/skill";
+import SkillModule, { Skill, SkillExperience } from "@/store/modules/skill";
+import { ServiceManager, SkillService } from "@/services";
 
 @Component
 export default class EditSkillDialog extends Mixins(DialogFormMixin) {
@@ -144,7 +143,7 @@ export default class EditSkillDialog extends Mixins(DialogFormMixin) {
   }
 
   async onSkillDelete(): Promise<void> {
-    await SkillModule.deleteSkill({
+    await ServiceManager.skill.deleteSkill({
       cvId: this.skill.cvId,
       skillId: this.skill.id,
     });
@@ -153,7 +152,7 @@ export default class EditSkillDialog extends Mixins(DialogFormMixin) {
 
   async onSave(): Promise<void> {
     if (this.form.validate()) {
-      const patchSkillDto: PatchSkillDto = {
+      const patchSkillDto: SkillService.PatchSkillDto = {
         cvId: this.skill.cvId,
         skillId: this.skill.id,
         data: {
@@ -162,7 +161,7 @@ export default class EditSkillDialog extends Mixins(DialogFormMixin) {
           highlight: this.highlight,
         },
       };
-      await SkillModule.patchSkill(patchSkillDto);
+      await ServiceManager.skill.patchSkill(patchSkillDto);
 
       this.popDialogComponent();
     }

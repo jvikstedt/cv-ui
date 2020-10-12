@@ -10,8 +10,6 @@ import i18n from "./i18n";
 // @ts-ignore
 import GSignInButton from "vue-google-signin-button";
 
-import "jsoneditor/dist/jsoneditor.min.css";
-
 Vue.use(GSignInButton);
 
 Vue.config.productionTip = false;

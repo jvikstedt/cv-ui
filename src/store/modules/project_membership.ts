@@ -8,14 +8,12 @@ import {
   VuexModule,
   MutationAction,
 } from "vuex-module-decorators";
-import Api from "@/api/api";
 import store from "@/store";
 import { normalize, schema } from "normalizr";
 import ProjectModule, { Project } from "@/store/modules/project";
 import CompanyModule from "@/store/modules/company";
 import MembershipSkillModule, {
   MembershipSkill,
-  MembershipSkillDto,
 } from "@/store/modules/membership_skill";
 import SkillModule from "@/store/modules/skill";
 import SkillSubjectModule from "@/store/modules/skill_subject";
@@ -26,8 +24,8 @@ export interface ProjectMembership {
   description: string;
   startYear: number;
   startMonth: number;
-  endYear: number;
-  endMonth: number;
+  endYear?: number | null;
+  endMonth?: number | null;
   highlight: boolean;
   cvId: number;
   project?: Project;
@@ -35,39 +33,6 @@ export interface ProjectMembership {
   membershipSkills?: MembershipSkill[];
   createdAt: Date;
   updatedAt: Date;
-}
-
-export interface PatchProjectMembershipDtoData {
-  description?: string;
-  startYear?: number;
-  startMonth?: number;
-  endYear?: number | null;
-  endMonth?: number | null;
-  highlight?: boolean;
-  membershipSkills?: MembershipSkillDto[];
-}
-
-export interface PatchProjectMembershipDto {
-  cvId: number;
-  projectMembershipId: number;
-  data: PatchProjectMembershipDtoData;
-}
-
-export interface DeleteProjectMembershipDto {
-  cvId: number;
-  projectMembershipId: number;
-}
-
-export interface CreateProjectMembershipDto {
-  cvId: number;
-  projectId: number;
-  description: string;
-  startYear: number;
-  startMonth: number;
-  endYear?: number | null;
-  endMonth?: number | null;
-  highlight: boolean;
-  membershipSkills: MembershipSkillDto[];
 }
 
 const CompanySchema = new schema.Entity("companies");
@@ -192,65 +157,18 @@ class ProjectMembershipModule extends VuexModule {
     }
   }
 
+  @Action
+  public resetCV(cvId: number): void {
+    this.delete(this.cvProjectMembershipIds[cvId] || []);
+  }
+
   @MutationAction({ mutate: ["fetching"] })
   async setFetching(fetching: boolean) {
     return { fetching };
   }
 
-  @Action({ rawError: true })
-  public async fetchCVProjectMemberships(cvId: number): Promise<void> {
-    await this.setFetching(true);
-    const projectMemberships: ProjectMembership[] = await Api.get(
-      `/cv/${cvId}/project_membership`
-    );
-
-    await this.saveProjectMemberships(projectMemberships);
-    await this.setFetching(false);
-  }
-
   @Action
-  public async patchProjectMembership({
-    cvId,
-    projectMembershipId,
-    data,
-  }: PatchProjectMembershipDto): Promise<void> {
-    const projectMembership: ProjectMembership = await Api.patch(
-      `/cv/${cvId}/project_membership/${projectMembershipId}`,
-      data
-    );
-
-    // ProjectMembership is deleted to force deletion of membershipSkills
-    // This is because backend does the same and will return membershipSkills
-    // with different ids
-    this.delete([projectMembershipId]);
-    await this.saveProjectMemberships([projectMembership]);
-  }
-
-  @Action
-  public async deleteProjectMembership(
-    deleteProjectMembershipDto: DeleteProjectMembershipDto
-  ): Promise<void> {
-    await Api.delete(
-      `/cv/${deleteProjectMembershipDto.cvId}/project_membership/${deleteProjectMembershipDto.projectMembershipId}`
-    );
-    this.delete([deleteProjectMembershipDto.projectMembershipId]);
-  }
-
-  @Action
-  public async createProjectMembership(
-    createProjectMembershipDto: CreateProjectMembershipDto
-  ): Promise<ProjectMembership> {
-    const projectMembership: ProjectMembership = await Api.post(
-      `/cv/${createProjectMembershipDto.cvId}/project_membership`,
-      createProjectMembershipDto
-    );
-    await this.saveProjectMemberships([projectMembership]);
-
-    return projectMembership;
-  }
-
-  @Action
-  private async saveProjectMemberships(
+  public async saveProjectMemberships(
     data: ProjectMembership[]
   ): Promise<void> {
     const normalizedData = normalize(data, [ProjectMembershipSchema]);

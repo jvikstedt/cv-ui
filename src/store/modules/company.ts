@@ -6,9 +6,7 @@ import {
   getModule,
   VuexModule,
   MutationAction,
-  Action,
 } from "vuex-module-decorators";
-import Api from "@/api/api";
 import store from "@/store";
 
 export interface Company {
@@ -16,15 +14,6 @@ export interface Company {
   name: string;
   createdAt: Date;
   updatedAt: Date;
-}
-
-export interface CreateCompanyDto {
-  name: string;
-}
-
-export interface SearchCompanyDto {
-  name: string;
-  limit?: number;
 }
 
 @Module({
@@ -73,45 +62,6 @@ class CompanyModule extends VuexModule {
         );
       }
     }
-  }
-
-  @Action
-  public async fetchCompanies(): Promise<void> {
-    await this.setFetching(true);
-
-    const companies: Company[] = await Api.get("/company");
-    this.add(companies);
-
-    await this.setFetching(false);
-  }
-
-  @Action
-  public async deleteCompany(id: number): Promise<void> {
-    await Api.delete(`/company/${id}`);
-    this.delete([id]);
-  }
-
-  @Action
-  public async createCompany(
-    createCompanyDto: CreateCompanyDto
-  ): Promise<Company> {
-    const company: Company = await Api.post("/company", createCompanyDto);
-    this.add([company]);
-
-    return company;
-  }
-
-  @Action
-  public async searchCompanies(
-    searchCompanyDto: SearchCompanyDto
-  ): Promise<Company[]> {
-    const companies: Company[] = await Api.post(
-      "/company/search",
-      searchCompanyDto
-    );
-    this.add(companies);
-
-    return companies;
   }
 
   @MutationAction({ mutate: ["fetching"] })

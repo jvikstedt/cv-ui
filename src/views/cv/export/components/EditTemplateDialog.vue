@@ -5,14 +5,10 @@
     <v-card-actions>
       <v-spacer></v-spacer>
 
-      <v-btn color="green darken-1" text @click="onSave" :disabled="!template">
-        Save
-      </v-btn>
-
       <v-btn color="red darken-1" text @click="onCancel"> Cancel </v-btn>
 
-      <v-btn color="green darken-1" text @click="onUse" :disabled="!template">
-        Use
+      <v-btn color="green darken-1" text @click="onSave" :disabled="!template">
+        Save
       </v-btn>
     </v-card-actions>
 
@@ -58,12 +54,6 @@ export default class EditTemplateDialog extends Mixins(DialogFormMixin) {
 
   template: Template | null = null;
 
-  async created(): Promise<void> {
-    if (ExportModule.selectedTemplate) {
-      this.template = R.clone(ExportModule.selectedTemplate);
-    }
-  }
-
   async onChange(template: Template): Promise<void> {
     this.template = template;
   }
@@ -82,13 +72,6 @@ export default class EditTemplateDialog extends Mixins(DialogFormMixin) {
       });
     }
 
-    this.popDialogComponent();
-  }
-
-  onUse(): void {
-    if (this.template) {
-      ExportModule.setSelectedTemplate(this.template);
-    }
     this.popDialogComponent();
   }
 

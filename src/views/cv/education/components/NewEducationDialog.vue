@@ -78,11 +78,9 @@ import * as R from "ramda";
 import { Component, Prop, Watch, Mixins } from "vue-property-decorator";
 import NewSchoolDialog from "@/views/school/components/NewSchoolDialog.vue";
 import { DialogFormMixin } from "@/mixins";
-import EducationModule, {
-  Education,
-  CreateEducationDto,
-} from "@/store/modules/education";
-import SchoolModule, { School } from "@/store/modules/school";
+import { Education } from "@/store/modules/education";
+import { School } from "@/store/modules/school";
+import { ServiceManager, EducationService } from "@/services";
 
 @Component({
   components: {
@@ -107,7 +105,7 @@ export default class NewEducationDialog extends Mixins(DialogFormMixin) {
 
   @Watch("search")
   async searchChanged(keyword: string): Promise<void> {
-    const schools = await SchoolModule.searchSchools({
+    const schools = await ServiceManager.school.searchSchools({
       name: keyword || "",
       limit: 10,
     });
@@ -123,7 +121,7 @@ export default class NewEducationDialog extends Mixins(DialogFormMixin) {
 
   async onSave(): Promise<void> {
     if (this.form.validate() && this.school && this.startYear) {
-      const createEducationDto: CreateEducationDto = {
+      const createEducationDto: EducationService.CreateEducationDto = {
         cvId: this.cvId,
         schoolId: this.school.id,
         degree: this.degree,
@@ -133,7 +131,7 @@ export default class NewEducationDialog extends Mixins(DialogFormMixin) {
         endYear: R.isEmpty(this.endYear) ? null : this.endYear,
         highlight: this.highlight,
       };
-      await EducationModule.createEducation(createEducationDto);
+      await ServiceManager.education.createEducation(createEducationDto);
       this.popDialogComponent();
     }
   }

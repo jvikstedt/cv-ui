@@ -41,12 +41,11 @@
 
 <script lang="ts">
 import { Component, Prop, Watch, Mixins } from "vue-property-decorator";
-import SkillGroupModule, { SkillGroup } from "@/store/modules/skill_group";
+import { SkillGroup } from "@/store/modules/skill_group";
 import NewSkillGroupDialog from "@/views/skill_group/components/NewSkillGroupDialog.vue";
 import { DialogFormMixin } from "@/mixins";
-import SkillSubjectModule, {
-  SkillSubject,
-} from "@/store/modules/skill_subject";
+import { SkillSubject } from "@/store/modules/skill_subject";
+import { ServiceManager } from "@/services";
 
 @Component
 export default class NewSkillSubjectDialog extends Mixins(DialogFormMixin) {
@@ -62,7 +61,7 @@ export default class NewSkillSubjectDialog extends Mixins(DialogFormMixin) {
 
   @Watch("search")
   async searchChanged(input: string): Promise<void> {
-    this.skillGroups = await SkillGroupModule.searchSkillGroups({
+    this.skillGroups = await ServiceManager.skillGroup.searchSkillGroups({
       name: input || "",
       limit: 10,
     });
@@ -70,10 +69,12 @@ export default class NewSkillSubjectDialog extends Mixins(DialogFormMixin) {
 
   async onSave(): Promise<void> {
     if (this.form.validate() && this.skillGroup) {
-      const skillSubject = await SkillSubjectModule.createSkillSubject({
-        name: this.name,
-        skillGroupId: this.skillGroup.id,
-      });
+      const skillSubject = await ServiceManager.skillSubject.createSkillSubject(
+        {
+          name: this.name,
+          skillGroupId: this.skillGroup.id,
+        }
+      );
 
       if (this.afterCreate) {
         await this.afterCreate(skillSubject);

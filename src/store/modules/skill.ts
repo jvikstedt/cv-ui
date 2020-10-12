@@ -9,7 +9,6 @@ import {
   VuexModule,
   MutationAction,
 } from "vuex-module-decorators";
-import Api from "@/api/api";
 import store from "@/store";
 import { normalize, schema } from "normalizr";
 import SkillSubjectModule, {
@@ -19,31 +18,6 @@ import SkillGroupModule from "@/store/modules/skill_group";
 import MembershipSkillModule, {
   MembershipSkill,
 } from "@/store/modules/membership_skill";
-
-export interface PatchSkillDtoData {
-  experienceInYears?: number;
-  interestLevel?: number;
-  highlight?: boolean;
-}
-
-export interface PatchSkillDto {
-  cvId: number;
-  skillId: number;
-  data: PatchSkillDtoData;
-}
-
-export interface DeleteSkillDto {
-  cvId: number;
-  skillId: number;
-}
-
-export interface CreateSkillDto {
-  cvId: number;
-  skillSubjectId: number;
-  experienceInYears: number;
-  interestLevel: number;
-  highlight: boolean;
-}
 
 export interface Skill {
   id: number;
@@ -141,6 +115,22 @@ class SkillModule extends VuexModule {
     };
   }
 
+  get findBySkillSubject() {
+    return (cvId: number, skillSubjectId: number): Skill | undefined => {
+      const skills = this.listByCV(cvId);
+      const skill = R.find(
+        (s) => R.equals(s.skillSubjectId, skillSubjectId),
+        skills
+      );
+
+      if (!skill) {
+        return undefined;
+      }
+
+      return this.find(skill.id);
+    };
+  }
+
   get listByCV() {
     return (cvId: number): Skill[] => {
       const ids = this.cvSkillIds[cvId] || [];
@@ -215,52 +205,18 @@ class SkillModule extends VuexModule {
     }
   }
 
+  @Action
+  public resetCV(cvId: number): void {
+    this.delete(this.cvSkillIds[cvId] || []);
+  }
+
   @MutationAction({ mutate: ["fetching"] })
   async setFetching(fetching: boolean) {
     return { fetching };
   }
 
   @Action
-  public async fetchCVSkills(cvId: number): Promise<void> {
-    await this.setFetching(true);
-    const skills: Skill[] = await Api.get(`/cv/${cvId}/skills`);
-
-    await this.saveSkills(skills);
-    await this.setFetching(false);
-  }
-
-  @Action
-  public async patchSkill({
-    cvId,
-    skillId,
-    data,
-  }: PatchSkillDto): Promise<void> {
-    const skill: Skill = await Api.patch(`/cv/${cvId}/skills/${skillId}`, data);
-
-    await this.saveSkills([skill]);
-  }
-
-  @Action
-  public async deleteSkill(deleteSkillDto: DeleteSkillDto): Promise<void> {
-    await Api.delete(
-      `/cv/${deleteSkillDto.cvId}/skills/${deleteSkillDto.skillId}`
-    );
-    this.delete([deleteSkillDto.skillId]);
-  }
-
-  @Action
-  public async createSkill(createSkillDto: CreateSkillDto): Promise<Skill> {
-    const skill: Skill = await Api.post(
-      `/cv/${createSkillDto.cvId}/skills`,
-      createSkillDto
-    );
-    await this.saveSkills([skill]);
-
-    return skill;
-  }
-
-  @Action
-  private async saveSkills(data: Skill[]): Promise<void> {
+  public async saveSkills(data: Skill[]): Promise<void> {
     const normalizedData = normalize(data, [SkillSchema]);
     const { skillGroups, skillSubjects, skills } = normalizedData.entities;
     SkillGroupModule.add(R.values(skillGroups || {}));

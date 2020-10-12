@@ -1,133 +1,116 @@
 <template>
   <v-container style="max-width: 1024px">
-    <v-card :loading="fetching">
-      <v-card-title class="headline">
-        <v-icon left>mdi-export</v-icon>
-        Export
-      </v-card-title>
-      <v-card-actions>
-        <v-btn color="primary" @click="editTemplate">Template</v-btn>
-        <v-btn color="primary" @click="editData">Edit data</v-btn>
-      </v-card-actions>
-      <v-card-text>
-        <object
-          v-if="selectedTemplate && selectedTemplate.exporter === 'pdf' && pdf"
-          id="pdfviewer"
-          v-bind:data="pdf"
-          type="application/pdf"
-          width="100%"
-          height="750px"
-        />
-        <a
-          v-if="
-            selectedTemplate && selectedTemplate.exporter === 'docx' && docx
-          "
-          :download="docxFileName()"
-          :href="docx"
-          target="_blank"
+    <v-row>
+      <v-col cols="12" sm="7">
+        <v-select
+          v-model="template"
+          :items="getTemplates"
+          label="Template"
+          placeholder="Select template"
+          item-text="name"
+          return-object
         >
-          Download docx
-        </a>
-        <p v-if="!selectedTemplate">Select template</p>
-      </v-card-text>
-    </v-card>
+          <template slot="selection" slot-scope="data">
+            {{ data.item.exporter }} - {{ data.item.name }}
+          </template>
+          <template slot="item" slot-scope="data">
+            {{ data.item.exporter }} - {{ data.item.name }}
+          </template>
+          <template v-slot:append-outer>
+            <v-btn :disabled="!template" @click="exportTemplate">
+              Export
+            </v-btn>
+            <v-btn class="ml-2" @click="templateManager">
+              Template manager
+            </v-btn>
+          </template>
+        </v-select>
+      </v-col>
+    </v-row>
+
+    <v-alert dense outlined text type="warning">
+      This is an export mode, modifications to the CV are not persistent!
+      <a @click="openCV">Click here</a> to get back to normal mode.
+    </v-alert>
+    <CVDetails :cvId="id" :canEdit="true" :hideExport="true" />
+    <CVSkills :cvId="id" :canEdit="true" />
+    <CVEducations :cvId="id" :canEdit="true" />
+    <CVWorkExperiences :cvId="id" :canEdit="true" />
+    <CVProjectMemberships :cvId="id" :canEdit="true" />
   </v-container>
 </template>
 
 <script lang="ts">
 import { Component, Vue, Watch } from "vue-property-decorator";
-import EditJsonDialog from "./components/EditJsonDialog.vue";
-import { Template } from "@/store/modules/export";
-import EditTemplateDialog from "./components/EditTemplateDialog.vue";
-import { ExportData } from "./types";
+import CVDetails from "../user/CVDetails.vue";
+import CVSkills from "../skill/CVSkills.vue";
+import CVEducations from "../education/CVEducations.vue";
+import CVWorkExperiences from "../work_experience/CVWorkExperiences.vue";
+import CVProjectMemberships from "../project_membership/CVProjectMemberships.vue";
+import { ServiceManager } from "@/services";
 import DialogModule from "@/store/modules/dialog";
-import ExportModule from "@/store/modules/export";
+import EditTemplateDialog from "./components/EditTemplateDialog.vue";
+import ExportModule, { Template } from "@/store/modules/export";
+import RenderTemplateDialog from "./components/RenderTemplateDialog.vue";
 
-@Component
+@Component({
+  components: {
+    CVDetails,
+    CVSkills,
+    CVEducations,
+    CVWorkExperiences,
+    CVProjectMemberships,
+  },
+})
 export default class CVExportView extends Vue {
   id: number | null = null;
 
-  get fetching(): boolean {
-    return ExportModule.fetching;
+  template: Template | null = null;
+
+  get canEditCV() {
+    return (): boolean => {
+      return true;
+    };
   }
 
-  get pdf(): string | null {
-    return ExportModule.pdf;
+  get getTemplates(): Template[] {
+    return ExportModule.getTemplates;
   }
 
-  get docx(): string | null {
-    return ExportModule.docx;
+  exportTemplate(): void {
+    if (this.template) {
+      DialogModule.pushDialogComponent({
+        component: RenderTemplateDialog,
+        props: { template: this.template, cvId: this.id },
+      });
+    }
   }
 
-  get exportData(): ExportData | null {
-    return ExportModule.exportData;
+  templateManager(): void {
+    DialogModule.pushDialogComponent({
+      component: EditTemplateDialog,
+      props: {},
+    });
+    this.template = null;
   }
 
-  get selectedTemplate(): Template | null {
-    return ExportModule.selectedTemplate;
+  @Watch("$route.params.id")
+  async routerChanged(id: string): Promise<void> {
+    this.id = parseInt(id, 10);
   }
 
   async created(): Promise<void> {
     const idStr = this.$route.params.id;
     this.id = parseInt(idStr, 10);
+  }
 
-    await ExportModule.fetchCV(this.id);
+  async mounted(): Promise<void> {
+    ServiceManager.setIsPlayground(true);
     await ExportModule.fetchTemplates();
   }
 
-  editData(): void {
-    DialogModule.pushDialogComponent({
-      component: EditJsonDialog,
-      props: {},
-      maxWidth: 1200,
-    });
-  }
-
-  editTemplate(): void {
-    DialogModule.pushDialogComponent({
-      component: EditTemplateDialog,
-      props: {},
-    });
-  }
-
-  async print(): Promise<void> {
-    if (this.selectedTemplate && this.exportData) {
-      switch (this.selectedTemplate.exporter) {
-        case "pdf":
-          await ExportModule.exportPDF({
-            ...this.selectedTemplate.data,
-            data: this.exportData,
-          });
-          break;
-        case "docx":
-          await ExportModule.exportDocx({
-            ...this.selectedTemplate.data,
-            data: this.exportData,
-          });
-          break;
-        default:
-          console.log(
-            `${this.selectedTemplate.exporter} not supported exporter`
-          );
-      }
-    }
-  }
-
-  @Watch("selectedTemplate")
-  async selectedTemplateChanged(): Promise<void> {
-    await this.print();
-  }
-
-  @Watch("exportData")
-  async cvExportDataChanged(): Promise<void> {
-    await this.print();
-  }
-
-  docxFileName(): string {
-    if (this.exportData) {
-      return `${this.exportData.user.firstName}-${this.exportData.user.lastName}.docx`.toLowerCase();
-    }
-    return "noname.docx";
+  openCV(): void {
+    this.$router.push(`/cv/${this.id}`);
   }
 }
 </script>

@@ -78,10 +78,9 @@
 import * as R from "ramda";
 import { Component, Prop, Mixins } from "vue-property-decorator";
 import { DialogFormMixin } from "@/mixins";
-import EducationModule, {
-  Education,
-  PatchEducationDto,
-} from "@/store/modules/education";
+import { Education } from "@/store/modules/education";
+import { ServiceManager } from "@/services";
+import { PatchEducationDto } from "@/services/education";
 
 @Component
 export default class EditEducationDialog extends Mixins(DialogFormMixin) {
@@ -92,7 +91,7 @@ export default class EditEducationDialog extends Mixins(DialogFormMixin) {
   fieldOfStudy = "";
   description = "";
   startYear!: number;
-  endYear: number | null = null;
+  endYear?: number | null = null;
   highlight = false;
 
   created(): void {
@@ -112,7 +111,7 @@ export default class EditEducationDialog extends Mixins(DialogFormMixin) {
       educationId: this.education.id,
     };
 
-    await EducationModule.deleteEducation(deleteEducationDto);
+    await ServiceManager.education.deleteEducation(deleteEducationDto);
   }
 
   async onSave(): Promise<void> {
@@ -129,7 +128,7 @@ export default class EditEducationDialog extends Mixins(DialogFormMixin) {
           highlight: this.highlight,
         },
       };
-      await EducationModule.patchEducation(patchEducationDto);
+      await ServiceManager.education.patchEducation(patchEducationDto);
 
       this.popDialogComponent();
     }

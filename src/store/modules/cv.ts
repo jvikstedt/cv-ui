@@ -8,19 +8,9 @@ import {
   getModule,
   MutationAction,
 } from "vuex-module-decorators";
-import Api from "@/api/api";
 import store from "@/store";
 import { normalize, schema } from "normalizr";
 import UserModule, { User } from "@/store/modules/user";
-
-export interface PatchCVDtoData {
-  description: string;
-}
-
-export interface PatchCVDto {
-  id: number;
-  data: PatchCVDtoData;
-}
 
 export interface CV {
   id: number;
@@ -151,23 +141,7 @@ class CVModule extends VuexModule {
   }
 
   @Action
-  public async fetchCV(id: number): Promise<void> {
-    await this.setFetching(true);
-
-    const cv = await Api.get(`/cv/${id}`);
-    await this.saveCVs([cv]);
-
-    await this.setFetching(false);
-  }
-
-  @Action
-  public async patchCV({ id, data }: PatchCVDto): Promise<void> {
-    const cv: CV = await Api.patch(`/cv/${id}`, data);
-    await this.saveCVs([cv]);
-  }
-
-  @Action
-  private async saveCVs(data: CV[]): Promise<void> {
+  public async saveCVs(data: CV[]): Promise<void> {
     const normalizedData = normalize(data, [CVSchema]);
     const { users, cvs } = normalizedData.entities;
     UserModule.add(R.values(users || {}));

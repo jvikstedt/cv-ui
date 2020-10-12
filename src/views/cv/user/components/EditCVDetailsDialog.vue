@@ -24,7 +24,8 @@
 <script lang="ts">
 import { Component, Prop, Mixins } from "vue-property-decorator";
 import { DialogFormMixin } from "@/mixins";
-import CVModule, { CV, PatchCVDto } from "@/store/modules/cv";
+import { CV } from "@/store/modules/cv";
+import { ServiceManager, CVService } from "@/services";
 
 @Component
 export default class EditCVDetailsDialog extends Mixins(DialogFormMixin) {
@@ -38,14 +39,14 @@ export default class EditCVDetailsDialog extends Mixins(DialogFormMixin) {
 
   async onSave(): Promise<void> {
     if (this.form.validate()) {
-      const patchCVDto: PatchCVDto = {
+      const patchCVDto: CVService.PatchCVDto = {
         id: this.cv.id,
         data: {
           description: this.description,
         },
       };
 
-      await CVModule.patchCV(patchCVDto);
+      await ServiceManager.cv.patchCV(patchCVDto);
 
       this.popDialogComponent();
     }

@@ -6,10 +6,8 @@ import {
   getModule,
   VuexModule,
   MutationAction,
-  Action,
 } from "vuex-module-decorators";
 import store from "@/store";
-import Api from "@/api/api";
 
 export interface User {
   id: number;
@@ -24,22 +22,6 @@ export interface User {
   avatarId: string;
   createdAt: Date;
   updatedAt: Date;
-}
-
-export interface PatchUserDtoData {
-  firstName?: string;
-  lastName?: string;
-  jobTitle?: string;
-  phone?: string;
-  location?: string;
-  workExperienceInYears?: number;
-  email?: string;
-  avatarId?: string;
-}
-
-export interface PatchUserDto {
-  id: number;
-  data: PatchUserDtoData;
 }
 
 @Module({
@@ -85,12 +67,6 @@ class UserModule extends VuexModule {
         this.allIds = R.reject((userId) => R.equals(userId, id), this.allIds);
       }
     }
-  }
-
-  @Action
-  public async patchUser({ id, data }: PatchUserDto): Promise<void> {
-    const savedUser: User = await Api.patch(`/users/${id}`, data);
-    this.add([savedUser]);
   }
 
   @MutationAction({ mutate: ["fetching"] })
