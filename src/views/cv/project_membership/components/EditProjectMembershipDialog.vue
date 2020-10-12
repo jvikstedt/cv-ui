@@ -36,7 +36,7 @@
         <MonthPicker
           v-model="startYearMonth"
           name="startYearMonth"
-          :rules="isRequiredRule"
+          :rules="startYearMonthRules"
           label="Start year and month"
           :readonly="!canEdit"
         />
@@ -44,6 +44,7 @@
           v-model="endYearMonth"
           name="endYearMonth"
           label="End year and month"
+          :rules="endYearMonthRules"
           :readonly="!canEdit"
         />
 
@@ -64,7 +65,7 @@
 
 <script lang="ts">
 import * as R from "ramda";
-import { Component, Prop, Mixins } from "vue-property-decorator";
+import { Component, Prop, Mixins, Watch } from "vue-property-decorator";
 import { ProjectMembership } from "@/store/modules/project_membership";
 import { MembershipSkillDto } from "@/store/modules/membership_skill";
 import { DialogFormMixin } from "@/mixins";
@@ -72,6 +73,9 @@ import MembershipSkillsField from "./MembershipSkillsField.vue";
 import { MonthPicker } from "@/components/form";
 import { YearMonth } from "@/components/form/MonthPicker.vue";
 import { ServiceManager, ProjectMembershipService } from "@/services";
+import { DateAfter, DateBefore, IsRequired } from "@/helpers/validator";
+import { DateTime } from "luxon";
+import { InputValidationRules } from "vuetify";
 
 @Component({
   components: {
@@ -90,6 +94,19 @@ export default class EditProjectMembershipDialog extends Mixins(
   endYearMonth = new YearMonth();
   highlight = false;
   membershipSkills: MembershipSkillDto[] = [];
+
+  startYearMonthRules: InputValidationRules = [
+    IsRequired(),
+    DateBefore(DateTime.local()),
+  ];
+  endYearMonthRules: InputValidationRules = [];
+
+  @Watch("startYearMonth")
+  async startYearMonthChanged(ym: YearMonth): Promise<void> {
+    this.endYearMonthRules = [
+      DateAfter(DateTime.fromFormat(`${ym.year}-${ym.month}`, "yyyy-M")),
+    ];
+  }
 
   created(): void {
     this.description = this.projectMembership.description;

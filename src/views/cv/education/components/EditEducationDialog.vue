@@ -51,7 +51,7 @@
         <v-text-field
           v-model.number="startYear"
           label="Start year"
-          :rules="isRequiredRule"
+          :rules="startYearRules"
           type="number"
           required
           :readonly="!canEdit"
@@ -60,6 +60,7 @@
         <v-text-field
           v-model.number="endYear"
           label="End year"
+          :rules="endYearRules"
           type="number"
           :readonly="!canEdit"
         ></v-text-field>
@@ -76,11 +77,14 @@
 
 <script lang="ts">
 import * as R from "ramda";
-import { Component, Prop, Mixins } from "vue-property-decorator";
+import { Component, Prop, Mixins, Watch } from "vue-property-decorator";
 import { DialogFormMixin } from "@/mixins";
 import { Education } from "@/store/modules/education";
 import { ServiceManager } from "@/services";
 import { PatchEducationDto } from "@/services/education";
+import { InputValidationRules } from "vuetify";
+import { DateAfter, DateBefore, IsRequired } from "@/helpers/validator";
+import { DateTime } from "luxon";
 
 @Component
 export default class EditEducationDialog extends Mixins(DialogFormMixin) {
@@ -90,9 +94,22 @@ export default class EditEducationDialog extends Mixins(DialogFormMixin) {
   degree = "";
   fieldOfStudy = "";
   description = "";
-  startYear!: number;
+  startYear = DateTime.local().year;
   endYear?: number | null = null;
   highlight = false;
+
+  startYearRules: InputValidationRules = [
+    IsRequired(),
+    DateBefore(DateTime.local(), "yyyy"),
+  ];
+  endYearRules: InputValidationRules = [];
+
+  @Watch("startYear")
+  async startYearChanged(year: number): Promise<void> {
+    this.endYearRules = [
+      DateAfter(DateTime.fromFormat(`${year}`, "yyyy"), "yyyy"),
+    ];
+  }
 
   created(): void {
     this.degree = this.education.degree;
@@ -101,6 +118,8 @@ export default class EditEducationDialog extends Mixins(DialogFormMixin) {
     this.startYear = this.education.startYear;
     this.endYear = this.education.endYear;
     this.highlight = this.education.highlight;
+
+    this.startYearChanged(this.startYear);
   }
 
   async onEducationDelete(): Promise<void> {

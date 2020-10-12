@@ -56,7 +56,7 @@
         <v-text-field
           v-model.number="startYear"
           label="Start year"
-          :rules="isRequiredRule"
+          :rules="startYearRules"
           type="number"
           required
         ></v-text-field>
@@ -64,6 +64,7 @@
         <v-text-field
           v-model.number="endYear"
           label="End year"
+          :rules="endYearRules"
           type="number"
         ></v-text-field>
 
@@ -81,6 +82,9 @@ import { DialogFormMixin } from "@/mixins";
 import { Education } from "@/store/modules/education";
 import { School } from "@/store/modules/school";
 import { ServiceManager, EducationService } from "@/services";
+import { InputValidationRules } from "vuetify";
+import { DateAfter, DateBefore, IsRequired } from "@/helpers/validator";
+import { DateTime } from "luxon";
 
 @Component({
   components: {
@@ -102,6 +106,19 @@ export default class NewEducationDialog extends Mixins(DialogFormMixin) {
   startYear: number | null = null;
   endYear: number | null = null;
   highlight = false;
+
+  startYearRules: InputValidationRules = [
+    IsRequired(),
+    DateBefore(DateTime.local(), "yyyy"),
+  ];
+  endYearRules: InputValidationRules = [];
+
+  @Watch("startYear")
+  async startYearChanged(year: number): Promise<void> {
+    this.endYearRules = [
+      DateAfter(DateTime.fromFormat(`${year}`, "yyyy"), "yyyy"),
+    ];
+  }
 
   @Watch("search")
   async searchChanged(keyword: string): Promise<void> {
