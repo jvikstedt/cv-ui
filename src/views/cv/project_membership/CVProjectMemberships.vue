@@ -65,6 +65,7 @@ import ProjectMembershipModule, {
   ProjectMembership,
 } from "@/store/modules/project_membership";
 import { ServiceManager } from "@/services";
+import { SortArr } from "@/helpers";
 
 @Component
 export default class CVProjectMemberships extends Vue {
@@ -72,7 +73,7 @@ export default class CVProjectMemberships extends Vue {
   @Prop({ required: true }) readonly canEdit!: boolean;
 
   get projectMemberships(): ProjectMembership[] {
-    return ProjectMembershipModule.listByCV(this.cvId);
+    return SortArr(ProjectMembershipModule.listByCV(this.cvId));
   }
 
   async created(): Promise<void> {
