@@ -2,7 +2,7 @@
   <v-card :loading="fetching">
     <v-row>
       <v-col cols="12" sm="4">
-        <p class="text-center">
+        <p class="text-center" v-if="!hideExport">
           <v-btn color="primary darken-1" text @click="onExport">
             Export
             <v-icon right>mdi-export</v-icon>
@@ -35,7 +35,7 @@
       <v-col cols="12" sm="8">
         <template v-if="!fetching && cv">
           <v-card-text>
-            <h3 class="mt-sm-9">
+            <h3 :class="{ 'mt-sm-9': !hideExport }">
               Details
               <v-btn
                 id="edit-user-details-btn"
@@ -88,6 +88,7 @@ import EditUserDetailsDialog from "./components/EditUserDetailsDialog.vue";
 import EditCVDetailsDialog from "./components/EditCVDetailsDialog.vue";
 import CVModule, { CV } from "@/store/modules/cv";
 import DialogModule from "@/store/modules/dialog";
+import { ServiceManager } from "@/services";
 
 @Component({
   components: {
@@ -98,13 +99,14 @@ import DialogModule from "@/store/modules/dialog";
 export default class CVDetails extends Vue {
   @Prop({ required: true }) readonly cvId!: number;
   @Prop({ required: true }) readonly canEdit!: boolean;
+  @Prop({ required: false }) readonly hideExport!: boolean;
 
   get fetching(): boolean {
     return CVModule.fetching;
   }
 
   async created(): Promise<void> {
-    await CVModule.fetchCV(this.cvId);
+    await ServiceManager.cv.fetchCV(this.cvId);
   }
 
   openEditCVDetailsDialog(): void {

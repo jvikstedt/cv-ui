@@ -26,7 +26,8 @@
 <script lang="ts">
 import { Component, Prop, Mixins } from "vue-property-decorator";
 import { DialogFormMixin } from "@/mixins";
-import CompanyModule, { Company } from "@/store/modules/company";
+import { Company } from "@/store/modules/company";
+import { ServiceManager } from "@/services";
 
 @Component
 export default class NewCompanyDialog extends Mixins(DialogFormMixin) {
@@ -38,7 +39,7 @@ export default class NewCompanyDialog extends Mixins(DialogFormMixin) {
 
   async onSave(): Promise<void> {
     if (this.form.validate()) {
-      const company = await CompanyModule.createCompany({
+      const company = await ServiceManager.company.createCompany({
         name: this.name,
       });
 

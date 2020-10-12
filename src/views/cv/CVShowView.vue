@@ -16,6 +16,7 @@ import CVEducations from "./education/CVEducations.vue";
 import CVWorkExperiences from "./work_experience/CVWorkExperiences.vue";
 import CVProjectMemberships from "./project_membership/CVProjectMemberships.vue";
 import AuthModule from "@/store/modules/auth";
+import { ServiceManager } from "@/services";
 
 @Component({
   components: {
@@ -43,6 +44,10 @@ export default class CVShowView extends Vue {
   async created(): Promise<void> {
     const idStr = this.$route.params.id;
     this.id = parseInt(idStr, 10);
+  }
+
+  mounted(): void {
+    ServiceManager.setIsPlayground(false);
   }
 }
 </script>

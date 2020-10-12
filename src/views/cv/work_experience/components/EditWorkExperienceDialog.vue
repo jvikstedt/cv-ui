@@ -62,12 +62,10 @@
 <script lang="ts">
 import { Component, Prop, Mixins } from "vue-property-decorator";
 import { DialogFormMixin } from "@/mixins";
-import WorkExperienceModule, {
-  WorkExperience,
-  PatchWorkExperienceDto,
-} from "@/store/modules/work_experience";
+import { WorkExperience } from "@/store/modules/work_experience";
 import { MonthPicker } from "@/components/form";
 import { YearMonth } from "@/components/form/MonthPicker.vue";
+import { ServiceManager, WorkExperienceService } from "@/services";
 
 @Component({
   components: {
@@ -76,6 +74,7 @@ import { YearMonth } from "@/components/form/MonthPicker.vue";
 })
 export default class EditWorkExperienceDialog extends Mixins(DialogFormMixin) {
   @Prop({ required: true }) readonly workExperience!: WorkExperience;
+  @Prop({ required: false }) readonly canEdit!: boolean;
 
   jobTitle = "";
   description = "";
@@ -90,8 +89,8 @@ export default class EditWorkExperienceDialog extends Mixins(DialogFormMixin) {
       month: this.workExperience.startMonth,
     };
     this.endYearMonth = {
-      year: this.workExperience.endYear,
-      month: this.workExperience.endMonth,
+      year: this.workExperience.endYear || null,
+      month: this.workExperience.endMonth || null,
     };
   }
 
@@ -103,7 +102,9 @@ export default class EditWorkExperienceDialog extends Mixins(DialogFormMixin) {
       workExperienceId: this.workExperience.id,
     };
 
-    await WorkExperienceModule.deleteWorkExperience(deleteWorkExperienceDto);
+    await ServiceManager.workExperience.deleteWorkExperience(
+      deleteWorkExperienceDto
+    );
   }
 
   async onSave(): Promise<void> {
@@ -112,7 +113,7 @@ export default class EditWorkExperienceDialog extends Mixins(DialogFormMixin) {
       this.startYearMonth.year &&
       this.startYearMonth.month
     ) {
-      const patchWorkExperienceDto: PatchWorkExperienceDto = {
+      const patchWorkExperienceDto: WorkExperienceService.PatchWorkExperienceDto = {
         cvId: this.workExperience.cvId,
         workExperienceId: this.workExperience.id,
         data: {
@@ -124,7 +125,9 @@ export default class EditWorkExperienceDialog extends Mixins(DialogFormMixin) {
           endMonth: this.endYearMonth.month,
         },
       };
-      await WorkExperienceModule.patchWorkExperience(patchWorkExperienceDto);
+      await ServiceManager.workExperience.patchWorkExperience(
+        patchWorkExperienceDto
+      );
 
       this.popDialogComponent();
     }

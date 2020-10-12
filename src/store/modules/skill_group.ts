@@ -6,25 +6,14 @@ import {
   getModule,
   VuexModule,
   MutationAction,
-  Action,
 } from "vuex-module-decorators";
 import store from "@/store";
-import Api from "@/api/api";
 
 export interface SkillGroup {
   id: number;
   name: string;
   createdAt: Date;
   updatedAt: Date;
-}
-
-export interface CreateSkillGroupDto {
-  name: string;
-}
-
-export interface SearchSkillGroupDto {
-  name: string;
-  limit?: number;
 }
 
 @Module({
@@ -73,48 +62,6 @@ class SkillGroupModule extends VuexModule {
         );
       }
     }
-  }
-
-  @Action
-  public async fetchSkillGroups(): Promise<void> {
-    await this.setFetching(true);
-
-    const skillGroups: SkillGroup[] = await Api.get("/skill_groups");
-    this.add(skillGroups);
-
-    await this.setFetching(false);
-  }
-
-  @Action
-  public async deleteSkillGroup(id: number): Promise<void> {
-    await Api.delete(`/skill_groups/${id}`);
-    this.delete([id]);
-  }
-
-  @Action
-  public async createSkillGroup(
-    createSkillGroupDto: CreateSkillGroupDto
-  ): Promise<SkillGroup> {
-    const skillGroup: SkillGroup = await Api.post(
-      "/skill_groups",
-      createSkillGroupDto
-    );
-    this.add([skillGroup]);
-
-    return skillGroup;
-  }
-
-  @Action
-  public async searchSkillGroups(
-    searchSkillGroupDto: SearchSkillGroupDto
-  ): Promise<SkillGroup[]> {
-    const skillGroups: SkillGroup[] = await Api.post(
-      "/skill_groups/search",
-      searchSkillGroupDto
-    );
-    this.add(skillGroups);
-
-    return skillGroups;
   }
 
   @MutationAction({ mutate: ["fetching"] })

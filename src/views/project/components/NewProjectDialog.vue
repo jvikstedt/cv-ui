@@ -41,10 +41,11 @@
 
 <script lang="ts">
 import { Component, Prop, Watch, Mixins } from "vue-property-decorator";
-import CompanyModule, { Company } from "@/store/modules/company";
+import { Company } from "@/store/modules/company";
 import NewCompanyDialog from "@/views/company/components/NewCompanyDialog.vue";
 import { DialogFormMixin } from "@/mixins";
-import ProjectModule, { Project } from "@/store/modules/project";
+import { Project } from "@/store/modules/project";
+import { ServiceManager } from "@/services";
 
 @Component
 export default class NewProjectDialog extends Mixins(DialogFormMixin) {
@@ -60,7 +61,7 @@ export default class NewProjectDialog extends Mixins(DialogFormMixin) {
 
   @Watch("search")
   async searchChanged(input: string): Promise<void> {
-    this.companies = await CompanyModule.searchCompanies({
+    this.companies = await ServiceManager.company.searchCompanies({
       name: input || "",
       limit: 10,
     });
@@ -68,7 +69,7 @@ export default class NewProjectDialog extends Mixins(DialogFormMixin) {
 
   async onSave(): Promise<void> {
     if (this.form.validate() && this.company) {
-      const project = await ProjectModule.createProject({
+      const project = await ServiceManager.project.createProject({
         name: this.name,
         companyId: this.company.id,
       });

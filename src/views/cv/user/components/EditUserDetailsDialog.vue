@@ -90,9 +90,10 @@
 <script lang="ts">
 import * as R from "ramda";
 import { Component, Prop, Mixins } from "vue-property-decorator";
-import UserModule, { User, PatchUserDto } from "@/store/modules/user";
+import { User } from "@/store/modules/user";
 import { CreateFile } from "@/api/file";
 import { DialogFormMixin } from "@/mixins";
+import { ServiceManager, UserService } from "@/services";
 
 @Component
 export default class EditUserNamesDialog extends Mixins(DialogFormMixin) {
@@ -139,7 +140,7 @@ export default class EditUserNamesDialog extends Mixins(DialogFormMixin) {
 
   async onSave(): Promise<void> {
     if (this.form.validate()) {
-      const patchUserDto: PatchUserDto = {
+      const patchUserDto: UserService.PatchUserDto = {
         id: this.user.id,
         data: {
           firstName: this.firstName,
@@ -153,7 +154,7 @@ export default class EditUserNamesDialog extends Mixins(DialogFormMixin) {
         },
       };
 
-      await UserModule.patchUser(patchUserDto);
+      await ServiceManager.user.patchUser(patchUserDto);
 
       this.popDialogComponent();
     }

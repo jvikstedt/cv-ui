@@ -6,9 +6,7 @@ import {
   getModule,
   VuexModule,
   MutationAction,
-  Action,
 } from "vuex-module-decorators";
-import Api from "@/api/api";
 import store from "@/store";
 
 export interface School {
@@ -16,15 +14,6 @@ export interface School {
   name: string;
   createdAt: Date;
   updatedAt: Date;
-}
-
-export interface CreateSchoolDto {
-  name: string;
-}
-
-export interface SearchSchoolDto {
-  name: string;
-  limit?: number;
 }
 
 @Module({
@@ -73,43 +62,6 @@ class SchoolModule extends VuexModule {
         );
       }
     }
-  }
-
-  @Action
-  public async fetchSchools(): Promise<void> {
-    await this.setFetching(true);
-
-    const schools: School[] = await Api.get("/schools");
-    this.add(schools);
-
-    await this.setFetching(false);
-  }
-
-  @Action
-  public async deleteSchool(id: number): Promise<void> {
-    await Api.delete(`/schools/${id}`);
-    this.delete([id]);
-  }
-
-  @Action
-  public async createSchool(createSchoolDto: CreateSchoolDto): Promise<School> {
-    const school: School = await Api.post("/schools", createSchoolDto);
-    this.add([school]);
-
-    return school;
-  }
-
-  @Action
-  public async searchSchools(
-    searchSchoolDto: SearchSchoolDto
-  ): Promise<School[]> {
-    const schools: School[] = await Api.post(
-      "/schools/search",
-      searchSchoolDto
-    );
-    this.add(schools);
-
-    return schools;
   }
 
   @MutationAction({ mutate: ["fetching"] })

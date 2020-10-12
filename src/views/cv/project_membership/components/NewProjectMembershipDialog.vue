@@ -64,16 +64,14 @@
 
 <script lang="ts">
 import { Component, Prop, Watch, Mixins } from "vue-property-decorator";
-import ProjectModule, { Project } from "@/store/modules/project";
+import { Project } from "@/store/modules/project";
 import NewProjectDialog from "@/views/project/components/NewProjectDialog.vue";
 import { DialogFormMixin } from "@/mixins";
-import ProjectMembershipModule, {
-  CreateProjectMembershipDto,
-} from "@/store/modules/project_membership";
 import { MembershipSkillDto } from "@/store/modules/membership_skill";
 import MembershipSkillsField from "./MembershipSkillsField.vue";
 import { MonthPicker } from "@/components/form";
 import { YearMonth } from "@/components/form/MonthPicker.vue";
+import { ProjectMembershipService, ServiceManager } from "@/services";
 
 @Component({
   components: {
@@ -98,7 +96,7 @@ export default class NewProjectMembershipDialog extends Mixins(
 
   @Watch("search")
   async searchChanged(keyword: string): Promise<void> {
-    this.projects = await ProjectModule.searchProjects({
+    this.projects = await ServiceManager.project.searchProjects({
       name: keyword || "",
       limit: 10,
     });
@@ -111,7 +109,7 @@ export default class NewProjectMembershipDialog extends Mixins(
       this.startYearMonth.year &&
       this.startYearMonth.month
     ) {
-      const createProjectMembershipDto: CreateProjectMembershipDto = {
+      const createProjectMembershipDto: ProjectMembershipService.CreateProjectMembershipDto = {
         cvId: this.cvId,
         projectId: this.project.id,
         description: this.description,
@@ -122,7 +120,7 @@ export default class NewProjectMembershipDialog extends Mixins(
         highlight: this.highlight,
         membershipSkills: this.membershipSkills,
       };
-      await ProjectMembershipModule.createProjectMembership(
+      await ServiceManager.projectMembership.createProjectMembership(
         createProjectMembershipDto
       );
       this.popDialogComponent();

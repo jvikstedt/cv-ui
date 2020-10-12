@@ -109,11 +109,10 @@ import {
   CVSearchDto,
   CVSearchResultSkill,
 } from "@/store/modules/cv";
-import SkillSubjectModule, {
-  SkillSubject,
-} from "@/store/modules/skill_subject";
+import { SkillSubject } from "@/store/modules/skill_subject";
 import { SearchMixin, DialogFormMixin } from "@/mixins";
 import SearchModule from "@/store/modules/search";
+import { ServiceManager } from "@/services";
 
 @Component
 export default class CVSearchView extends Mixins(SearchMixin, DialogFormMixin) {
@@ -133,10 +132,12 @@ export default class CVSearchView extends Mixins(SearchMixin, DialogFormMixin) {
 
   @Watch("searchInput")
   async searchInputChanged(input: string): Promise<void> {
-    const skillSubjects = await SkillSubjectModule.searchSkillSubjects({
-      name: input || "",
-      limit: 10,
-    });
+    const skillSubjects = await ServiceManager.skillSubject.searchSkillSubjects(
+      {
+        name: input || "",
+        limit: 10,
+      }
+    );
 
     this.skillSubjects = R.reject(
       (skillSubject: SkillSubject) =>

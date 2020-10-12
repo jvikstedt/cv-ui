@@ -32,7 +32,7 @@ import NewSkillSubjectDialog from "./components/NewSkillSubjectDialog.vue";
 import { SkillSubject } from "@/store/modules/skill_subject";
 import EditSkillSubjectDialog from "./components/EditSkillSubjectDialog.vue";
 import DialogModule from "@/store/modules/dialog";
-import SkillSubjectModule from "@/store/modules/skill_subject";
+import { ServiceManager } from "@/services";
 
 @Component
 export default class SkillSubjectListView extends Vue {
@@ -42,10 +42,12 @@ export default class SkillSubjectListView extends Vue {
 
   @Watch("search")
   async searchChanged(newValue: string): Promise<void> {
-    const skillSubjects = await SkillSubjectModule.searchSkillSubjects({
-      name: newValue || "",
-      limit: 10,
-    });
+    const skillSubjects = await ServiceManager.skillSubject.searchSkillSubjects(
+      {
+        name: newValue || "",
+        limit: 10,
+      }
+    );
     this.skillSubjects = skillSubjects;
   }
 

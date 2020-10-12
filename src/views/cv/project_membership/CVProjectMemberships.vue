@@ -60,10 +60,11 @@ import { Component, Vue, Prop } from "vue-property-decorator";
 import NewProjectMembershipDialog from "./components/NewProjectMembershipDialog.vue";
 import EditProjectMembershipDialog from "./components/EditProjectMembershipDialog.vue";
 import DialogModule from "@/store/modules/dialog";
+import { Skill } from "@/store/modules/skill";
 import ProjectMembershipModule, {
   ProjectMembership,
 } from "@/store/modules/project_membership";
-import { Skill } from "@/store/modules/skill";
+import { ServiceManager } from "@/services";
 
 @Component
 export default class CVProjectMemberships extends Vue {
@@ -75,7 +76,7 @@ export default class CVProjectMemberships extends Vue {
   }
 
   async created(): Promise<void> {
-    await ProjectMembershipModule.fetchCVProjectMemberships(this.cvId);
+    await ServiceManager.projectMembership.fetchCVProjectMemberships(this.cvId);
   }
 
   getChipStyle(skill: Skill): string {

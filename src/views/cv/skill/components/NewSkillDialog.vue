@@ -83,12 +83,11 @@
 <script lang="ts">
 import * as R from "ramda";
 import { Component, Prop, Watch, Mixins } from "vue-property-decorator";
-import SkillSubjectModule, {
-  SkillSubject,
-} from "@/store/modules/skill_subject";
+import { SkillSubject } from "@/store/modules/skill_subject";
 import NewSkillSubjectDialog from "@/views/skill_subject/components/NewSkillSubjectDialog.vue";
 import { DialogFormMixin } from "@/mixins";
-import SkillModule, { Skill, CreateSkillDto } from "@/store/modules/skill";
+import { Skill } from "@/store/modules/skill";
+import { ServiceManager, SkillService } from "@/services";
 
 @Component({
   components: {
@@ -113,10 +112,12 @@ export default class NewSkillDialog extends Mixins(DialogFormMixin) {
 
   @Watch("search")
   async searchChanged(keyword: string): Promise<void> {
-    const skillSubjects = await SkillSubjectModule.searchSkillSubjects({
-      name: keyword || "",
-      limit: 10,
-    });
+    const skillSubjects = await ServiceManager.skillSubject.searchSkillSubjects(
+      {
+        name: keyword || "",
+        limit: 10,
+      }
+    );
     this.skillSubjects = R.reject(
       (skillSubject: SkillSubject) =>
         !!R.find(
@@ -129,14 +130,14 @@ export default class NewSkillDialog extends Mixins(DialogFormMixin) {
 
   async onSave(): Promise<void> {
     if (this.form.validate() && this.skillSubject) {
-      const createSkillDto: CreateSkillDto = {
+      const createSkillDto: SkillService.CreateSkillDto = {
         cvId: this.cvId,
         experienceInYears: this.experienceInYears,
         interestLevel: this.interestLevel,
         highlight: this.highlight,
         skillSubjectId: this.skillSubject.id,
       };
-      const skill = await SkillModule.createSkill(createSkillDto);
+      const skill = await ServiceManager.skill.createSkill(createSkillDto);
 
       if (this.afterCreate) {
         await this.afterCreate(skill);

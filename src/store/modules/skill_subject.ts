@@ -10,7 +10,6 @@ import {
 } from "vuex-module-decorators";
 import { normalize, schema } from "normalizr";
 import store from "@/store";
-import Api from "@/api/api";
 import { SkillGroup } from "@/store/modules/skill_group";
 import SkillGroupModule from "@/store/modules/skill_group";
 
@@ -21,25 +20,6 @@ export interface SkillSubject {
   skillGroupId: number;
   createdAt: Date;
   updatedAt: Date;
-}
-
-export interface CreateSkillSubjectDto {
-  name: string;
-  skillGroupId: number;
-}
-
-export interface PatchSkillSubjectDtoData {
-  name?: string;
-}
-
-export interface PatchSkillSubjectDto {
-  skillSubjectId: number;
-  data: PatchSkillSubjectDtoData;
-}
-
-export interface SearchSkillSubjectDto {
-  name: string;
-  limit?: number;
 }
 
 const SkillGroupSchema = new schema.Entity("skillGroups");
@@ -109,67 +89,13 @@ class SkillSubjectModule extends VuexModule {
     }
   }
 
-  @Action
-  public async fetchSkillSubjects(): Promise<void> {
-    await this.setFetching(true);
-
-    const skillSubjects: SkillSubject[] = await Api.get("/skill_subjects");
-    await this.saveSkillSubjects(skillSubjects);
-
-    await this.setFetching(false);
-  }
-
-  @Action
-  public async deleteSkillSubject(id: number): Promise<void> {
-    await Api.delete(`/skill_subjects/${id}`);
-    this.delete([id]);
-  }
-
-  @Action
-  public async createSkillSubject(
-    createSkillSubjectDto: CreateSkillSubjectDto
-  ): Promise<SkillSubject> {
-    const skillSubject: SkillSubject = await Api.post(
-      "/skill_Subjects",
-      createSkillSubjectDto
-    );
-    await this.saveSkillSubjects([skillSubject]);
-
-    return skillSubject;
-  }
-
-  @Action
-  public async patchSkillSubject({
-    skillSubjectId,
-    data,
-  }: PatchSkillSubjectDto): Promise<void> {
-    const skillSubject: SkillSubject = await Api.patch(
-      `/skill_subjects/${skillSubjectId}`,
-      data
-    );
-    await this.saveSkillSubjects([skillSubject]);
-  }
-
-  @Action
-  public async searchSkillSubjects(
-    searchSkillSubjectDto: SearchSkillSubjectDto
-  ): Promise<SkillSubject[]> {
-    const skillSubjects: SkillSubject[] = await Api.post(
-      "/skill_Subjects/search",
-      searchSkillSubjectDto
-    );
-    await this.saveSkillSubjects(skillSubjects);
-
-    return skillSubjects;
-  }
-
   @MutationAction({ mutate: ["fetching"] })
   async setFetching(fetching: boolean) {
     return { fetching };
   }
 
   @Action
-  private async saveSkillSubjects(data: SkillSubject[]): Promise<void> {
+  public async saveSkillSubjects(data: SkillSubject[]): Promise<void> {
     const normalizedData = normalize(data, [SkillSubjectSchema]);
     const { skillGroups, skillSubjects } = normalizedData.entities;
     SkillGroupModule.add(R.values(skillGroups || {}));

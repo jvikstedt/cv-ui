@@ -43,6 +43,7 @@ import DialogModule from "@/store/modules/dialog";
 import WorkExperienceModule, {
   WorkExperience,
 } from "@/store/modules/work_experience";
+import { ServiceManager } from "@/services";
 
 @Component
 export default class CVWorkExperiences extends Vue {
@@ -54,7 +55,7 @@ export default class CVWorkExperiences extends Vue {
   }
 
   async created(): Promise<void> {
-    await WorkExperienceModule.fetchCVWorkExperiences(this.cvId);
+    await ServiceManager.workExperience.fetchCVWorkExperiences(this.cvId);
   }
 
   onWorkExperienceClick(workExperience: WorkExperience): void {
