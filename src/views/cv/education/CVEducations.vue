@@ -8,7 +8,7 @@
       <div v-for="education in educations" :key="education.id">
         <v-list-item three-line style="background-color: white">
           <v-list-item-content>
-            <v-list-item-title class="headline mb-2">
+            <v-list-item-title class="headline mb-2 text-wrap">
               {{ education.school.name }}
               <v-btn icon small @click="onEducationClick(education)">
                 <v-icon v-if="canEdit">mdi-pencil</v-icon>
