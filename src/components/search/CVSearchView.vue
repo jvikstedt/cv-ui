@@ -5,9 +5,20 @@
       Search
     </v-card-title>
 
+    <v-card-actions>
+      <v-spacer></v-spacer>
+
+      <v-btn color="red darken-1" text @click="onCancel"> Close </v-btn>
+
+      <v-btn id="search-view-search-btn" color="primary" @click="onSearch">
+        Search
+        <v-icon right>mdi-magnify</v-icon>
+      </v-btn>
+    </v-card-actions>
+
     <v-card-text>
       <v-text-field
-        label="Text"
+        label="Text search"
         :value="searchData.text"
         @input="setText"
         placeholder="Search by name, location, job title..."
@@ -20,48 +31,50 @@
         :search-input.sync="searchInput"
         item-text="name"
         item-value="id"
-        label="Skill"
-        placeholder="Start typing to search"
+        label="Skill search"
+        placeholder="Start typing to search and select"
         return-object
         @change="onSelect"
       ></v-autocomplete>
 
-      <template v-for="skill in searchData.skills">
-        <div :key="skill.skillSubjectId">
-          <v-row class="ml-1 mr-1 mb-2">
-            <p class="ma-0">{{ skill.name }}</p>
-            <v-checkbox
-              :value="skill.required"
-              @change="setSkillRequired($event, skill)"
-              label="Required"
-              dense
-              hide-details
-              class="ma-0 pa-0 ml-2"
-            ></v-checkbox>
-            <v-btn
-              height="auto"
-              icon
-              color="red lighten-2"
-              @click="removeSelectedSkillSubject(skill)"
-            >
-              <v-icon>mdi-delete</v-icon>
-            </v-btn>
-          </v-row>
-        </div>
-      </template>
+      <v-simple-table dense>
+        <template v-slot:default>
+          <tbody>
+            <tr v-for="skill in searchData.skills" :key="skill.skillSubjectId">
+              <td>{{ skill.name }}</td>
+              <td>
+                <v-checkbox
+                  :input-value="skill.required"
+                  @change="setSkillRequired($event, skill)"
+                  label="Required"
+                  hide-details
+                  class="ma-0 pa-0 ml-2"
+                ></v-checkbox>
+              </td>
+              <td>
+                <v-btn
+                  height="auto"
+                  icon
+                  color="red lighten-2"
+                  @click="removeSelectedSkillSubject(skill)"
+                >
+                  <v-icon>mdi-delete</v-icon>
+                </v-btn>
+              </td>
+            </tr>
+          </tbody>
+        </template>
+      </v-simple-table>
 
-      <v-btn id="search-view-search-btn" color="primary" @click="onSearch">
-        Search
-        <v-icon right>mdi-magnify</v-icon>
-      </v-btn>
-
-      <v-btn color="red darken-1" text @click="onCancel"> Close </v-btn>
-
-      <v-list class="mt-2">
+      <v-list class="mt-2" three-line>
         <template v-if="results.length">
           <template v-for="item in results">
-            <v-list-item :key="item.id" @click="onResultClick(item)">
-              <v-list-item-avatar tile size="50" color="indigo">
+            <v-list-item
+              :key="item.id"
+              @click="onResultClick(item)"
+              class="pa-0"
+            >
+              <v-list-item-avatar tile size="70" color="indigo">
                 <v-img v-if="avatarSrc(item)" :src="avatarSrc(item)"></v-img>
                 <span v-else class="white--text headline">{{
                   initials(item)
@@ -69,11 +82,19 @@
               </v-list-item-avatar>
 
               <v-list-item-content>
-                <v-list-item-title v-html="item.fullName"></v-list-item-title>
-                <v-list-item-subtitle>
+                <v-list-item-title
+                  class="font-weight-bold"
+                  v-html="item.fullName"
+                ></v-list-item-title>
+                <v-list-item-subtitle
+                  class="text--primary"
+                  v-text="item.jobTitle"
+                ></v-list-item-subtitle>
+                <v-list-item-subtitle class="text-wrap">
                   <v-chip
                     :key="skill.id"
-                    class="ma-2"
+                    class="ma-1"
+                    small
                     :style="getChipStyle(skill)"
                     text-color="blue-grey darken-4"
                     v-for="skill in commonSkills(item)"
