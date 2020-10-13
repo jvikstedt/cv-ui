@@ -227,6 +227,7 @@ export default class RenderTemplateDialog extends Mixins(DialogFormMixin) {
           endYear: projectMembership.endYear,
           endMonth: projectMembership.endMonth,
           description: projectMembership.description,
+          role: projectMembership.role,
           highlight: projectMembership.highlight,
           disabled: false,
         }),

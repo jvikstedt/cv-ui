@@ -33,6 +33,15 @@
           :readonly="!canEdit"
         ></v-text-field>
 
+        <v-text-field
+          v-model="role"
+          :counter="255"
+          :rules="isRequiredRule"
+          label="Role"
+          required
+          :readonly="!canEdit"
+        ></v-text-field>
+
         <MonthPicker
           v-model="startYearMonth"
           name="startYearMonth"
@@ -90,6 +99,7 @@ export default class EditProjectMembershipDialog extends Mixins(
   @Prop({ required: false }) readonly canEdit!: boolean;
 
   description = "";
+  role = "";
   startYearMonth = new YearMonth();
   endYearMonth = new YearMonth();
   highlight = false;
@@ -110,6 +120,7 @@ export default class EditProjectMembershipDialog extends Mixins(
 
   created(): void {
     this.description = this.projectMembership.description;
+    this.role = this.projectMembership.role;
     this.startYearMonth = {
       year: this.projectMembership.startYear,
       month: this.projectMembership.startMonth,
@@ -152,6 +163,7 @@ export default class EditProjectMembershipDialog extends Mixins(
         projectMembershipId: this.projectMembership.id,
         data: {
           description: this.description,
+          role: this.role,
           startYear: this.startYearMonth.year,
           startMonth: this.startYearMonth.month,
           endYear: this.endYearMonth.year,

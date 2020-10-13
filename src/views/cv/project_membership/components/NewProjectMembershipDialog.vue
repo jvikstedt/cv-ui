@@ -35,6 +35,16 @@
           name="description"
           :counter="255"
           label="Description"
+          :rules="isRequiredRule"
+          required
+        ></v-text-field>
+
+        <v-text-field
+          v-model="role"
+          name="role"
+          :counter="255"
+          label="Role"
+          :rules="isRequiredRule"
           required
         ></v-text-field>
 
@@ -93,6 +103,7 @@ export default class NewProjectMembershipDialog extends Mixins(
   project: Project | null = null;
 
   description = "";
+  role = "";
   startYearMonth = new YearMonth();
   endYearMonth = new YearMonth();
   highlight = false;
@@ -130,6 +141,7 @@ export default class NewProjectMembershipDialog extends Mixins(
         cvId: this.cvId,
         projectId: this.project.id,
         description: this.description,
+        role: this.role,
         startYear: this.startYearMonth.year,
         startMonth: this.startYearMonth.month,
         endYear: this.endYearMonth.year,

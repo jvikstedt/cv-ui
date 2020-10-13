@@ -25,15 +25,20 @@
               </v-btn>
             </v-list-item-title>
             <v-list-item-subtitle>
-              {{ projectMembership.startMonth }}.{{
-                projectMembership.startYear
-              }}
-              -
-              <span
-                v-if="projectMembership.endMonth || projectMembership.endYear"
-              >
-                {{ projectMembership.endMonth }}.{{ projectMembership.endYear }}
-              </span>
+              <div>{{ projectMembership.role }}</div>
+              <div>
+                {{ projectMembership.startMonth }}.{{
+                  projectMembership.startYear
+                }}
+                -
+                <span
+                  v-if="projectMembership.endMonth || projectMembership.endYear"
+                >
+                  {{ projectMembership.endMonth }}.{{
+                    projectMembership.endYear
+                  }}
+                </span>
+              </div>
             </v-list-item-subtitle>
             <div>
               <v-chip
