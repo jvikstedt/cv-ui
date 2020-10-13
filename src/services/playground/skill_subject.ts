@@ -17,10 +17,7 @@ export default class SkillSubjectService extends ApiService {
     createSkillSubjectDto: CreateSkillSubjectDto
   ): Promise<SkillSubject> {
     const id =
-      (R.defaultTo(
-        0,
-        R.last(Object.keys(SkillSubjectModule.byId).sort())
-      ) as number) + 1;
+      (R.defaultTo(0, R.last(SkillSubjectModule.allIds.sort())) as number) + 1;
 
     const skillSubject = {
       ...createSkillSubjectDto,

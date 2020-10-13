@@ -7,8 +7,10 @@ import { CreateSkillDto, DeleteSkillDto, PatchSkillDto } from "../skill";
 export default class SkillService extends ApiService {
   public async createSkill(createSkillDto: CreateSkillDto): Promise<Skill> {
     const id =
-      (R.defaultTo(0, R.last(Object.keys(SkillModule.byId).sort())) as number) +
-      1;
+      (R.defaultTo(
+        0,
+        R.last(SkillModule.cvSkillIds[createSkillDto.cvId].sort())
+      ) as number) + 1;
 
     const skill = {
       ...createSkillDto,
@@ -49,7 +51,7 @@ export default class SkillService extends ApiService {
       const id =
         (R.defaultTo(
           0,
-          R.last(Object.keys(SkillModule.byId).sort())
+          R.last(SkillModule.cvSkillIds[cvId].sort())
         ) as number) + 1;
       const skillSubject = SkillSubjectModule.find(skillSubjectId);
       skill = {
@@ -66,6 +68,7 @@ export default class SkillService extends ApiService {
         updatedAt: new Date(),
         ...data,
       };
+      SkillModule.saveSkills([skill]);
     }
     return skill;
   }

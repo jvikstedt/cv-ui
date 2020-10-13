@@ -15,10 +15,7 @@ export default class ProjectService extends ApiService {
     createProjectDto: CreateProjectDto
   ): Promise<Project> {
     const id =
-      (R.defaultTo(
-        0,
-        R.last(Object.keys(ProjectModule.byId).sort())
-      ) as number) + 1;
+      (R.defaultTo(0, R.last(ProjectModule.allIds.sort())) as number) + 1;
 
     const project = {
       ...createProjectDto,

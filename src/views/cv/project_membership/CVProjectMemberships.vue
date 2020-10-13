@@ -43,7 +43,7 @@
             <div>
               <v-chip
                 :key="membershipSkill.id"
-                class="ma-2"
+                class="mr-2 mt-2"
                 :style="getChipStyle(membershipSkill.skill)"
                 text-color="blue-grey darken-4"
                 v-for="membershipSkill in projectMembership.membershipSkills"

@@ -14,10 +14,7 @@ export default class CompanyService extends ApiService {
     createCompanyDto: CreateCompanyDto
   ): Promise<Company> {
     const id =
-      (R.defaultTo(
-        0,
-        R.last(Object.keys(CompanyModule.byId).sort())
-      ) as number) + 1;
+      (R.defaultTo(0, R.last(CompanyModule.allIds.sort())) as number) + 1;
 
     const company = {
       ...createCompanyDto,

@@ -17,7 +17,11 @@ export default class WorkExperienceService extends ApiService {
     const id =
       (R.defaultTo(
         0,
-        R.last(Object.keys(WorkExperienceModule.byId).sort())
+        R.last(
+          WorkExperienceModule.cvWorkExperienceIds[
+            createWorkExperienceDto.cvId
+          ].sort()
+        )
       ) as number) + 1;
 
     const workExperience = {
