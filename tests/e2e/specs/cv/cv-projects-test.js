@@ -21,6 +21,7 @@ describe("CV projects", () => {
     cy.get(".v-list-item__content").last().click();
 
     cy.get("input[name=description]").type("foo");
+    cy.get("input[name=role]").type("Developer");
 
     cy.pickMonthAndYear("startYearMonth", "2000", "Jan");
     cy.pickMonthAndYear("endYearMonth", "2002", "May");

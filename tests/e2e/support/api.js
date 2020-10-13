@@ -124,6 +124,7 @@ Cypress.Commands.add(
   (
     projectName = "Test project",
     description = "foo",
+    role = "Developer",
     startYear = 2000,
     startMonth = 1,
     endYear = 2002,
@@ -178,6 +179,7 @@ Cypress.Commands.add(
           body: {
             projectId: result.project.id,
             description,
+            role,
             startYear,
             startMonth,
             endYear,

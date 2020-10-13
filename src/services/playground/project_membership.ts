@@ -67,6 +67,7 @@ export default class ProjectMembershipService extends ApiService {
     }
     projectMembership.description =
       data.description || projectMembership.description;
+    projectMembership.role = data.role || projectMembership.role;
     projectMembership.startYear = data.startYear || projectMembership.startYear;
     projectMembership.startMonth =
       data.startMonth || projectMembership.startMonth;

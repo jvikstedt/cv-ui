@@ -22,6 +22,7 @@ import SkillGroupModule from "@/store/modules/skill_group";
 export interface ProjectMembership {
   id: number;
   description: string;
+  role: string;
   startYear: number;
   startMonth: number;
   endYear?: number | null;

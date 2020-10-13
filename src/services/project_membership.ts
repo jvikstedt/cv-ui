@@ -8,6 +8,7 @@ export const Api = new ApiService();
 
 export interface PatchProjectMembershipDtoData {
   description?: string;
+  role?: string;
   startYear?: number;
   startMonth?: number;
   endYear?: number | null;
@@ -31,6 +32,7 @@ export interface CreateProjectMembershipDto {
   cvId: number;
   projectId: number;
   description: string;
+  role: string;
   startYear: number;
   startMonth: number;
   endYear?: number | null;
