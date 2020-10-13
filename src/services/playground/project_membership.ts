@@ -22,7 +22,11 @@ export default class ProjectMembershipService extends ApiService {
     const id =
       (R.defaultTo(
         0,
-        R.last(Object.keys(ProjectMembershipModule.byId).sort())
+        R.last(
+          ProjectMembershipModule.cvProjectMembershipIds[
+            createProjectMembershipDto.cvId
+          ].sort()
+        )
       ) as number) + 1;
 
     const membershipSkills = this.getMembershipSkills(
@@ -65,6 +69,7 @@ export default class ProjectMembershipService extends ApiService {
         projectMembershipId
       );
     }
+
     projectMembership.description =
       data.description || projectMembership.description;
     projectMembership.role = data.role || projectMembership.role;
@@ -96,10 +101,8 @@ export default class ProjectMembershipService extends ApiService {
     projectMembershipId: number
   ): MembershipSkill[] {
     let id =
-      (R.defaultTo(
-        0,
-        R.last(Object.keys(MembershipSkillModule.byId).sort())
-      ) as number) + 1;
+      (R.defaultTo(0, R.last(MembershipSkillModule.allIds.sort())) as number) +
+      1;
 
     return R.map((m) => {
       const skill = SkillPlayground.findPlaygroundSkill(cvId, m.skillSubjectId);

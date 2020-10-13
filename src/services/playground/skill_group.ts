@@ -10,10 +10,7 @@ export default class SkillGroupService extends ApiService {
     createSkillGroupDto: CreateSkillGroupDto
   ): Promise<SkillGroup> {
     const id =
-      (R.defaultTo(
-        0,
-        R.last(Object.keys(SkillGroupModule.byId).sort())
-      ) as number) + 1;
+      (R.defaultTo(0, R.last(SkillGroupModule.allIds.sort())) as number) + 1;
 
     const skillGroup = {
       ...createSkillGroupDto,

@@ -12,10 +12,7 @@ export default class SchoolService extends ApiService {
 
   public async createSchool(createSchoolDto: CreateSchoolDto): Promise<School> {
     const id =
-      (R.defaultTo(
-        0,
-        R.last(Object.keys(SchoolModule.byId).sort())
-      ) as number) + 1;
+      (R.defaultTo(0, R.last(SchoolModule.allIds.sort())) as number) + 1;
 
     const school = {
       ...createSchoolDto,

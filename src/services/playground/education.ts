@@ -15,7 +15,7 @@ export default class EducationService extends ApiService {
     const id =
       (R.defaultTo(
         0,
-        R.last(Object.keys(EducationModule.byId).sort())
+        R.last(EducationModule.cvEducationIds[createEducationDto.cvId].sort())
       ) as number) + 1;
 
     const education = {

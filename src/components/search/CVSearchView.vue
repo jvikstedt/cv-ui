@@ -93,7 +93,7 @@
                 <v-list-item-subtitle class="text-wrap">
                   <v-chip
                     :key="skill.id"
-                    class="ma-1"
+                    class="mr-1 mt-1"
                     small
                     :style="getChipStyle(skill)"
                     text-color="blue-grey darken-4"
