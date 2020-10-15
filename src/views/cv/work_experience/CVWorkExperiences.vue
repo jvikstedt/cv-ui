@@ -9,6 +9,7 @@
         <v-list-item three-line style="background-color: white">
           <v-list-item-content>
             <v-list-item-title class="headline mb-2 text-wrap">
+              <v-icon v-if="workExperience.highlight">mdi-star</v-icon>
               {{ workExperience.company.name }}
               <v-btn icon small @click="onWorkExperienceClick(workExperience)">
                 <v-icon v-if="canEdit">mdi-pencil</v-icon>

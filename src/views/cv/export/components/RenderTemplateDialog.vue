@@ -212,6 +212,7 @@ export default class RenderTemplateDialog extends Mixins(DialogFormMixin) {
           endMonth: workExperience.endMonth,
           description: workExperience.description,
           jobTitle: workExperience.jobTitle,
+          highlight: workExperience.highlight,
           disabled: false,
         }),
         workExperiences

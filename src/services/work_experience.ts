@@ -12,6 +12,7 @@ export interface PatchWorkExperienceDtoData {
   startMonth?: number;
   endYear?: number | null;
   endMonth?: number | null;
+  highlight?: boolean;
 }
 
 export interface PatchWorkExperienceDto {
@@ -34,6 +35,7 @@ export interface CreateWorkExperienceDto {
   startMonth: number;
   endYear?: number | null;
   endMonth?: number | null;
+  highlight: boolean;
 }
 
 export interface Service {
