@@ -12,6 +12,7 @@
         <v-list-item three-line style="background-color: white">
           <v-list-item-content>
             <v-list-item-title class="headline mb-2 text-wrap">
+              <v-icon v-if="projectMembership.highlight">mdi-star</v-icon>
               {{ projectMembership.project.company.name }} /
               {{ projectMembership.project.name }}
               <v-btn

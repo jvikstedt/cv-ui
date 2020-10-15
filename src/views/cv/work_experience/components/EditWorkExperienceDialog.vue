@@ -55,6 +55,12 @@
           label="End year and month"
           :readonly="!canEdit"
         />
+
+        <v-checkbox
+          v-model="highlight"
+          label="Highlight"
+          :readonly="!canEdit"
+        ></v-checkbox>
       </v-card-text>
     </v-form>
   </v-card>
@@ -84,6 +90,7 @@ export default class EditWorkExperienceDialog extends Mixins(DialogFormMixin) {
   description = "";
   startYearMonth = new YearMonth();
   endYearMonth = new YearMonth();
+  highlight = false;
 
   startYearMonthRules: InputValidationRules = [
     IsRequired(),
@@ -101,6 +108,7 @@ export default class EditWorkExperienceDialog extends Mixins(DialogFormMixin) {
   created(): void {
     this.jobTitle = this.workExperience.jobTitle;
     this.description = this.workExperience.description;
+    this.highlight = this.workExperience.highlight;
     this.startYearMonth = {
       year: this.workExperience.startYear,
       month: this.workExperience.startMonth,
@@ -140,6 +148,7 @@ export default class EditWorkExperienceDialog extends Mixins(DialogFormMixin) {
           startMonth: this.startYearMonth.month,
           endYear: this.endYearMonth.year,
           endMonth: this.endYearMonth.month,
+          highlight: this.highlight,
         },
       };
       await ServiceManager.workExperience.patchWorkExperience(

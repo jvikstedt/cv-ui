@@ -57,6 +57,8 @@
           :rules="endYearMonthRules"
           label="End year and month"
         />
+
+        <v-checkbox v-model="highlight" label="Highlight"></v-checkbox>
       </v-card-text>
     </v-form>
   </v-card>
@@ -90,6 +92,7 @@ export default class NewWorkExperienceDialog extends Mixins(DialogFormMixin) {
   description = "";
   startYearMonth = new YearMonth();
   endYearMonth = new YearMonth();
+  highlight = false;
 
   startYearMonthRules: InputValidationRules = [
     IsRequired(),
@@ -128,6 +131,7 @@ export default class NewWorkExperienceDialog extends Mixins(DialogFormMixin) {
         startMonth: this.startYearMonth.month,
         endYear: this.endYearMonth.year,
         endMonth: this.endYearMonth.month,
+        highlight: this.highlight,
       };
       await ServiceManager.workExperience.createWorkExperience(
         createWorkExperienceDto

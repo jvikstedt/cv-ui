@@ -9,6 +9,7 @@
         <v-list-item three-line style="background-color: white">
           <v-list-item-content>
             <v-list-item-title class="headline mb-2 text-wrap">
+              <v-icon v-if="education.highlight">mdi-star</v-icon>
               {{ education.school.name }}
               <v-btn icon small @click="onEducationClick(education)">
                 <v-icon v-if="canEdit">mdi-pencil</v-icon>

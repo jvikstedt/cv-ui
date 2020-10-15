@@ -20,6 +20,7 @@ export interface WorkExperience {
   startMonth: number;
   endYear?: number | null;
   endMonth?: number | null;
+  highlight: boolean;
   cvId: number;
   company: Company;
   companyId: number;
