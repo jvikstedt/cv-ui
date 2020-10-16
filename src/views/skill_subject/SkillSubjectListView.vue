@@ -73,7 +73,10 @@ export default class SkillSubjectListView extends Vue {
 
   @Watch("search")
   async searchChanged(): Promise<void> {
-    await this.optionsChanged();
+    this.options = {
+      ...this.options,
+      page: 1,
+    };
   }
 
   @Watch("options", { deep: true })
