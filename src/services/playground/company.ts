@@ -2,6 +2,7 @@ import * as R from "ramda";
 import ApiService from "@/services/api/company";
 import CompanyModule, { Company } from "@/store/modules/company";
 import { CreateCompanyDto, SearchCompanyDto } from "../company";
+import { SortArrayOfNumbers } from "@/helpers/index";
 
 export default class CompanyService extends ApiService {
   private fakedCompanies: Company[] = [];
@@ -14,7 +15,10 @@ export default class CompanyService extends ApiService {
     createCompanyDto: CreateCompanyDto
   ): Promise<Company> {
     const id =
-      (R.defaultTo(0, R.last(CompanyModule.allIds.sort())) as number) + 1;
+      (R.defaultTo(
+        0,
+        R.last(SortArrayOfNumbers(CompanyModule.allIds))
+      ) as number) + 1;
 
     const company = {
       ...createCompanyDto,

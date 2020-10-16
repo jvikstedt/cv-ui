@@ -7,6 +7,7 @@ import {
   SearchProjectDto,
 } from "../project";
 import CompanyModule from "@/store/modules/company";
+import { SortArrayOfNumbers } from "@/helpers/index";
 
 export default class ProjectService extends ApiService {
   private fakedProjects: Project[] = [];
@@ -15,7 +16,10 @@ export default class ProjectService extends ApiService {
     createProjectDto: CreateProjectDto
   ): Promise<Project> {
     const id =
-      (R.defaultTo(0, R.last(ProjectModule.allIds.sort())) as number) + 1;
+      (R.defaultTo(
+        0,
+        R.last(SortArrayOfNumbers(ProjectModule.allIds))
+      ) as number) + 1;
 
     const project = {
       ...createProjectDto,

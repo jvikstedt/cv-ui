@@ -2,6 +2,7 @@ import * as R from "ramda";
 import ApiService from "@/services/api/school";
 import SchoolModule, { School } from "@/store/modules/school";
 import { CreateSchoolDto, SearchSchoolDto } from "../school";
+import { SortArrayOfNumbers } from "@/helpers/index";
 
 export default class SchoolService extends ApiService {
   private fakedSchools: School[] = [];
@@ -12,7 +13,10 @@ export default class SchoolService extends ApiService {
 
   public async createSchool(createSchoolDto: CreateSchoolDto): Promise<School> {
     const id =
-      (R.defaultTo(0, R.last(SchoolModule.allIds.sort())) as number) + 1;
+      (R.defaultTo(
+        0,
+        R.last(SortArrayOfNumbers(SchoolModule.allIds))
+      ) as number) + 1;
 
     const school = {
       ...createSchoolDto,

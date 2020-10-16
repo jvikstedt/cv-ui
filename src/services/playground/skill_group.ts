@@ -2,6 +2,7 @@ import * as R from "ramda";
 import SkillGroupModule, { SkillGroup } from "@/store/modules/skill_group";
 import ApiService from "@/services/api/skill_group";
 import { CreateSkillGroupDto, SearchSkillGroupDto } from "../skill_group";
+import { SortArrayOfNumbers } from "@/helpers/index";
 
 export default class SkillGroupService extends ApiService {
   private fakedSkillGroups: SkillGroup[] = [];
@@ -10,7 +11,10 @@ export default class SkillGroupService extends ApiService {
     createSkillGroupDto: CreateSkillGroupDto
   ): Promise<SkillGroup> {
     const id =
-      (R.defaultTo(0, R.last(SkillGroupModule.allIds.sort())) as number) + 1;
+      (R.defaultTo(
+        0,
+        R.last(SortArrayOfNumbers(SkillGroupModule.allIds))
+      ) as number) + 1;
 
     const skillGroup = {
       ...createSkillGroupDto,

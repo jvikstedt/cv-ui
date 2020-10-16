@@ -3,13 +3,14 @@ import SkillModule, { Skill } from "@/store/modules/skill";
 import SkillSubjectModule from "@/store/modules/skill_subject";
 import ApiService from "@/services/api/skill";
 import { CreateSkillDto, DeleteSkillDto, PatchSkillDto } from "../skill";
+import { SortArrayOfNumbers } from "@/helpers/index";
 
 export default class SkillService extends ApiService {
   public async createSkill(createSkillDto: CreateSkillDto): Promise<Skill> {
     const id =
       (R.defaultTo(
         0,
-        R.last(SkillModule.cvSkillIds[createSkillDto.cvId].sort())
+        R.last(SortArrayOfNumbers(SkillModule.cvSkillIds[createSkillDto.cvId]))
       ) as number) + 1;
 
     const skill = {
@@ -51,7 +52,7 @@ export default class SkillService extends ApiService {
       const id =
         (R.defaultTo(
           0,
-          R.last(SkillModule.cvSkillIds[cvId].sort())
+          R.last(SortArrayOfNumbers(SkillModule.cvSkillIds[cvId]))
         ) as number) + 1;
       const skillSubject = SkillSubjectModule.find(skillSubjectId);
       skill = {

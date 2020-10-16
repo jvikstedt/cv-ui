@@ -14,6 +14,7 @@ import MembershipSkillModule, {
 } from "@/store/modules/membership_skill";
 import ProjectModule from "@/store/modules/project";
 import { Playground as SkillPlayground } from "@/services/skill";
+import { SortArrayOfNumbers } from "@/helpers/index";
 
 export default class ProjectMembershipService extends ApiService {
   public async createProjectMembership(
@@ -23,9 +24,11 @@ export default class ProjectMembershipService extends ApiService {
       (R.defaultTo(
         0,
         R.last(
-          ProjectMembershipModule.cvProjectMembershipIds[
-            createProjectMembershipDto.cvId
-          ].sort()
+          SortArrayOfNumbers(
+            ProjectMembershipModule.cvProjectMembershipIds[
+              createProjectMembershipDto.cvId
+            ]
+          )
         )
       ) as number) + 1;
 
@@ -101,8 +104,10 @@ export default class ProjectMembershipService extends ApiService {
     projectMembershipId: number
   ): MembershipSkill[] {
     let id =
-      (R.defaultTo(0, R.last(MembershipSkillModule.allIds.sort())) as number) +
-      1;
+      (R.defaultTo(
+        0,
+        R.last(SortArrayOfNumbers(MembershipSkillModule.allIds))
+      ) as number) + 1;
 
     return R.map((m) => {
       const skill = SkillPlayground.findPlaygroundSkill(cvId, m.skillSubjectId);

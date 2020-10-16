@@ -7,6 +7,7 @@ import {
   DeleteEducationDto,
   PatchEducationDto,
 } from "../education";
+import { SortArrayOfNumbers } from "@/helpers/index";
 
 export default class EducationService extends ApiService {
   public async createEducation(
@@ -15,7 +16,11 @@ export default class EducationService extends ApiService {
     const id =
       (R.defaultTo(
         0,
-        R.last(EducationModule.cvEducationIds[createEducationDto.cvId].sort())
+        R.last(
+          SortArrayOfNumbers(
+            EducationModule.cvEducationIds[createEducationDto.cvId]
+          )
+        )
       ) as number) + 1;
 
     const education = {

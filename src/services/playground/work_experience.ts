@@ -9,6 +9,7 @@ import {
   DeleteWorkExperienceDto,
   PatchWorkExperienceDto,
 } from "../work_experience";
+import { SortArrayOfNumbers } from "@/helpers/index";
 
 export default class WorkExperienceService extends ApiService {
   public async createWorkExperience(
@@ -18,9 +19,11 @@ export default class WorkExperienceService extends ApiService {
       (R.defaultTo(
         0,
         R.last(
-          WorkExperienceModule.cvWorkExperienceIds[
-            createWorkExperienceDto.cvId
-          ].sort()
+          SortArrayOfNumbers(
+            WorkExperienceModule.cvWorkExperienceIds[
+              createWorkExperienceDto.cvId
+            ]
+          )
         )
       ) as number) + 1;
 
