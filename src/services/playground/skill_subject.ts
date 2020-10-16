@@ -10,6 +10,7 @@ import {
   SkillSubjectSearchResult,
 } from "../skill_subject";
 import SkillGroupModule from "@/store/modules/skill_group";
+import { SortArrayOfNumbers } from "@/helpers/index";
 
 export default class SkillSubjectService extends ApiService {
   private fakedSkillSubjects: SkillSubject[] = [];
@@ -18,7 +19,10 @@ export default class SkillSubjectService extends ApiService {
     createSkillSubjectDto: CreateSkillSubjectDto
   ): Promise<SkillSubject> {
     const id =
-      (R.defaultTo(0, R.last(SkillSubjectModule.allIds.sort())) as number) + 1;
+      (R.defaultTo(
+        0,
+        R.last(SortArrayOfNumbers(SkillSubjectModule.allIds))
+      ) as number) + 1;
 
     const skillSubject = {
       ...createSkillSubjectDto,

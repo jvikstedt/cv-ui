@@ -23,4 +23,8 @@ const SortArr = (arr: any[]): any[] => {
   }, arr);
 };
 
-export { validator, FormatDateTime, SortArr };
+const SortArrayOfNumbers = (arr: number[]): number[] => {
+  return arr.slice().sort((a, b) => a - b);
+};
+
+export { validator, FormatDateTime, SortArr, SortArrayOfNumbers };
