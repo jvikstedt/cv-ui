@@ -59,6 +59,11 @@
               <v-icon>mdi-email</v-icon> {{ cv.user.email }}
             </p>
 
+            <p class="pa-0 mb-1" v-if="cv.user.workExperienceInYears">
+              <v-icon>mdi-domain</v-icon>
+              {{ cv.user.workExperienceInYears }} years of experience
+            </p>
+
             <h3 class="mt-4">
               Description
               <v-btn

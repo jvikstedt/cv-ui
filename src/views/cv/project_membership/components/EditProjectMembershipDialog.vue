@@ -141,15 +141,17 @@ export default class EditProjectMembershipDialog extends Mixins(
   }
 
   async onProjectMembershipDelete(): Promise<void> {
-    const deleteProjectMembershipDto = {
-      cvId: this.projectMembership.cvId,
-      projectMembershipId: this.projectMembership.id,
-    };
+    if (confirm("Are you sure you want to delete?")) {
+      const deleteProjectMembershipDto = {
+        cvId: this.projectMembership.cvId,
+        projectMembershipId: this.projectMembership.id,
+      };
 
-    await ServiceManager.projectMembership.deleteProjectMembership(
-      deleteProjectMembershipDto
-    );
-    this.popDialogComponent();
+      await ServiceManager.projectMembership.deleteProjectMembership(
+        deleteProjectMembershipDto
+      );
+      this.popDialogComponent();
+    }
   }
 
   async onSave(): Promise<void> {

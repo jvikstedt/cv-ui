@@ -20,8 +20,20 @@ export interface PatchSkillSubjectDto {
 }
 
 export interface SearchSkillSubjectDto {
-  name: string;
-  limit?: number;
+  name?: string;
+
+  take?: number;
+
+  skip?: number;
+
+  orderColumnName?: string;
+
+  orderSort?: "ASC" | "DESC";
+}
+
+export interface SkillSubjectSearchResult {
+  items: SkillSubject[];
+  total: number;
 }
 
 export interface Service {
@@ -29,8 +41,10 @@ export interface Service {
   createSkillSubject(
     createSkillSubjectDto: CreateSkillSubjectDto
   ): Promise<SkillSubject>;
-  patchSkillSubject(patchSkillSubjectDto: PatchSkillSubjectDto): Promise<void>;
+  patchSkillSubject(
+    patchSkillSubjectDto: PatchSkillSubjectDto
+  ): Promise<SkillSubject>;
   searchSkillSubjects(
     searchSkillSubjectDto: SearchSkillSubjectDto
-  ): Promise<SkillSubject[]>;
+  ): Promise<SkillSubjectSearchResult>;
 }

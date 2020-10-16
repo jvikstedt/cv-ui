@@ -123,14 +123,16 @@ export default class EditEducationDialog extends Mixins(DialogFormMixin) {
   }
 
   async onEducationDelete(): Promise<void> {
-    this.popDialogComponent();
+    if (confirm("Are you sure you want to delete?")) {
+      const deleteEducationDto = {
+        cvId: this.education.cvId,
+        educationId: this.education.id,
+      };
 
-    const deleteEducationDto = {
-      cvId: this.education.cvId,
-      educationId: this.education.id,
-    };
+      await ServiceManager.education.deleteEducation(deleteEducationDto);
 
-    await ServiceManager.education.deleteEducation(deleteEducationDto);
+      this.popDialogComponent();
+    }
   }
 
   async onSave(): Promise<void> {

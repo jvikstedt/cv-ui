@@ -6,6 +6,7 @@ import {
   CreateSkillSubjectDto,
   PatchSkillSubjectDto,
   SearchSkillSubjectDto,
+  SkillSubjectSearchResult,
 } from "../skill_subject";
 
 export default class SkillSubjectService {
@@ -38,23 +39,25 @@ export default class SkillSubjectService {
   public async patchSkillSubject({
     skillSubjectId,
     data,
-  }: PatchSkillSubjectDto): Promise<void> {
+  }: PatchSkillSubjectDto): Promise<SkillSubject> {
     const skillSubject: SkillSubject = await Api.patch(
       `/skill_subjects/${skillSubjectId}`,
       data
     );
     await SkillSubjectModule.saveSkillSubjects([skillSubject]);
+
+    return skillSubject;
   }
 
   public async searchSkillSubjects(
     searchSkillSubjectDto: SearchSkillSubjectDto
-  ): Promise<SkillSubject[]> {
-    const skillSubjects: SkillSubject[] = await Api.post(
+  ): Promise<SkillSubjectSearchResult> {
+    const result: SkillSubjectSearchResult = await Api.post(
       "/skill_Subjects/search",
       searchSkillSubjectDto
     );
-    await SkillSubjectModule.saveSkillSubjects(skillSubjects);
+    await SkillSubjectModule.saveSkillSubjects(result.items);
 
-    return skillSubjects;
+    return result;
   }
 }

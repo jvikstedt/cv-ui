@@ -112,19 +112,16 @@ export default class NewSkillDialog extends Mixins(DialogFormMixin) {
 
   @Watch("search")
   async searchChanged(keyword: string): Promise<void> {
-    const skillSubjects = await ServiceManager.skillSubject.searchSkillSubjects(
-      {
-        name: keyword || "",
-        limit: 10,
-      }
-    );
+    const { items } = await ServiceManager.skillSubject.searchSkillSubjects({
+      name: keyword || "",
+    });
     this.skillSubjects = R.reject(
       (skillSubject: SkillSubject) =>
         !!R.find(
           (skill: Skill) => R.equals(skillSubject.id, skill.skillSubject.id),
           this.existingSkills
         ),
-      skillSubjects
+      items
     );
   }
 

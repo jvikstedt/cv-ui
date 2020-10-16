@@ -120,16 +120,18 @@ export default class EditWorkExperienceDialog extends Mixins(DialogFormMixin) {
   }
 
   async onWorkExperienceDelete(): Promise<void> {
-    this.popDialogComponent();
+    if (confirm("Are you sure you want to delete?")) {
+      const deleteWorkExperienceDto = {
+        cvId: this.workExperience.cvId,
+        workExperienceId: this.workExperience.id,
+      };
 
-    const deleteWorkExperienceDto = {
-      cvId: this.workExperience.cvId,
-      workExperienceId: this.workExperience.id,
-    };
+      await ServiceManager.workExperience.deleteWorkExperience(
+        deleteWorkExperienceDto
+      );
 
-    await ServiceManager.workExperience.deleteWorkExperience(
-      deleteWorkExperienceDto
-    );
+      this.popDialogComponent();
+    }
   }
 
   async onSave(): Promise<void> {

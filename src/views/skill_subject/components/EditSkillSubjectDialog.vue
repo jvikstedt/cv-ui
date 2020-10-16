@@ -70,6 +70,9 @@ export default class EditSkillSubjectDialog extends Mixins(
   DialogFormMixin
 ) {
   @Prop({ required: true }) readonly skillSubject!: SkillSubject;
+  @Prop({ required: false }) readonly afterSave!: (
+    skillSubject: SkillSubject
+  ) => Promise<void>;
   searchKey = "SkillSearchKey";
 
   name = "";
@@ -99,8 +102,13 @@ export default class EditSkillSubjectDialog extends Mixins(
           name: this.name,
         },
       };
-      await ServiceManager.skillSubject.patchSkillSubject(patchSkillSubjectDto);
+      const skillSubject = await ServiceManager.skillSubject.patchSkillSubject(
+        patchSkillSubjectDto
+      );
 
+      if (this.afterSave) {
+        await this.afterSave(skillSubject);
+      }
       this.popDialogComponent();
     }
   }

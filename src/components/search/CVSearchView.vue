@@ -153,12 +153,9 @@ export default class CVSearchView extends Mixins(SearchMixin, DialogFormMixin) {
 
   @Watch("searchInput")
   async searchInputChanged(input: string): Promise<void> {
-    const skillSubjects = await ServiceManager.skillSubject.searchSkillSubjects(
-      {
-        name: input || "",
-        limit: 10,
-      }
-    );
+    const { items } = await ServiceManager.skillSubject.searchSkillSubjects({
+      name: input || "",
+    });
 
     this.skillSubjects = R.reject(
       (skillSubject: SkillSubject) =>
@@ -167,7 +164,7 @@ export default class CVSearchView extends Mixins(SearchMixin, DialogFormMixin) {
             R.equals(skill.skillSubjectId, skillSubject.id),
           SearchModule.searchData.skills || []
         ),
-      skillSubjects
+      items
     );
   }
 
