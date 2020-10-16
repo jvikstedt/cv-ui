@@ -25,6 +25,9 @@
           :loading="fetching"
           :server-items-length="itemsTotal"
           class="elevation-1"
+          :footer-props="{
+            ['items-per-page-options']: [5, 10, 15],
+          }"
         >
           <template v-slot:[`item.actions`]="{ item }">
             <v-icon small class="mr-2" @click="editItem(item)">
