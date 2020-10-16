@@ -43,6 +43,7 @@ import EducationModule from "@/store/modules/education";
 import WorkExperienceModule from "@/store/modules/work_experience";
 import ProjectMembershipModule from "@/store/modules/project_membership";
 import { MembershipSkill } from "@/store/modules/membership_skill";
+import { SortArr } from "@/helpers";
 
 const calculateTotalSkillExperience = (
   skill: Skill,
@@ -121,9 +122,11 @@ export default class RenderTemplateDialog extends Mixins(DialogFormMixin) {
     }
 
     const skills = SkillModule.listByCV(this.cvId);
-    const educations = EducationModule.listByCV(this.cvId);
-    const workExperiences = WorkExperienceModule.listByCV(this.cvId);
-    const projectMemberships = ProjectMembershipModule.listByCV(this.cvId);
+    const educations = SortArr(EducationModule.listByCV(this.cvId));
+    const workExperiences = SortArr(WorkExperienceModule.listByCV(this.cvId));
+    const projectMemberships = SortArr(
+      ProjectMembershipModule.listByCV(this.cvId)
+    );
 
     const allMembershipSkills = R.reject(
       R.isNil,
@@ -230,6 +233,13 @@ export default class RenderTemplateDialog extends Mixins(DialogFormMixin) {
           description: projectMembership.description,
           role: projectMembership.role,
           highlight: projectMembership.highlight,
+          membershipSkills: R.map(
+            (ms) => ({
+              name: ms.skill.skillSubject.name,
+              skillGroupName: ms.skill.skillSubject.skillGroup.name,
+            }),
+            projectMembership.membershipSkills || []
+          ),
           disabled: false,
         }),
         projectMemberships

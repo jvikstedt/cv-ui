@@ -25,8 +25,10 @@
                 <v-icon v-else>mdi-information-outline</v-icon>
               </v-btn>
             </v-list-item-title>
+            <div class="mb-2">
+              {{ projectMembership.role }}
+            </div>
             <v-list-item-subtitle>
-              <div>{{ projectMembership.role }}</div>
               <div>
                 {{ projectMembership.startMonth }}.{{
                   projectMembership.startYear
@@ -40,6 +42,9 @@
                   }}
                 </span>
               </div>
+            </v-list-item-subtitle>
+            <v-list-item-subtitle>
+              {{ projectMembership.description }}
             </v-list-item-subtitle>
             <div>
               <v-chip

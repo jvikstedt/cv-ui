@@ -117,12 +117,9 @@ export default class MembershipSkillsField extends Vue {
 
   @Watch("searchInput")
   async searchInputChanged(input: string): Promise<void> {
-    const skillSubjects = await ServiceManager.skillSubject.searchSkillSubjects(
-      {
-        name: input || "",
-        limit: 10,
-      }
-    );
+    const { items } = await ServiceManager.skillSubject.searchSkillSubjects({
+      name: input || "",
+    });
 
     this.skillSubjects = R.reject(
       (skillSubject: SkillSubject) =>
@@ -131,7 +128,7 @@ export default class MembershipSkillsField extends Vue {
             R.equals(membershipSkill.skillSubjectId, skillSubject.id),
           this.value
         ),
-      skillSubjects
+      items
     );
   }
 

@@ -7,6 +7,7 @@ import {
   CreateSkillSubjectDto,
   PatchSkillSubjectDto,
   SearchSkillSubjectDto,
+  SkillSubjectSearchResult,
 } from "../skill_subject";
 import SkillGroupModule from "@/store/modules/skill_group";
 
@@ -39,10 +40,10 @@ export default class SkillSubjectService extends ApiService {
   public async patchSkillSubject({
     skillSubjectId,
     data,
-  }: PatchSkillSubjectDto): Promise<void> {
+  }: PatchSkillSubjectDto): Promise<SkillSubject> {
     const originalSkillSubject = SkillSubjectModule.find(skillSubjectId);
     if (!originalSkillSubject) {
-      return;
+      throw new Error(`Could not find skill subject ${skillSubjectId}`);
     }
     const skillSubject = {
       ...originalSkillSubject,
@@ -50,15 +51,19 @@ export default class SkillSubjectService extends ApiService {
     };
 
     await SkillSubjectModule.saveSkillSubjects([skillSubject]);
+    return skillSubject;
   }
 
   public async searchSkillSubjects(
     searchSkillSubjectDto: SearchSkillSubjectDto
-  ): Promise<SkillSubject[]> {
-    const skillSubjects = await super.searchSkillSubjects(
-      searchSkillSubjectDto
-    );
+  ): Promise<SkillSubjectSearchResult> {
+    const result = await super.searchSkillSubjects(searchSkillSubjectDto);
 
-    return [...skillSubjects, ...this.fakedSkillSubjects];
+    const { items, total } = result;
+
+    return {
+      items: [...items, ...this.fakedSkillSubjects],
+      total: total + R.length(this.fakedSkillSubjects),
+    };
   }
 }

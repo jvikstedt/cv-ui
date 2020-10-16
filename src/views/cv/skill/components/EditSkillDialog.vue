@@ -143,11 +143,13 @@ export default class EditSkillDialog extends Mixins(DialogFormMixin) {
   }
 
   async onSkillDelete(): Promise<void> {
-    await ServiceManager.skill.deleteSkill({
-      cvId: this.skill.cvId,
-      skillId: this.skill.id,
-    });
-    this.popDialogComponent();
+    if (confirm("Are you sure you want to delete?")) {
+      await ServiceManager.skill.deleteSkill({
+        cvId: this.skill.cvId,
+        skillId: this.skill.id,
+      });
+      this.popDialogComponent();
+    }
   }
 
   async onSave(): Promise<void> {
