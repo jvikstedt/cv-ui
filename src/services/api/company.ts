@@ -1,6 +1,11 @@
 import Api from "@/api/api";
 import CompanyModule, { Company } from "@/store/modules/company";
-import { CreateCompanyDto, SearchCompanyDto } from "../company";
+import {
+  CompanySearchResult,
+  CreateCompanyDto,
+  PatchCompanyDto,
+  SearchCompanyDto,
+} from "../company";
 
 export default class CompanyService {
   public async fetchCompanies(): Promise<void> {
@@ -26,15 +31,25 @@ export default class CompanyService {
     return company;
   }
 
+  public async patchCompany({
+    companyId,
+    data,
+  }: PatchCompanyDto): Promise<Company> {
+    const company: Company = await Api.patch(`/company/${companyId}`, data);
+    CompanyModule.add([company]);
+
+    return company;
+  }
+
   public async searchCompanies(
     searchCompanyDto: SearchCompanyDto
-  ): Promise<Company[]> {
-    const companies: Company[] = await Api.post(
+  ): Promise<CompanySearchResult> {
+    const result: CompanySearchResult = await Api.post(
       "/company/search",
       searchCompanyDto
     );
-    CompanyModule.add(companies);
+    CompanyModule.add(result.items);
 
-    return companies;
+    return result;
   }
 }

@@ -3,7 +3,7 @@
     <v-card>
       <v-card-title class="headline">
         <v-icon left>mdi-code-braces</v-icon>
-        Skill subjects
+        Companies
         <v-spacer></v-spacer>
         <v-text-field
           v-model="search"
@@ -15,12 +15,12 @@
       </v-card-title>
       <v-card-actions>
         <v-spacer></v-spacer>
-        <v-btn color="primary" @click="newSkillSubject"> New </v-btn>
+        <v-btn color="primary" @click="newCompanyDialog"> New </v-btn>
       </v-card-actions>
       <v-card-text>
         <v-data-table
           :headers="headers"
-          :items="skillSubjects"
+          :items="companies"
           :options.sync="options"
           :loading="fetching"
           :server-items-length="itemsTotal"
@@ -43,20 +43,18 @@
 <script lang="ts">
 import * as R from "ramda";
 import { Component, Vue, Watch } from "vue-property-decorator";
-import NewSkillSubjectDialog from "./components/NewSkillSubjectDialog.vue";
-import SkillSubjectModule, {
-  SkillSubject,
-} from "@/store/modules/skill_subject";
-import EditSkillSubjectDialog from "./components/EditSkillSubjectDialog.vue";
+import NewCompanyDialog from "./components/NewCompanyDialog.vue";
+import CompanyModule, { Company } from "@/store/modules/company";
+import EditCompanyDialog from "./components/EditCompanyDialog.vue";
 import DialogModule from "@/store/modules/dialog";
 import { ServiceManager } from "@/services";
 import { DataOptions } from "vuetify";
 
 @Component
-export default class SkillSubjectListView extends Vue {
-  fetching = SkillSubjectModule.fetching;
-  skillSubjects: SkillSubject[] = [];
-  skillSubject: SkillSubject | null = null;
+export default class CompanyListView extends Vue {
+  fetching = CompanyModule.fetching;
+  companies: Company[] = [];
+  company: Company | null = null;
   search = "";
 
   options: DataOptions | Partial<DataOptions> = {
@@ -67,7 +65,6 @@ export default class SkillSubjectListView extends Vue {
   itemsTotal = 0;
   headers = [
     { text: "Name", value: "name" },
-    { text: "Skill group", value: "skillGroup.name" },
     { text: "Actions", value: "actions", sortable: false },
   ];
 
@@ -81,17 +78,14 @@ export default class SkillSubjectListView extends Vue {
 
   @Watch("options", { deep: true })
   async optionsChanged(): Promise<void> {
-    const sortBy = this.options.sortBy || [];
     const sortDesc = this.options.sortDesc || [];
     const page = this.options.page || 1;
     const itemsPerPage = this.options.itemsPerPage || 10;
 
-    const orderColumnName = R.equals(sortBy[0], "skillGroup.name")
-      ? "skillGroup.name"
-      : "skillSubject.name";
+    const orderColumnName = "company.name";
     const orderSort = sortDesc[0] ? "DESC" : "ASC";
 
-    const result = await ServiceManager.skillSubject.searchSkillSubjects({
+    const result = await ServiceManager.company.searchCompanies({
       skip: (page - 1) * itemsPerPage,
       take: itemsPerPage,
       orderColumnName,
@@ -99,35 +93,35 @@ export default class SkillSubjectListView extends Vue {
       name: this.search,
     });
 
-    this.skillSubjects = result.items;
+    this.companies = result.items;
     this.itemsTotal = result.total;
   }
 
-  async afterCreate(skillSubject: SkillSubject): Promise<void> {
-    this.skillSubjects = [skillSubject, ...this.skillSubjects];
+  async afterCreate(company: Company): Promise<void> {
+    this.companies = [company, ...this.companies];
   }
 
-  async afterSave(skillSubject: SkillSubject): Promise<void> {
-    this.skillSubjects = R.map((s) => {
-      if (R.equals(s.id, skillSubject.id)) {
-        return skillSubject;
+  async afterSave(company: Company): Promise<void> {
+    this.companies = R.map((s) => {
+      if (R.equals(s.id, company.id)) {
+        return company;
       }
       return s;
-    }, this.skillSubjects);
+    }, this.companies);
   }
 
-  newSkillSubject(): void {
+  newCompanyDialog(): void {
     DialogModule.pushDialogComponent({
-      component: NewSkillSubjectDialog,
+      component: NewCompanyDialog,
       props: { afterCreate: this.afterCreate },
     });
   }
 
-  editItem(skillSubject: SkillSubject): void {
+  editItem(company: Company): void {
     DialogModule.pushDialogComponent({
-      component: EditSkillSubjectDialog,
+      component: EditCompanyDialog,
       props: {
-        skillSubject: skillSubject,
+        company: company,
         afterSave: this.afterSave,
       },
     });

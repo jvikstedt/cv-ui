@@ -1,7 +1,12 @@
 import * as R from "ramda";
 import ApiService from "@/services/api/company";
 import CompanyModule, { Company } from "@/store/modules/company";
-import { CreateCompanyDto, SearchCompanyDto } from "../company";
+import {
+  CompanySearchResult,
+  CreateCompanyDto,
+  PatchCompanyDto,
+  SearchCompanyDto,
+} from "../company";
 import { SortArrayOfNumbers } from "@/helpers/index";
 
 export default class CompanyService extends ApiService {
@@ -33,11 +38,33 @@ export default class CompanyService extends ApiService {
     return company;
   }
 
+  public async patchCompany({
+    companyId,
+    data,
+  }: PatchCompanyDto): Promise<Company> {
+    const originalCompany = CompanyModule.find(companyId);
+    if (!originalCompany) {
+      throw new Error(`Could not find company ${companyId}`);
+    }
+    const company = {
+      ...originalCompany,
+      ...data,
+    };
+
+    CompanyModule.add([company]);
+    return company;
+  }
+
   public async searchCompanies(
     searchCompanyDto: SearchCompanyDto
-  ): Promise<Company[]> {
-    const companies = await super.searchCompanies(searchCompanyDto);
+  ): Promise<CompanySearchResult> {
+    const result = await super.searchCompanies(searchCompanyDto);
 
-    return [...companies, ...this.fakedCompanies];
+    const { items, total } = result;
+
+    return {
+      items: [...items, ...this.fakedCompanies],
+      total: total + R.length(this.fakedCompanies),
+    };
   }
 }
