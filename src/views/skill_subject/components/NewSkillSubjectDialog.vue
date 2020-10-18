@@ -61,10 +61,10 @@ export default class NewSkillSubjectDialog extends Mixins(DialogFormMixin) {
 
   @Watch("search")
   async searchChanged(input: string): Promise<void> {
-    this.skillGroups = await ServiceManager.skillGroup.searchSkillGroups({
+    const { items } = await ServiceManager.skillGroup.searchSkillGroups({
       name: input || "",
-      limit: 10,
     });
+    this.skillGroups = items;
   }
 
   async onSave(): Promise<void> {

@@ -9,6 +9,8 @@ import { LoginView } from "@/views/auth";
 import { SkillSubjectListView } from "@/views/skill_subject";
 import { CompanyListView } from "@/views/company";
 import { ProjectListView } from "@/views/project";
+import { SkillGroupListView } from "@/views/skill_group";
+import { SchoolListView } from "@/views/school";
 
 Vue.use(VueRouter);
 
@@ -65,6 +67,22 @@ const routes: Array<RouteConfig> = [
     path: "/projects",
     name: "ProjectListView",
     component: ProjectListView,
+    meta: {
+      requiresAuth: true,
+    },
+  },
+  {
+    path: "/skill_groups",
+    name: "SkillGroupListView",
+    component: SkillGroupListView,
+    meta: {
+      requiresAuth: true,
+    },
+  },
+  {
+    path: "/schools",
+    name: "SchoolListView",
+    component: SchoolListView,
     meta: {
       requiresAuth: true,
     },

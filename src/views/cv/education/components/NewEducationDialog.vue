@@ -122,9 +122,8 @@ export default class NewEducationDialog extends Mixins(DialogFormMixin) {
 
   @Watch("search")
   async searchChanged(keyword: string): Promise<void> {
-    const schools = await ServiceManager.school.searchSchools({
+    const { items } = await ServiceManager.school.searchSchools({
       name: keyword || "",
-      limit: 10,
     });
     this.schools = R.reject(
       (school: School) =>
@@ -132,7 +131,7 @@ export default class NewEducationDialog extends Mixins(DialogFormMixin) {
           (education: Education) => R.equals(school.id, education.school.id),
           this.existingEducations
         ),
-      schools
+      items
     );
   }
 
