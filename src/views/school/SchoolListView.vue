@@ -2,7 +2,7 @@
   <v-container style="max-width: 1024px">
     <v-card>
       <v-card-title class="headline">
-        <v-icon left>mdi-code-braces</v-icon>
+        <v-icon left>mdi-school</v-icon>
         Schools
         <v-spacer></v-spacer>
         <v-text-field

@@ -49,7 +49,7 @@
           <v-list-item-content>
             <v-list-item-title>
               <v-icon left>mdi-group</v-icon>
-              Skill groups
+              Skill Groups
             </v-list-item-title>
           </v-list-item-content>
         </v-list-item>
@@ -60,7 +60,7 @@
           <v-list-item-content>
             <v-list-item-title>
               <v-icon left>mdi-code-braces</v-icon>
-              Skill subjects
+              Skill Subjects
             </v-list-item-title>
           </v-list-item-content>
         </v-list-item>

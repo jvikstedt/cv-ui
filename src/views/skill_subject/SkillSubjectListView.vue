@@ -3,7 +3,7 @@
     <v-card>
       <v-card-title class="headline">
         <v-icon left>mdi-code-braces</v-icon>
-        Skill subjects
+        Skill Subjects
         <v-spacer></v-spacer>
         <v-text-field
           v-model="search"
