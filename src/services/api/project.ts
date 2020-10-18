@@ -3,6 +3,7 @@ import ProjectModule, { Project } from "@/store/modules/project";
 import {
   CreateProjectDto,
   PatchProjectDto,
+  ProjectSearchResult,
   SearchProjectDto,
 } from "../project";
 
@@ -33,20 +34,21 @@ export default class SkillGroupService {
   public async patchProject({
     projectId,
     data,
-  }: PatchProjectDto): Promise<void> {
+  }: PatchProjectDto): Promise<Project> {
     const project: Project = await Api.patch(`/project/${projectId}`, data);
     await ProjectModule.saveProjects([project]);
+    return project;
   }
 
   public async searchProjects(
     searchProjectDto: SearchProjectDto
-  ): Promise<Project[]> {
-    const projects: Project[] = await Api.post(
+  ): Promise<ProjectSearchResult> {
+    const result: ProjectSearchResult = await Api.post(
       "/project/search",
       searchProjectDto
     );
-    await ProjectModule.saveProjects(projects);
+    await ProjectModule.saveProjects(result.items);
 
-    return projects;
+    return result;
   }
 }

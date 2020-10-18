@@ -20,14 +20,28 @@ export interface PatchProjectDto {
 }
 
 export interface SearchProjectDto {
-  name: string;
-  limit?: number;
+  name?: string;
+
+  take?: number;
+
+  skip?: number;
+
+  orderColumnName?: string;
+
+  orderSort?: "ASC" | "DESC";
+}
+
+export interface ProjectSearchResult {
+  items: Project[];
+  total: number;
 }
 
 export interface Service {
   fetchProjects(): Promise<void>;
   deleteProject(id: number): Promise<void>;
   createProject(createProjectDto: CreateProjectDto): Promise<Project>;
-  patchProject(patchProjectDto: PatchProjectDto): Promise<void>;
-  searchProjects(searchProjectDto: SearchProjectDto): Promise<Project[]>;
+  patchProject(patchProjectDto: PatchProjectDto): Promise<Project>;
+  searchProjects(
+    searchProjectDto: SearchProjectDto
+  ): Promise<ProjectSearchResult>;
 }

@@ -4,6 +4,7 @@ import ApiService from "@/services/api/project";
 import {
   CreateProjectDto,
   PatchProjectDto,
+  ProjectSearchResult,
   SearchProjectDto,
 } from "../project";
 import CompanyModule from "@/store/modules/company";
@@ -41,10 +42,10 @@ export default class ProjectService extends ApiService {
   public async patchProject({
     projectId,
     data,
-  }: PatchProjectDto): Promise<void> {
+  }: PatchProjectDto): Promise<Project> {
     const originalProject = ProjectModule.find(projectId);
     if (!originalProject) {
-      return;
+      throw new Error(`Could not find project ${projectId}`);
     }
     const project = {
       ...originalProject,
@@ -52,13 +53,20 @@ export default class ProjectService extends ApiService {
     };
 
     await ProjectModule.saveProjects([project]);
+
+    return project;
   }
 
   public async searchProjects(
     searchProjectDto: SearchProjectDto
-  ): Promise<Project[]> {
-    const projects = await super.searchProjects(searchProjectDto);
+  ): Promise<ProjectSearchResult> {
+    const result = await super.searchProjects(searchProjectDto);
 
-    return [...projects, ...this.fakedProjects];
+    const { items, total } = result;
+
+    return {
+      items: [...items, ...this.fakedProjects],
+      total: total + R.length(this.fakedProjects),
+    };
   }
 }

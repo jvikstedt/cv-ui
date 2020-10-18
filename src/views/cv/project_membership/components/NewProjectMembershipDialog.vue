@@ -124,10 +124,10 @@ export default class NewProjectMembershipDialog extends Mixins(
 
   @Watch("search")
   async searchChanged(keyword: string): Promise<void> {
-    this.projects = await ServiceManager.project.searchProjects({
+    const { items } = await ServiceManager.project.searchProjects({
       name: keyword || "",
-      limit: 10,
     });
+    this.projects = items;
   }
 
   async onSave(): Promise<void> {
