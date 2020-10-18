@@ -10,9 +10,6 @@
     >
       <v-list>
         <v-list-item link router to="/">
-          <v-list-item-action>
-            <v-icon>mdi-settings</v-icon>
-          </v-list-item-action>
           <v-list-item-content>
             <v-list-item-title>
               <v-icon left>mdi-view-dashboard</v-icon>
@@ -21,9 +18,6 @@
           </v-list-item-content>
         </v-list-item>
         <v-list-item link router to="/companies">
-          <v-list-item-action>
-            <v-icon>mdi-settings</v-icon>
-          </v-list-item-action>
           <v-list-item-content>
             <v-list-item-title>
               <v-icon left>mdi-domain</v-icon>
@@ -32,9 +26,6 @@
           </v-list-item-content>
         </v-list-item>
         <v-list-item link router to="/projects">
-          <v-list-item-action>
-            <v-icon>mdi-settings</v-icon>
-          </v-list-item-action>
           <v-list-item-content>
             <v-list-item-title>
               <v-icon left>mdi-account-group</v-icon>
@@ -43,9 +34,6 @@
           </v-list-item-content>
         </v-list-item>
         <v-list-item link router to="/schools">
-          <v-list-item-action>
-            <v-icon>mdi-settings</v-icon>
-          </v-list-item-action>
           <v-list-item-content>
             <v-list-item-title>
               <v-icon left>mdi-school</v-icon>
@@ -54,9 +42,6 @@
           </v-list-item-content>
         </v-list-item>
         <v-list-item link router to="/skill_groups">
-          <v-list-item-action>
-            <v-icon>mdi-settings</v-icon>
-          </v-list-item-action>
           <v-list-item-content>
             <v-list-item-title>
               <v-icon left>mdi-group</v-icon>
@@ -65,9 +50,6 @@
           </v-list-item-content>
         </v-list-item>
         <v-list-item link router to="/skill_subjects">
-          <v-list-item-action>
-            <v-icon>mdi-settings</v-icon>
-          </v-list-item-action>
           <v-list-item-content>
             <v-list-item-title>
               <v-icon left>mdi-code-braces</v-icon>
