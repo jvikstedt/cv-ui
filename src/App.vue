@@ -16,7 +16,18 @@
           <v-list-item-content>
             <v-list-item-title>
               <v-icon left>mdi-code-braces</v-icon>
-              Skills
+              Skill subjects
+            </v-list-item-title>
+          </v-list-item-content>
+        </v-list-item>
+        <v-list-item link router to="/companies">
+          <v-list-item-action>
+            <v-icon>mdi-settings</v-icon>
+          </v-list-item-action>
+          <v-list-item-content>
+            <v-list-item-title>
+              <v-icon left>mdi-domain</v-icon>
+              Companies
             </v-list-item-title>
           </v-list-item-content>
         </v-list-item>

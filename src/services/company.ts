@@ -9,14 +9,38 @@ export interface CreateCompanyDto {
   name: string;
 }
 
+export interface PatchCompanyDtoData {
+  name?: string;
+}
+
+export interface PatchCompanyDto {
+  companyId: number;
+  data: PatchCompanyDtoData;
+}
+
 export interface SearchCompanyDto {
-  name: string;
-  limit?: number;
+  name?: string;
+
+  take?: number;
+
+  skip?: number;
+
+  orderColumnName?: string;
+
+  orderSort?: "ASC" | "DESC";
+}
+
+export interface CompanySearchResult {
+  items: Company[];
+  total: number;
 }
 
 export interface Service {
   fetchCompanies(): Promise<void>;
   deleteCompany(id: number): Promise<void>;
   createCompany(createCompanyDto: CreateCompanyDto): Promise<Company>;
-  searchCompanies(searchCompanyDto: SearchCompanyDto): Promise<Company[]>;
+  patchCompany(patchCompanyDto: PatchCompanyDto): Promise<Company>;
+  searchCompanies(
+    searchCompanyDto: SearchCompanyDto
+  ): Promise<CompanySearchResult>;
 }

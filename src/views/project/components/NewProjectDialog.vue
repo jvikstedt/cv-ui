@@ -61,10 +61,10 @@ export default class NewProjectDialog extends Mixins(DialogFormMixin) {
 
   @Watch("search")
   async searchChanged(input: string): Promise<void> {
-    this.companies = await ServiceManager.company.searchCompanies({
+    const { items } = await ServiceManager.company.searchCompanies({
       name: input || "",
-      limit: 10,
     });
+    this.companies = items;
   }
 
   async onSave(): Promise<void> {

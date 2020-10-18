@@ -7,6 +7,7 @@ import { CVShowView } from "@/views/cv";
 import { CVExportView } from "@/views/cv/export";
 import { LoginView } from "@/views/auth";
 import { SkillSubjectListView } from "@/views/skill_subject";
+import { CompanyListView } from "@/views/company";
 
 Vue.use(VueRouter);
 
@@ -47,6 +48,14 @@ const routes: Array<RouteConfig> = [
     path: "/skill_subjects",
     name: "SkillSubjectListView",
     component: SkillSubjectListView,
+    meta: {
+      requiresAuth: true,
+    },
+  },
+  {
+    path: "/companies",
+    name: "CompanyListView",
+    component: CompanyListView,
     meta: {
       requiresAuth: true,
     },
