@@ -9,6 +9,17 @@
       style="background-color: #e3e3e3"
     >
       <v-list>
+        <v-list-item link router to="/">
+          <v-list-item-action>
+            <v-icon>mdi-settings</v-icon>
+          </v-list-item-action>
+          <v-list-item-content>
+            <v-list-item-title>
+              <v-icon left>mdi-view-dashboard</v-icon>
+              Dashboard
+            </v-list-item-title>
+          </v-list-item-content>
+        </v-list-item>
         <v-list-item link router to="/companies">
           <v-list-item-action>
             <v-icon>mdi-settings</v-icon>
