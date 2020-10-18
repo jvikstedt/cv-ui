@@ -1,6 +1,11 @@
 import Api from "@/api/api";
 import SchoolModule, { School } from "@/store/modules/school";
-import { CreateSchoolDto, SearchSchoolDto } from "../school";
+import {
+  CreateSchoolDto,
+  PatchSchoolDto,
+  SchoolSearchResult,
+  SearchSchoolDto,
+} from "../school";
 
 export default class SchoolService {
   public async fetchSchools(): Promise<void> {
@@ -24,15 +29,25 @@ export default class SchoolService {
     return school;
   }
 
+  public async patchSchool({
+    schoolId,
+    data,
+  }: PatchSchoolDto): Promise<School> {
+    const school: School = await Api.patch(`/schools/${schoolId}`, data);
+    SchoolModule.add([school]);
+
+    return school;
+  }
+
   public async searchSchools(
     searchSchoolDto: SearchSchoolDto
-  ): Promise<School[]> {
-    const schools: School[] = await Api.post(
+  ): Promise<SchoolSearchResult> {
+    const result: SchoolSearchResult = await Api.post(
       "/schools/search",
       searchSchoolDto
     );
-    SchoolModule.add(schools);
+    SchoolModule.add(result.items);
 
-    return schools;
+    return result;
   }
 }

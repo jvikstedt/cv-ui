@@ -9,14 +9,36 @@ export interface CreateSchoolDto {
   name: string;
 }
 
+export interface PatchSchoolDtoData {
+  name?: string;
+}
+
+export interface PatchSchoolDto {
+  schoolId: number;
+  data: PatchSchoolDtoData;
+}
+
 export interface SearchSchoolDto {
-  name: string;
-  limit?: number;
+  name?: string;
+
+  take?: number;
+
+  skip?: number;
+
+  orderColumnName?: string;
+
+  orderSort?: "ASC" | "DESC";
+}
+
+export interface SchoolSearchResult {
+  items: School[];
+  total: number;
 }
 
 export interface Service {
   fetchSchools(): Promise<void>;
   deleteSchool(id: number): Promise<void>;
   createSchool(createSchoolDto: CreateSchoolDto): Promise<School>;
-  searchSchools(searchSchoolDto: SearchSchoolDto): Promise<School[]>;
+  patchSchool(patchSchoolDto: PatchSchoolDto): Promise<School>;
+  searchSchools(searchSchoolDto: SearchSchoolDto): Promise<SchoolSearchResult>;
 }

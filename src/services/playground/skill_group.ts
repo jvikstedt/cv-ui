@@ -1,7 +1,12 @@
 import * as R from "ramda";
 import SkillGroupModule, { SkillGroup } from "@/store/modules/skill_group";
 import ApiService from "@/services/api/skill_group";
-import { CreateSkillGroupDto, SearchSkillGroupDto } from "../skill_group";
+import {
+  CreateSkillGroupDto,
+  PatchSkillGroupDto,
+  SearchSkillGroupDto,
+  SkillGroupSearchResult,
+} from "../skill_group";
 import { SortArrayOfNumbers } from "@/helpers/index";
 
 export default class SkillGroupService extends ApiService {
@@ -31,11 +36,33 @@ export default class SkillGroupService extends ApiService {
     SkillGroupModule.delete([id]);
   }
 
+  public async patchSkillGroup({
+    skillGroupId,
+    data,
+  }: PatchSkillGroupDto): Promise<SkillGroup> {
+    const originalSkillGroup = SkillGroupModule.find(skillGroupId);
+    if (!originalSkillGroup) {
+      throw new Error(`Could not find skillGroup ${skillGroupId}`);
+    }
+    const skillGroup = {
+      ...originalSkillGroup,
+      ...data,
+    };
+
+    SkillGroupModule.add([skillGroup]);
+    return skillGroup;
+  }
+
   public async searchSkillGroups(
     searchSkillGroupDto: SearchSkillGroupDto
-  ): Promise<SkillGroup[]> {
-    const skillSubjects = await super.searchSkillGroups(searchSkillGroupDto);
+  ): Promise<SkillGroupSearchResult> {
+    const result = await super.searchSkillGroups(searchSkillGroupDto);
 
-    return [...skillSubjects, ...this.fakedSkillGroups];
+    const { items, total } = result;
+
+    return {
+      items: [...items, ...this.fakedSkillGroups],
+      total: total + R.length(this.fakedSkillGroups),
+    };
   }
 }

@@ -9,9 +9,30 @@ export interface CreateSkillGroupDto {
   name: string;
 }
 
+export interface PatchSkillGroupDtoData {
+  name?: string;
+}
+
+export interface PatchSkillGroupDto {
+  skillGroupId: number;
+  data: PatchSkillGroupDtoData;
+}
+
 export interface SearchSkillGroupDto {
-  name: string;
-  limit?: number;
+  name?: string;
+
+  take?: number;
+
+  skip?: number;
+
+  orderColumnName?: string;
+
+  orderSort?: "ASC" | "DESC";
+}
+
+export interface SkillGroupSearchResult {
+  items: SkillGroup[];
+  total: number;
 }
 
 export interface Service {
@@ -19,7 +40,8 @@ export interface Service {
   createSkillGroup(
     createSkillGroupDto: CreateSkillGroupDto
   ): Promise<SkillGroup>;
+  patchSkillGroup(patchSkillGroupDto: PatchSkillGroupDto): Promise<SkillGroup>;
   searchSkillGroups(
     searchSkillGroupDto: SearchSkillGroupDto
-  ): Promise<SkillGroup[]>;
+  ): Promise<SkillGroupSearchResult>;
 }

@@ -1,6 +1,11 @@
 import Api from "@/api/api";
 import SkillGroupModule, { SkillGroup } from "@/store/modules/skill_group";
-import { CreateSkillGroupDto, SearchSkillGroupDto } from "../skill_group";
+import {
+  CreateSkillGroupDto,
+  PatchSkillGroupDto,
+  SearchSkillGroupDto,
+  SkillGroupSearchResult,
+} from "../skill_group";
 
 export default class SkillGroupService {
   public async fetchSkillGroups(): Promise<void> {
@@ -29,15 +34,28 @@ export default class SkillGroupService {
     return skillGroup;
   }
 
+  public async patchSkillGroup({
+    skillGroupId,
+    data,
+  }: PatchSkillGroupDto): Promise<SkillGroup> {
+    const skillGroup: SkillGroup = await Api.patch(
+      `/skill_groups/${skillGroupId}`,
+      data
+    );
+    SkillGroupModule.add([skillGroup]);
+
+    return skillGroup;
+  }
+
   public async searchSkillGroups(
     searchSkillGroupDto: SearchSkillGroupDto
-  ): Promise<SkillGroup[]> {
-    const skillGroups: SkillGroup[] = await Api.post(
+  ): Promise<SkillGroupSearchResult> {
+    const result: SkillGroupSearchResult = await Api.post(
       "/skill_groups/search",
       searchSkillGroupDto
     );
-    SkillGroupModule.add(skillGroups);
+    SkillGroupModule.add(result.items);
 
-    return skillGroups;
+    return result;
   }
 }

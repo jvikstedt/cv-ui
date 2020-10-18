@@ -1,7 +1,12 @@
 import * as R from "ramda";
 import ApiService from "@/services/api/school";
 import SchoolModule, { School } from "@/store/modules/school";
-import { CreateSchoolDto, SearchSchoolDto } from "../school";
+import {
+  CreateSchoolDto,
+  PatchSchoolDto,
+  SchoolSearchResult,
+  SearchSchoolDto,
+} from "../school";
 import { SortArrayOfNumbers } from "@/helpers/index";
 
 export default class SchoolService extends ApiService {
@@ -31,11 +36,33 @@ export default class SchoolService extends ApiService {
     return school;
   }
 
+  public async patchSchool({
+    schoolId,
+    data,
+  }: PatchSchoolDto): Promise<School> {
+    const originalSchool = SchoolModule.find(schoolId);
+    if (!originalSchool) {
+      throw new Error(`Could not find school ${schoolId}`);
+    }
+    const school = {
+      ...originalSchool,
+      ...data,
+    };
+
+    SchoolModule.add([school]);
+    return school;
+  }
+
   public async searchSchools(
     searchSchoolDto: SearchSchoolDto
-  ): Promise<School[]> {
-    const schools = await super.searchSchools(searchSchoolDto);
+  ): Promise<SchoolSearchResult> {
+    const result = await super.searchSchools(searchSchoolDto);
 
-    return [...schools, ...this.fakedSchools];
+    const { items, total } = result;
+
+    return {
+      items: [...items, ...this.fakedSchools],
+      total: total + R.length(this.fakedSchools),
+    };
   }
 }
