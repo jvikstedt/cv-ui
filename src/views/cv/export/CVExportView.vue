@@ -109,6 +109,10 @@ export default class CVExportView extends Vue {
     await ExportModule.fetchTemplates();
   }
 
+  beforeDestroy(): void {
+    ServiceManager.setIsPlayground(false);
+  }
+
   openCV(): void {
     this.$router.push(`/cv/${this.id}`);
   }
