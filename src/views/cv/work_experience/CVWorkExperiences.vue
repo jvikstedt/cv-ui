@@ -49,7 +49,6 @@ import DialogModule from "@/store/modules/dialog";
 import WorkExperienceModule, {
   WorkExperience,
 } from "@/store/modules/work_experience";
-import { ServiceManager } from "@/services";
 import { SortArr } from "@/helpers";
 
 @Component
@@ -59,10 +58,6 @@ export default class CVWorkExperiences extends Vue {
 
   get workExperiences(): WorkExperience[] {
     return SortArr(WorkExperienceModule.listByCV(this.cvId));
-  }
-
-  async created(): Promise<void> {
-    await ServiceManager.workExperience.fetchCVWorkExperiences(this.cvId);
   }
 
   onWorkExperienceClick(workExperience: WorkExperience): void {

@@ -41,7 +41,6 @@ import NewEducationDialog from "./components/NewEducationDialog.vue";
 import EditEducationDialog from "./components/EditEducationDialog.vue";
 import DialogModule from "@/store/modules/dialog";
 import EducationModule, { Education } from "@/store/modules/education";
-import { ServiceManager } from "@/services";
 import { SortArr } from "@/helpers";
 
 @Component
@@ -51,10 +50,6 @@ export default class CVEducations extends Vue {
 
   get educations(): Education[] {
     return SortArr(EducationModule.listByCV(this.cvId));
-  }
-
-  async created(): Promise<void> {
-    await ServiceManager.education.fetchCVEducations(this.cvId);
   }
 
   onEducationClick(education: Education): void {

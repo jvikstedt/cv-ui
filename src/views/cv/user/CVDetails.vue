@@ -93,7 +93,6 @@ import EditUserDetailsDialog from "./components/EditUserDetailsDialog.vue";
 import EditCVDetailsDialog from "./components/EditCVDetailsDialog.vue";
 import CVModule, { CV } from "@/store/modules/cv";
 import DialogModule from "@/store/modules/dialog";
-import { ServiceManager } from "@/services";
 
 @Component({
   components: {
@@ -108,10 +107,6 @@ export default class CVDetails extends Vue {
 
   get fetching(): boolean {
     return CVModule.fetching;
-  }
-
-  async created(): Promise<void> {
-    await ServiceManager.cv.fetchCV(this.cvId);
   }
 
   openEditCVDetailsDialog(): void {
