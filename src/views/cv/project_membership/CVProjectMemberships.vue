@@ -80,7 +80,6 @@ import { Skill } from "@/store/modules/skill";
 import ProjectMembershipModule, {
   ProjectMembership,
 } from "@/store/modules/project_membership";
-import { ServiceManager } from "@/services";
 import { SortArr } from "@/helpers";
 
 @Component
@@ -90,10 +89,6 @@ export default class CVProjectMemberships extends Vue {
 
   get projectMemberships(): ProjectMembership[] {
     return SortArr(ProjectMembershipModule.listByCV(this.cvId));
-  }
-
-  async created(): Promise<void> {
-    await ServiceManager.projectMembership.fetchCVProjectMemberships(this.cvId);
   }
 
   getChipStyle(skill: Skill): string {

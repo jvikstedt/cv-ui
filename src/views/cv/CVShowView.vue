@@ -36,18 +36,31 @@ export default class CVShowView extends Vue {
     };
   }
 
+  async fetchCV(): Promise<void> {
+    ServiceManager.setIsPlayground(false);
+    if (this.id) {
+      await Promise.all([
+        ServiceManager.cv.fetchCV(this.id),
+        ServiceManager.workExperience.fetchCVWorkExperiences(this.id),
+        ServiceManager.skill.fetchCVSkills(this.id),
+        ServiceManager.projectMembership.fetchCVProjectMemberships(this.id),
+        ServiceManager.education.fetchCVEducations(this.id),
+      ]);
+    }
+  }
+
   @Watch("$route.params.id")
   async routerChanged(id: string): Promise<void> {
     this.id = parseInt(id, 10);
+
+    await this.fetchCV();
   }
 
   async created(): Promise<void> {
     const idStr = this.$route.params.id;
     this.id = parseInt(idStr, 10);
-  }
 
-  mounted(): void {
-    ServiceManager.setIsPlayground(false);
+    await this.fetchCV();
   }
 }
 </script>

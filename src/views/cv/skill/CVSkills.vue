@@ -47,7 +47,6 @@ import NewSkillDialog from "./components/NewSkillDialog.vue";
 import DialogModule from "@/store/modules/dialog";
 import SkillModule, { Skill } from "@/store/modules/skill";
 import SkillChip from "./components/SkillChip.vue";
-import { ServiceManager } from "@/services";
 
 @Component({
   components: {
@@ -73,10 +72,6 @@ export default class CVSkills extends Vue {
       (skill: Skill) => skill.skillSubject.skillGroup.name,
       this.skills
     );
-  }
-
-  async created(): Promise<void> {
-    await ServiceManager.skill.fetchCVSkills(this.cvId);
   }
 
   skillGroups(): string[] {

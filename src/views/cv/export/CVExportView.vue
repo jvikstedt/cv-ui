@@ -94,19 +94,32 @@ export default class CVExportView extends Vue {
     this.template = null;
   }
 
+  async fetchCV(): Promise<void> {
+    ServiceManager.setIsPlayground(true);
+    if (this.id) {
+      await Promise.all([
+        ExportModule.fetchTemplates(),
+        ServiceManager.cv.fetchCV(this.id),
+        ServiceManager.workExperience.fetchCVWorkExperiences(this.id),
+        ServiceManager.skill.fetchCVSkills(this.id),
+        ServiceManager.projectMembership.fetchCVProjectMemberships(this.id),
+        ServiceManager.education.fetchCVEducations(this.id),
+      ]);
+    }
+  }
+
   @Watch("$route.params.id")
   async routerChanged(id: string): Promise<void> {
     this.id = parseInt(id, 10);
+
+    await this.fetchCV();
   }
 
   async created(): Promise<void> {
     const idStr = this.$route.params.id;
     this.id = parseInt(idStr, 10);
-  }
 
-  async mounted(): Promise<void> {
-    ServiceManager.setIsPlayground(true);
-    await ExportModule.fetchTemplates();
+    await this.fetchCV();
   }
 
   beforeDestroy(): void {
