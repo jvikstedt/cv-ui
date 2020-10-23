@@ -20,6 +20,12 @@
         item-text="name"
         return-object
       >
+        <template slot="selection" slot-scope="data">
+          {{ data.item.exporter }} - {{ data.item.name }}
+        </template>
+        <template slot="item" slot-scope="data">
+          {{ data.item.exporter }} - {{ data.item.name }}
+        </template>
         <template v-slot:append-outer>
           <v-btn @click="newTemplate"> New </v-btn>
         </template>
