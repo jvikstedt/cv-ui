@@ -75,7 +75,7 @@
 
 <script lang="ts">
 import { Component, Prop, Watch, Mixins } from "vue-property-decorator";
-import { Project } from "@/store/modules/project";
+import ProjectModule, { Project } from "@/store/modules/project";
 import NewProjectDialog from "@/views/project/components/NewProjectDialog.vue";
 import { DialogFormMixin } from "@/mixins";
 import { MembershipSkillDto } from "@/store/modules/membership_skill";
@@ -99,7 +99,6 @@ export default class NewProjectMembershipDialog extends Mixins(
   @Prop({ required: true }) readonly cvId!: number;
 
   search = "";
-  projects: Project[] = [];
   project: Project | null = null;
 
   description = "";
@@ -115,6 +114,10 @@ export default class NewProjectMembershipDialog extends Mixins(
   ];
   endYearMonthRules: InputValidationRules = [];
 
+  get projects(): Project[] {
+    return ProjectModule.list;
+  }
+
   @Watch("startYearMonth")
   async startYearMonthChanged(ym: YearMonth): Promise<void> {
     this.endYearMonthRules = [
@@ -124,10 +127,9 @@ export default class NewProjectMembershipDialog extends Mixins(
 
   @Watch("search")
   async searchChanged(keyword: string): Promise<void> {
-    const { items } = await ServiceManager.project.searchProjects({
+    await ServiceManager.project.searchProjects({
       name: keyword || "",
     });
-    this.projects = items;
   }
 
   async onSave(): Promise<void> {
@@ -164,7 +166,6 @@ export default class NewProjectMembershipDialog extends Mixins(
   }
 
   afterProjectCreate(project: Project): void {
-    this.projects = [...this.projects, project];
     this.project = project;
   }
 }

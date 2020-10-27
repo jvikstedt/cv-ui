@@ -80,7 +80,7 @@ import { Component, Prop, Watch, Mixins } from "vue-property-decorator";
 import NewSchoolDialog from "@/views/school/components/NewSchoolDialog.vue";
 import { DialogFormMixin } from "@/mixins";
 import { Education } from "@/store/modules/education";
-import { School } from "@/store/modules/school";
+import SchoolModule, { School } from "@/store/modules/school";
 import { ServiceManager, EducationService } from "@/services";
 import { InputValidationRules } from "vuetify";
 import { DateAfter, DateBefore, IsRequired } from "@/helpers/validator";
@@ -97,7 +97,6 @@ export default class NewEducationDialog extends Mixins(DialogFormMixin) {
   readonly existingEducations!: Education[];
 
   search = "";
-  schools: School[] = [];
   school: School | null = null;
 
   degree = "";
@@ -113,6 +112,17 @@ export default class NewEducationDialog extends Mixins(DialogFormMixin) {
   ];
   endYearRules: InputValidationRules = [];
 
+  get schools(): School[] {
+    return R.reject(
+      (school: School) =>
+        !!R.find(
+          (education: Education) => R.equals(school.id, education.school.id),
+          this.existingEducations
+        ),
+      SchoolModule.list
+    );
+  }
+
   @Watch("startYear")
   async startYearChanged(year: number): Promise<void> {
     this.endYearRules = [
@@ -122,17 +132,9 @@ export default class NewEducationDialog extends Mixins(DialogFormMixin) {
 
   @Watch("search")
   async searchChanged(keyword: string): Promise<void> {
-    const { items } = await ServiceManager.school.searchSchools({
+    await ServiceManager.school.searchSchools({
       name: keyword || "",
     });
-    this.schools = R.reject(
-      (school: School) =>
-        !!R.find(
-          (education: Education) => R.equals(school.id, education.school.id),
-          this.existingEducations
-        ),
-      items
-    );
   }
 
   async onSave(): Promise<void> {
@@ -160,7 +162,6 @@ export default class NewEducationDialog extends Mixins(DialogFormMixin) {
   }
 
   afterSchoolCreate(school: School): void {
-    this.schools = [...this.schools, school];
     this.school = school;
   }
 }
