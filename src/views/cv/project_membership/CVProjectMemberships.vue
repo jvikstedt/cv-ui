@@ -55,7 +55,9 @@
                 v-for="membershipSkill in projectMembership.membershipSkills"
                 small
               >
-                {{ membershipSkill.skill.skillSubject.name }}
+                {{ membershipSkill.skill.skillSubject.name }} ({{
+                  membershipSkill.skill.skillSubject.skillGroup.name
+                }})
               </v-chip>
             </div>
           </v-list-item-content>

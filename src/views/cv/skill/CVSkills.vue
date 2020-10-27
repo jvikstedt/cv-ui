@@ -12,6 +12,7 @@
         :key="skill.id"
         :skill="skill"
         :canEdit="canEdit"
+        :showSkillGroup="true"
       />
 
       <v-subheader class="pa-0">Skill categories</v-subheader>

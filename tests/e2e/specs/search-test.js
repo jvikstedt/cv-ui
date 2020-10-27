@@ -35,15 +35,15 @@ describe("Search", () => {
 
     cy.get("input[name=skill]").first().type("Docker");
 
-    cy.get(".v-list-item__mask").contains("Docker").click();
+    cy.get(".v-list-item").contains("Docker").click();
 
     cy.get("input[name=skill]").first().type("Ruby");
 
-    cy.get(".v-list-item__mask").contains("Ruby").click();
+    cy.get(".v-list-item").contains("Ruby").click();
 
     cy.get("input[name=skill]").first().type("Typescript");
 
-    cy.get(".v-list-item__mask").contains("Typescript").click();
+    cy.get(".v-list-item").contains("Typescript").click();
 
     cy.waitUntil(
       () => {

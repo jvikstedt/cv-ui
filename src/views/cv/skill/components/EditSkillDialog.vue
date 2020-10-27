@@ -1,6 +1,8 @@
 <template>
   <v-card>
-    <v-card-title class="headline">{{ skill.skillSubject.name }}</v-card-title>
+    <v-card-title class="headline">
+      {{ skill.skillSubject.name }} ({{ skill.skillSubject.skillGroup.name }})
+    </v-card-title>
 
     <v-form ref="form" v-model="valid" lazy-validation @submit.prevent="onSave">
       <v-card-actions>

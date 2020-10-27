@@ -23,6 +23,12 @@
           placeholder="Start typing to search"
           return-object
         >
+          <template slot="selection" slot-scope="data">
+            {{ data.item.name }} ({{ data.item.skillGroup.name }})
+          </template>
+          <template slot="item" slot-scope="data">
+            {{ data.item.name }} ({{ data.item.skillGroup.name }})
+          </template>
           <template v-slot:append-outer>
             <v-btn @click="newSkillSubject">New</v-btn>
           </template>
@@ -35,7 +41,7 @@
           v-model="experienceInYears"
           class="align-center"
           :max="10"
-          :min="1"
+          :min="0"
           hide-details
         >
           <template v-slot:append>
@@ -103,7 +109,7 @@ export default class NewSkillDialog extends Mixins(DialogFormMixin) {
     skill: Skill
   ) => Promise<void>;
 
-  experienceInYears = 1;
+  experienceInYears = 0;
   interestLevel = 1;
   highlight = false;
   search = "";

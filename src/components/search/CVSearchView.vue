@@ -35,13 +35,24 @@
         placeholder="Start typing to search and select"
         return-object
         @change="onSelect"
-      ></v-autocomplete>
+      >
+        <template slot="selection" slot-scope="data">
+          {{ data.item.name }} ({{ data.item.skillGroup.name }})
+        </template>
+        <template slot="item" slot-scope="data">
+          {{ data.item.name }} ({{ data.item.skillGroup.name }})
+        </template>
+      </v-autocomplete>
 
       <v-simple-table dense>
         <template v-slot:default>
           <tbody>
             <tr v-for="skill in searchData.skills" :key="skill.skillSubjectId">
-              <td>{{ skill.name }}</td>
+              <td>
+                {{ skill.name }} ({{
+                  findSkillSubject(skill.skillSubjectId).skillGroup.name
+                }})
+              </td>
               <td>
                 <v-checkbox
                   :input-value="skill.required"
@@ -102,7 +113,9 @@
                     <v-avatar left class="">
                       {{ Math.ceil(skill.experienceInYears) }}
                     </v-avatar>
-                    {{ skill.name }}
+                    {{ skill.name }} ({{
+                      findSkillSubject(skill.skillSubjectId).skillGroup.name
+                    }})
                     <v-icon v-if="skill.highlight" right>mdi-star</v-icon>
                   </v-chip>
                 </v-list-item-subtitle>
@@ -130,7 +143,9 @@ import {
   CVSearchDto,
   CVSearchResultSkill,
 } from "@/store/modules/cv";
-import { SkillSubject } from "@/store/modules/skill_subject";
+import SkillSubjectModule, {
+  SkillSubject,
+} from "@/store/modules/skill_subject";
 import { SearchMixin, DialogFormMixin } from "@/mixins";
 import SearchModule from "@/store/modules/search";
 import { ServiceManager } from "@/services";
@@ -142,6 +157,8 @@ export default class CVSearchView extends Mixins(SearchMixin, DialogFormMixin) {
   searchInput = null;
   selectedSkillSubject: SkillSubject | null = null;
   skillSubjects: SkillSubject[] = [];
+
+  findSkillSubject = SkillSubjectModule.find;
 
   get searchData(): CVSearchDtoData {
     return SearchModule.searchData;
@@ -222,6 +239,11 @@ export default class CVSearchView extends Mixins(SearchMixin, DialogFormMixin) {
     const searchDtoSkill = new CVSearchDtoSkill();
     searchDtoSkill.skillSubjectId = skillSubject.id;
     searchDtoSkill.name = skillSubject.name;
+
+    this.skillSubjects = R.reject(
+      (s) => R.equals(s.id, skillSubject.id),
+      this.skillSubjects
+    );
 
     SearchModule.setSearchData({
       ...this.searchData,
