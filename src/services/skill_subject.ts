@@ -37,6 +37,7 @@ export interface SkillSubjectSearchResult {
 }
 
 export interface Service {
+  fetchSkillSubjects(): Promise<void>;
   deleteSkillSubject(id: number): Promise<void>;
   createSkillSubject(
     createSkillSubjectDto: CreateSkillSubjectDto

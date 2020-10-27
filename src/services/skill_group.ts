@@ -36,6 +36,7 @@ export interface SkillGroupSearchResult {
 }
 
 export interface Service {
+  fetchSkillGroups(): Promise<void>;
   deleteSkillGroup(id: number): Promise<void>;
   createSkillGroup(
     createSkillGroupDto: CreateSkillGroupDto
