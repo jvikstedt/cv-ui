@@ -48,7 +48,6 @@
             <v-text-field
               name="experienceInYears"
               v-model="experienceInYears"
-              :rules="isRequiredRule"
               class="mt-0 pt-0"
               hide-details
               single-line
@@ -89,7 +88,9 @@
 <script lang="ts">
 import * as R from "ramda";
 import { Component, Prop, Watch, Mixins } from "vue-property-decorator";
-import { SkillSubject } from "@/store/modules/skill_subject";
+import SkillSubjectModule, {
+  SkillSubject,
+} from "@/store/modules/skill_subject";
 import NewSkillSubjectDialog from "@/views/skill_subject/components/NewSkillSubjectDialog.vue";
 import { DialogFormMixin } from "@/mixins";
 import { Skill } from "@/store/modules/skill";
@@ -113,22 +114,24 @@ export default class NewSkillDialog extends Mixins(DialogFormMixin) {
   interestLevel = 1;
   highlight = false;
   search = "";
-  skillSubjects: SkillSubject[] = [];
   skillSubject: SkillSubject | null = null;
 
-  @Watch("search")
-  async searchChanged(keyword: string): Promise<void> {
-    const { items } = await ServiceManager.skillSubject.searchSkillSubjects({
-      name: keyword || "",
-    });
-    this.skillSubjects = R.reject(
+  get skillSubjects(): SkillSubject[] {
+    return R.reject(
       (skillSubject: SkillSubject) =>
         !!R.find(
           (skill: Skill) => R.equals(skillSubject.id, skill.skillSubject.id),
           this.existingSkills
         ),
-      items
+      SkillSubjectModule.list
     );
+  }
+
+  @Watch("search")
+  async searchChanged(keyword: string): Promise<void> {
+    await ServiceManager.skillSubject.searchSkillSubjects({
+      name: keyword || "",
+    });
   }
 
   async onSave(): Promise<void> {
@@ -158,7 +161,6 @@ export default class NewSkillDialog extends Mixins(DialogFormMixin) {
   }
 
   afterSkillSubjectCreate(skillSubject: SkillSubject): void {
-    this.skillSubjects = [...this.skillSubjects, skillSubject];
     this.skillSubject = skillSubject;
   }
 }

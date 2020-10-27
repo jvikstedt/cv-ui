@@ -41,7 +41,7 @@
 
 <script lang="ts">
 import { Component, Prop, Watch, Mixins } from "vue-property-decorator";
-import { SkillGroup } from "@/store/modules/skill_group";
+import SkillGroupModule, { SkillGroup } from "@/store/modules/skill_group";
 import NewSkillGroupDialog from "@/views/skill_group/components/NewSkillGroupDialog.vue";
 import { DialogFormMixin } from "@/mixins";
 import { SkillSubject } from "@/store/modules/skill_subject";
@@ -56,15 +56,17 @@ export default class NewSkillSubjectDialog extends Mixins(DialogFormMixin) {
   name = "";
 
   search = "";
-  skillGroups: SkillGroup[] = [];
   skillGroup: SkillGroup | null = null;
+
+  get skillGroups(): SkillGroup[] {
+    return SkillGroupModule.list;
+  }
 
   @Watch("search")
   async searchChanged(input: string): Promise<void> {
-    const { items } = await ServiceManager.skillGroup.searchSkillGroups({
+    await ServiceManager.skillGroup.searchSkillGroups({
       name: input || "",
     });
-    this.skillGroups = items;
   }
 
   async onSave(): Promise<void> {
@@ -91,7 +93,6 @@ export default class NewSkillSubjectDialog extends Mixins(DialogFormMixin) {
   }
 
   afterSkillGroupCreate(skillGroup: SkillGroup): void {
-    this.skillGroups = [...this.skillGroups, skillGroup];
     this.skillGroup = skillGroup;
   }
 }

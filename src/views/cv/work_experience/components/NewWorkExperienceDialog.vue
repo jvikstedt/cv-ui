@@ -66,7 +66,7 @@
 
 <script lang="ts">
 import { Component, Prop, Watch, Mixins } from "vue-property-decorator";
-import { Company } from "@/store/modules/company";
+import CompanyModule, { Company } from "@/store/modules/company";
 import NewCompanyDialog from "@/views/company/components/NewCompanyDialog.vue";
 import { DialogFormMixin } from "@/mixins";
 import { MonthPicker } from "@/components/form";
@@ -85,7 +85,6 @@ export default class NewWorkExperienceDialog extends Mixins(DialogFormMixin) {
   @Prop({ required: true }) readonly cvId!: number;
 
   search = "";
-  companies: Company[] = [];
   company: Company | null = null;
 
   jobTitle = "";
@@ -100,6 +99,10 @@ export default class NewWorkExperienceDialog extends Mixins(DialogFormMixin) {
   ];
   endYearMonthRules: InputValidationRules = [];
 
+  get companies(): Company[] {
+    return CompanyModule.list;
+  }
+
   @Watch("startYearMonth")
   async startYearMonthChanged(ym: YearMonth): Promise<void> {
     this.endYearMonthRules = [
@@ -109,11 +112,9 @@ export default class NewWorkExperienceDialog extends Mixins(DialogFormMixin) {
 
   @Watch("search")
   async searchChanged(keyword: string): Promise<void> {
-    const { items } = await ServiceManager.company.searchCompanies({
+    await ServiceManager.company.searchCompanies({
       name: keyword || "",
     });
-
-    this.companies = items;
   }
 
   async onSave(): Promise<void> {
@@ -149,7 +150,6 @@ export default class NewWorkExperienceDialog extends Mixins(DialogFormMixin) {
   }
 
   afterCompanyCreate(company: Company): void {
-    this.companies = [...this.companies, company];
     this.company = company;
   }
 }
