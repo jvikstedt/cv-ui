@@ -27,7 +27,7 @@ describe("CV projects", () => {
     cy.pickMonthAndYear("endYearMonth", "2002", "May");
 
     cy.get("input[name=skill]").first().type("Ansible");
-    cy.get(".v-list-item__content").last().click();
+    cy.get(".v-list-item").last().click();
 
     cy.contains("Save").click();
 
@@ -52,7 +52,7 @@ describe("CV projects", () => {
     cy.get("#cv-projects .edit-project-membership-btn").first().click();
 
     cy.get("input[name=skill]").first().type("Python");
-    cy.get(".v-list-item__content").last().click();
+    cy.get(".v-list-item").last().click();
 
     cy.contains("Save").click();
 

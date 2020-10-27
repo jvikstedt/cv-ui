@@ -9,7 +9,11 @@
     <v-avatar left class="">
       {{ Math.ceil(skillExperience.totalExperience) }}
     </v-avatar>
-    {{ skill.skillSubject.name }}
+    {{
+      `${skill.skillSubject.name} ${
+        showSkillGroup ? "(" + skill.skillSubject.skillGroup.name + ")" : ""
+      }`
+    }}
     <v-icon v-if="skill.highlight" right>mdi-star</v-icon>
   </v-chip>
 </template>
@@ -24,6 +28,7 @@ import SkillModule, { Skill, SkillExperience } from "@/store/modules/skill";
 export default class SkillChip extends Vue {
   @Prop({ required: true }) readonly skill!: Skill;
   @Prop({ required: true }) readonly canEdit!: boolean;
+  @Prop({ required: false, default: false }) readonly showSkillGroup!: boolean;
 
   get skillExperience(): SkillExperience | undefined {
     return SkillModule.skillExperience(this.skill.id);

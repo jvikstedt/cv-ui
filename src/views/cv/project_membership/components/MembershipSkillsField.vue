@@ -12,7 +12,14 @@
       return-object
       @change="onSelect"
       v-if="!readonly"
-    ></v-autocomplete>
+    >
+      <template slot="selection" slot-scope="data">
+        {{ data.item.name }} ({{ data.item.skillGroup.name }})
+      </template>
+      <template slot="item" slot-scope="data">
+        {{ data.item.name }} ({{ data.item.skillGroup.name }})
+      </template>
+    </v-autocomplete>
 
     <v-simple-table>
       <template v-slot:default>
@@ -25,7 +32,7 @@
         </thead>
         <tbody>
           <tr v-for="m in membershipSkillRows" :key="m.skillSubjectId">
-            <td>{{ m.skillSubjectName }}</td>
+            <td>{{ m.skillSubjectName }} ({{ m.skillGroupName }})</td>
             <td>
               <v-checkbox
                 :input-value="m.automaticCalculation"
@@ -74,6 +81,7 @@ import { ServiceManager } from "@/services";
 interface MembershipSkillRow {
   skillSubjectId: number;
   skillSubjectName: string;
+  skillGroupName: string;
   automaticCalculation: boolean;
   experienceInYears: number;
 }
@@ -107,6 +115,7 @@ export default class MembershipSkillsField extends Vue {
           return {
             skillSubjectId: dto.skillSubjectId,
             skillSubjectName: skillSubject.name,
+            skillGroupName: skillSubject.skillGroup.name,
             automaticCalculation: dto.automaticCalculation,
             experienceInYears: dto.experienceInYears,
           };

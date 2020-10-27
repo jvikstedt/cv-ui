@@ -17,7 +17,7 @@ describe("CV skills", () => {
 
     cy.get("input[name=skillSubject]").first().type("Ansible");
 
-    cy.get(".v-list-item__content").last().click();
+    cy.get(".v-list-item").last().click();
 
     cy.get("input[name=experienceInYears]").clear().type("4");
 
