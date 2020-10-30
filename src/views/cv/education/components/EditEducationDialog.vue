@@ -2,7 +2,13 @@
   <v-card>
     <v-card-title class="headline">{{ education.school.name }}</v-card-title>
 
-    <v-form ref="form" v-model="valid" lazy-validation @submit.prevent="onSave">
+    <v-form
+      ref="form"
+      v-model="valid"
+      lazy-validation
+      :readonly="!canEdit"
+      @submit.prevent="onSave"
+    >
       <v-card-actions>
         <v-spacer></v-spacer>
 
@@ -28,7 +34,6 @@
           :rules="isRequiredRule"
           label="Degree"
           required
-          :readonly="!canEdit"
         ></v-text-field>
 
         <v-text-field
@@ -37,7 +42,6 @@
           :rules="isRequiredRule"
           label="Field of study"
           required
-          :readonly="!canEdit"
         ></v-text-field>
 
         <v-text-field
@@ -45,7 +49,6 @@
           :counter="255"
           label="Description"
           required
-          :readonly="!canEdit"
         ></v-text-field>
 
         <v-text-field
@@ -54,7 +57,6 @@
           :rules="startYearRules"
           type="number"
           required
-          :readonly="!canEdit"
         ></v-text-field>
 
         <v-text-field
@@ -62,14 +64,9 @@
           label="End year"
           :rules="endYearRules"
           type="number"
-          :readonly="!canEdit"
         ></v-text-field>
 
-        <v-checkbox
-          v-model="highlight"
-          label="Highlight"
-          :readonly="!canEdit"
-        ></v-checkbox>
+        <v-checkbox v-model="highlight" label="Highlight"></v-checkbox>
       </v-card-text>
     </v-form>
   </v-card>

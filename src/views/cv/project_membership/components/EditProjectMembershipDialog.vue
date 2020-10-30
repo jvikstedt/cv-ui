@@ -4,7 +4,13 @@
       projectMembership.project.name
     }}</v-card-title>
 
-    <v-form ref="form" v-model="valid" lazy-validation @submit.prevent="onSave">
+    <v-form
+      ref="form"
+      v-model="valid"
+      lazy-validation
+      :readonly="!canEdit"
+      @submit.prevent="onSave"
+    >
       <v-card-actions>
         <v-spacer></v-spacer>
 
@@ -30,7 +36,6 @@
           :rules="isRequiredRule"
           label="Description"
           required
-          :readonly="!canEdit"
         ></v-text-field>
 
         <v-text-field
@@ -39,7 +44,6 @@
           :rules="isRequiredRule"
           label="Role"
           required
-          :readonly="!canEdit"
         ></v-text-field>
 
         <MonthPicker
@@ -57,11 +61,7 @@
           :readonly="!canEdit"
         />
 
-        <v-checkbox
-          :readonly="!canEdit"
-          v-model="highlight"
-          label="Highlight"
-        ></v-checkbox>
+        <v-checkbox v-model="highlight" label="Highlight"></v-checkbox>
 
         <MembershipSkillsField
           :readonly="!canEdit"

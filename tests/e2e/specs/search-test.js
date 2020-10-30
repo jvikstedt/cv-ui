@@ -10,21 +10,21 @@ describe("Search", () => {
     cy.resetSkills();
   });
 
-  it("Searches bobtest -user and verifies it opens correct cv", () => {
+  it("Searches admin -user and verifies it opens correct cv", () => {
     cy.visit("/");
 
-    cy.get("input[name=searchbar]").first().type("bob test");
+    cy.get("input[name=searchbar]").first().type("john doe");
 
-    cy.get(".v-menu__content .v-list-item__content").contains("Bob Test");
+    cy.get(".v-menu__content .v-list-item__content").contains("John Doe");
 
-    cy.get("input[name=searchbar]").first().clear().type("john");
+    cy.get("input[name=searchbar]").first().clear().type("bob");
 
     cy.get(".v-menu__content .v-list-item__content")
-      .contains("Bob Test")
+      .contains("John Doe")
       .should("not.exist");
   });
 
-  it("Searches bobtest -user with multiple skills", () => {
+  it("Searches admin -user with multiple skills", () => {
     cy.createSkill("Docker", 4);
     cy.createSkill("Ruby", 2);
     cy.createSkill("Typescript", 2);
@@ -49,7 +49,7 @@ describe("Search", () => {
       () => {
         cy.get("#search-view-search-btn").click();
         return cy.get(".v-dialog").then((dialog) => {
-          if (dialog.text().includes("Bob Test")) {
+          if (dialog.text().includes("John Doe")) {
             return true;
           }
           return false;
@@ -58,10 +58,10 @@ describe("Search", () => {
       { interval: 1000 }
     );
 
-    cy.get(".v-dialog .v-list-item__content").contains("Bob Test").click();
+    cy.get(".v-dialog .v-list-item__content").contains("John Doe").click();
 
     cy.url().should("include", `/cv/${user.cvIds[0]}`);
 
-    cy.contains("Bob Test");
+    cy.contains("John Doe");
   });
 });
