@@ -9,6 +9,7 @@
         ref="form"
         v-model="valid"
         lazy-validation
+        :readonly="!canEdit"
         @submit.prevent="onSave"
       >
         <v-card-actions>
@@ -16,7 +17,9 @@
 
           <v-btn color="red darken-1" text @click="onCancel"> Cancel </v-btn>
 
-          <v-btn color="green darken-1" text type="submit"> Save </v-btn>
+          <v-btn color="green darken-1" :disabled="!canEdit" text type="submit">
+            Save
+          </v-btn>
         </v-card-actions>
         <v-card-text>
           <v-text-field
@@ -63,6 +66,7 @@ import SkillSubjectModule, {
   SkillSubject,
 } from "@/store/modules/skill_subject";
 import { ServiceManager, SkillSubjectService } from "@/services";
+import AuthModule from "@/store/modules/auth";
 
 @Component
 export default class EditSkillSubjectDialog extends Mixins(
@@ -76,6 +80,8 @@ export default class EditSkillSubjectDialog extends Mixins(
   searchKey = "SkillSearchKey";
 
   name = "";
+
+  canEdit = AuthModule.hasRole("ADMIN");
 
   get fetching(): boolean {
     return SkillSubjectModule.fetching;

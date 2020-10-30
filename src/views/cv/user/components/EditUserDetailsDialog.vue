@@ -4,7 +4,13 @@
       {{ user.firstName }} {{ user.lastName }}
     </v-card-title>
 
-    <v-form ref="form" v-model="valid" lazy-validation @submit.prevent="onSave">
+    <v-form
+      ref="form"
+      v-model="valid"
+      lazy-validation
+      :readonly="!canEdit"
+      @submit.prevent="onSave"
+    >
       <v-card-actions>
         <v-spacer></v-spacer>
 
@@ -32,7 +38,6 @@
           v-model="firstName"
           label="First name"
           :rules="isRequiredRule"
-          :readonly="!canEdit"
         ></v-text-field>
 
         <v-text-field
@@ -40,7 +45,6 @@
           v-model="lastName"
           label="Last name"
           :rules="isRequiredRule"
-          :readonly="!canEdit"
         ></v-text-field>
 
         <v-text-field
@@ -48,7 +52,6 @@
           v-model="jobTitle"
           label="Job title"
           :rules="isRequiredRule"
-          :readonly="!canEdit"
         ></v-text-field>
 
         <v-text-field
@@ -56,7 +59,6 @@
           label="Work experience in years"
           :rules="isRequiredRule"
           type="number"
-          :readonly="!canEdit"
         ></v-text-field>
 
         <v-text-field
@@ -64,7 +66,6 @@
           v-model="phone"
           label="Phone"
           :rules="isRequiredRule"
-          :readonly="!canEdit"
         ></v-text-field>
 
         <v-text-field
@@ -72,7 +73,6 @@
           v-model="location"
           label="Location"
           :rules="isRequiredRule"
-          :readonly="!canEdit"
         ></v-text-field>
 
         <v-text-field
@@ -80,7 +80,6 @@
           v-model="email"
           label="Email"
           :rules="isRequiredRule"
-          :readonly="!canEdit"
         ></v-text-field>
       </v-card-text>
     </v-form>

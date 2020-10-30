@@ -8,6 +8,7 @@
         ref="form"
         v-model="valid"
         lazy-validation
+        :readonly="!canEdit"
         @submit.prevent="onSave"
       >
         <v-card-actions>
@@ -15,7 +16,9 @@
 
           <v-btn color="red darken-1" text @click="onCancel"> Cancel </v-btn>
 
-          <v-btn color="green darken-1" text type="submit"> Save </v-btn>
+          <v-btn color="green darken-1" :disabled="!canEdit" text type="submit">
+            Save
+          </v-btn>
         </v-card-actions>
         <v-card-text>
           <v-text-field
@@ -36,6 +39,7 @@ import { Component, Prop, Mixins } from "vue-property-decorator";
 import { DialogFormMixin } from "@/mixins";
 import ProjectModule, { Project } from "@/store/modules/project";
 import { ServiceManager, ProjectService } from "@/services";
+import AuthModule from "@/store/modules/auth";
 
 @Component
 export default class EditProjectDialog extends Mixins(DialogFormMixin) {
@@ -45,6 +49,8 @@ export default class EditProjectDialog extends Mixins(DialogFormMixin) {
   ) => Promise<void>;
 
   name = "";
+
+  canEdit = AuthModule.hasRole("ADMIN");
 
   get fetching(): boolean {
     return ProjectModule.fetching;
