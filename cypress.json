@@ -3,6 +3,8 @@
   "env": {
     "EXTERNAL_API": "http://localhost:8080/api",
     "USERNAME": "bobtest",
-    "PASSWORD": "BobTest123"
+    "PASSWORD": "BobTest123",
+    "ADMIN_USERNAME": "admin",
+    "ADMIN_PASSWORD": "Admin123"
   }
 }

@@ -4,7 +4,13 @@
       {{ skill.skillSubject.name }} ({{ skill.skillSubject.skillGroup.name }})
     </v-card-title>
 
-    <v-form ref="form" v-model="valid" lazy-validation @submit.prevent="onSave">
+    <v-form
+      ref="form"
+      v-model="valid"
+      lazy-validation
+      :readonly="!canEdit"
+      @submit.prevent="onSave"
+    >
       <v-card-actions>
         <v-spacer></v-spacer>
 
@@ -26,7 +32,6 @@
           :max="10"
           :min="0"
           hide-details
-          :readonly="!canEdit"
         >
           <template v-slot:append>
             <v-text-field
@@ -37,7 +42,6 @@
               single-line
               type="number"
               style="width: 60px"
-              :readonly="!canEdit"
             ></v-text-field>
           </template>
         </v-slider>
@@ -49,7 +53,6 @@
           :max="3"
           :min="1"
           hide-details
-          :readonly="!canEdit"
         >
           <template v-slot:append>
             <v-text-field
@@ -61,16 +64,11 @@
               single-line
               type="number"
               style="width: 60px"
-              :readonly="!canEdit"
             ></v-text-field>
           </template>
         </v-slider>
 
-        <v-checkbox
-          v-model="highlight"
-          label="Highlight"
-          :readonly="!canEdit"
-        ></v-checkbox>
+        <v-checkbox v-model="highlight" label="Highlight"></v-checkbox>
 
         <div v-if="skillExperience">
           <v-subheader>

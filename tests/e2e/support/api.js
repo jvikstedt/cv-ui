@@ -29,7 +29,10 @@ import * as R from "ramda";
 
 Cypress.Commands.add(
   "login",
-  (username = Cypress.env("USERNAME"), password = Cypress.env("PASSWORD")) => {
+  (
+    username = Cypress.env("ADMIN_USERNAME"),
+    password = Cypress.env("ADMIN_PASSWORD")
+  ) => {
     cy.request({
       method: "POST",
       url: `${Cypress.env("EXTERNAL_API")}/auth/signin`,

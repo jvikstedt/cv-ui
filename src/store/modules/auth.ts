@@ -10,6 +10,8 @@ import jwt from "jwt-decode";
 import Api from "@/api/api";
 import store from "@/store";
 
+export const ADMIN_ROLE = "ADMIN";
+
 export class TokenData {
   cvIds!: number[];
   firstName!: string;
@@ -17,6 +19,7 @@ export class TokenData {
   userId!: number;
   templateIds!: number[];
   username!: string;
+  roles!: string[];
 }
 
 export class AuthCredentialsDto {
@@ -55,8 +58,14 @@ class AuthModule extends VuexModule {
     return this.tokenData;
   }
 
+  get hasRole() {
+    return (role: string): boolean => R.includes(role, this.user.roles);
+  }
+
   get canEditCV() {
-    return (cvId: number): boolean => R.includes(cvId, this.user.cvIds);
+    return (cvId: number): boolean =>
+      R.includes(cvId, this.user.cvIds) ||
+      R.includes(ADMIN_ROLE, this.user.roles);
   }
 
   @Mutation
