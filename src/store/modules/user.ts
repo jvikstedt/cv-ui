@@ -6,7 +6,9 @@ import {
   getModule,
   VuexModule,
   MutationAction,
+  Action,
 } from "vuex-module-decorators";
+import { normalize, schema } from "normalizr";
 import store from "@/store";
 
 export interface User {
@@ -23,6 +25,8 @@ export interface User {
   createdAt: Date;
   updatedAt: Date;
 }
+
+const UserSchema = new schema.Entity("users");
 
 @Module({
   dynamic: true,
@@ -72,6 +76,13 @@ class UserModule extends VuexModule {
   @MutationAction({ mutate: ["fetching"] })
   async setFetching(fetching: boolean) {
     return { fetching };
+  }
+
+  @Action
+  public async saveUsers(data: User[]): Promise<void> {
+    const normalizedData = normalize(data, [UserSchema]);
+    const { users } = normalizedData.entities;
+    this.add(R.values(users || {}));
   }
 }
 
