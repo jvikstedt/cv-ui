@@ -32,7 +32,7 @@ export interface PatchUserDto {
 }
 
 export interface SearchUserDto {
-  name?: string;
+  email?: string;
 
   take?: number;
 
