@@ -27,12 +27,11 @@
 import jwt from "jwt-decode";
 import * as R from "ramda";
 
+let adminToken;
+
 Cypress.Commands.add(
   "login",
-  (
-    username = Cypress.env("ADMIN_USERNAME"),
-    password = Cypress.env("ADMIN_PASSWORD")
-  ) => {
+  (username = Cypress.env("USERNAME"), password = Cypress.env("PASSWORD")) => {
     cy.request({
       method: "POST",
       url: `${Cypress.env("EXTERNAL_API")}/auth/signin`,
@@ -45,6 +44,21 @@ Cypress.Commands.add(
       .then((body) => {
         window.localStorage.setItem("accessToken", body.accessToken);
       });
+
+    if (!adminToken) {
+      cy.request({
+        method: "POST",
+        url: `${Cypress.env("EXTERNAL_API")}/auth/signin`,
+        body: {
+          username: Cypress.env("ADMIN_USERNAME"),
+          password: Cypress.env("ADMIN_PASSWORD"),
+        },
+      })
+        .its("body")
+        .then((body) => {
+          adminToken = body.accessToken;
+        });
+    }
   }
 );
 
@@ -69,7 +83,7 @@ Cypress.Commands.add(
       method: "GET",
       url: `${Cypress.env("EXTERNAL_API")}/skill_subjects`,
       headers: {
-        Authorization: `Bearer ${accessToken}`,
+        Authorization: `Bearer ${adminToken}`,
       },
     })
       .its("body")
@@ -83,7 +97,7 @@ Cypress.Commands.add(
           method: "POST",
           url: `${Cypress.env("EXTERNAL_API")}/cv/${cvId}/skills`,
           headers: {
-            Authorization: `Bearer ${accessToken}`,
+            Authorization: `Bearer ${adminToken}`,
           },
           body: {
             skillSubjectId: skillSubject.id,
@@ -105,7 +119,7 @@ Cypress.Commands.add("resetSkills", () => {
     method: "GET",
     url: `${Cypress.env("EXTERNAL_API")}/cv/${cvId}/skills`,
     headers: {
-      Authorization: `Bearer ${accessToken}`,
+      Authorization: `Bearer ${adminToken}`,
     },
   })
     .its("body")
@@ -115,7 +129,7 @@ Cypress.Commands.add("resetSkills", () => {
           method: "DELETE",
           url: `${Cypress.env("EXTERNAL_API")}/cv/${cvId}/skills/${skill.id}`,
           headers: {
-            Authorization: `Bearer ${accessToken}`,
+            Authorization: `Bearer ${adminToken}`,
           },
         });
       }
@@ -144,7 +158,7 @@ Cypress.Commands.add(
       method: "GET",
       url: `${Cypress.env("EXTERNAL_API")}/skill_subjects`,
       headers: {
-        Authorization: `Bearer ${accessToken}`,
+        Authorization: `Bearer ${adminToken}`,
       },
     })
       .its("body")
@@ -161,7 +175,7 @@ Cypress.Commands.add(
             method: "GET",
             url: `${Cypress.env("EXTERNAL_API")}/project`,
             headers: {
-              Authorization: `Bearer ${accessToken}`,
+              Authorization: `Bearer ${adminToken}`,
             },
           })
           .its("body")
@@ -177,7 +191,7 @@ Cypress.Commands.add(
           method: "POST",
           url: `${Cypress.env("EXTERNAL_API")}/cv/${cvId}/project_membership`,
           headers: {
-            Authorization: `Bearer ${accessToken}`,
+            Authorization: `Bearer ${adminToken}`,
           },
           body: {
             projectId: result.project.id,
@@ -211,7 +225,7 @@ Cypress.Commands.add("resetProjectMemberships", () => {
     method: "GET",
     url: `${Cypress.env("EXTERNAL_API")}/cv/${cvId}/project_membership`,
     headers: {
-      Authorization: `Bearer ${accessToken}`,
+      Authorization: `Bearer ${adminToken}`,
     },
   })
     .its("body")
@@ -223,7 +237,7 @@ Cypress.Commands.add("resetProjectMemberships", () => {
             project.id
           }`,
           headers: {
-            Authorization: `Bearer ${accessToken}`,
+            Authorization: `Bearer ${adminToken}`,
           },
         });
       }
@@ -244,7 +258,7 @@ Cypress.Commands.add("resetUserInformation", () => {
     method: "PATCH",
     url: `${Cypress.env("EXTERNAL_API")}/users/${user.userId}`,
     headers: {
-      Authorization: `Bearer ${accessToken}`,
+      Authorization: `Bearer ${adminToken}`,
     },
     body: {
       firstName: user.firstName,
@@ -261,7 +275,7 @@ Cypress.Commands.add("resetCVInformation", () => {
     method: "PATCH",
     url: `${Cypress.env("EXTERNAL_API")}/cv/${user.cvIds[0]}`,
     headers: {
-      Authorization: `Bearer ${accessToken}`,
+      Authorization: `Bearer ${adminToken}`,
     },
     body: {
       description: "",

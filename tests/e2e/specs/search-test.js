@@ -13,14 +13,14 @@ describe("Search", () => {
   it("Searches admin -user and verifies it opens correct cv", () => {
     cy.visit("/");
 
-    cy.get("input[name=searchbar]").first().type("john doe");
+    cy.get("input[name=searchbar]").first().type("bob test");
 
-    cy.get(".v-menu__content .v-list-item__content").contains("John Doe");
+    cy.get(".v-menu__content .v-list-item__content").contains("Bob Test");
 
-    cy.get("input[name=searchbar]").first().clear().type("bob");
+    cy.get("input[name=searchbar]").first().clear().type("john");
 
     cy.get(".v-menu__content .v-list-item__content")
-      .contains("John Doe")
+      .contains("Bob Test")
       .should("not.exist");
   });
 
@@ -49,7 +49,7 @@ describe("Search", () => {
       () => {
         cy.get("#search-view-search-btn").click();
         return cy.get(".v-dialog").then((dialog) => {
-          if (dialog.text().includes("John Doe")) {
+          if (dialog.text().includes("Bob Test")) {
             return true;
           }
           return false;
@@ -58,10 +58,10 @@ describe("Search", () => {
       { interval: 1000 }
     );
 
-    cy.get(".v-dialog .v-list-item__content").contains("John Doe").click();
+    cy.get(".v-dialog .v-list-item__content").contains("Bob Test").click();
 
     cy.url().should("include", `/cv/${user.cvIds[0]}`);
 
-    cy.contains("John Doe");
+    cy.contains("Bob Test");
   });
 });
