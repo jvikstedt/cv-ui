@@ -282,3 +282,153 @@ Cypress.Commands.add("resetCVInformation", () => {
     },
   });
 });
+
+Cypress.Commands.add("resetWorkExperiences", () => {
+  const accessToken = window.localStorage.getItem("accessToken");
+  const tokenData = jwt(accessToken);
+  const cvId = tokenData.cvIds[0];
+
+  cy.request({
+    method: "GET",
+    url: `${Cypress.env("EXTERNAL_API")}/cv/${cvId}/work_experience`,
+    headers: {
+      Authorization: `Bearer ${adminToken}`,
+    },
+  })
+    .its("body")
+    .then((body) => {
+      for (const workExperience of body) {
+        cy.request({
+          method: "DELETE",
+          url: `${Cypress.env("EXTERNAL_API")}/cv/${cvId}/work_experience/${
+            workExperience.id
+          }`,
+          headers: {
+            Authorization: `Bearer ${adminToken}`,
+          },
+        });
+      }
+    });
+});
+
+Cypress.Commands.add(
+  "createWorkExperience",
+  (
+    companyName = "Test company",
+    jobTitle = "Developer",
+    description = "foo",
+    startYear = 2000,
+    startMonth = 1,
+    endYear = 2002,
+    endMonth = 12,
+    highlight = false
+  ) => {
+    const accessToken = window.localStorage.getItem("accessToken");
+    const tokenData = jwt(accessToken);
+
+    const cvId = tokenData.cvIds[0];
+
+    cy.request({
+      method: "GET",
+      url: `${Cypress.env("EXTERNAL_API")}/company`,
+      headers: {
+        Authorization: `Bearer ${adminToken}`,
+      },
+    })
+      .its("body")
+      .then((companies) => {
+        const company = R.find((c) => R.equals(c.name, companyName), companies);
+        cy.request({
+          method: "POST",
+          url: `${Cypress.env("EXTERNAL_API")}/cv/${cvId}/work_experience`,
+          headers: {
+            Authorization: `Bearer ${adminToken}`,
+          },
+          body: {
+            companyId: company.id,
+            description,
+            jobTitle,
+            startYear,
+            startMonth,
+            endYear,
+            endMonth,
+            highlight,
+          },
+        });
+      });
+  }
+);
+
+Cypress.Commands.add("resetEducations", () => {
+  const accessToken = window.localStorage.getItem("accessToken");
+  const tokenData = jwt(accessToken);
+  const cvId = tokenData.cvIds[0];
+
+  cy.request({
+    method: "GET",
+    url: `${Cypress.env("EXTERNAL_API")}/cv/${cvId}/educations`,
+    headers: {
+      Authorization: `Bearer ${adminToken}`,
+    },
+  })
+    .its("body")
+    .then((body) => {
+      for (const education of body) {
+        cy.request({
+          method: "DELETE",
+          url: `${Cypress.env("EXTERNAL_API")}/cv/${cvId}/educations/${
+            education.id
+          }`,
+          headers: {
+            Authorization: `Bearer ${adminToken}`,
+          },
+        });
+      }
+    });
+});
+
+Cypress.Commands.add(
+  "createEducation",
+  (
+    schoolName = "Test school",
+    degree = "Bachelor's degree, Information Technology",
+    fieldOfStudy = "Computer Software Engineering",
+    description = "foo",
+    startYear = 2000,
+    endYear = 2002,
+    highlight = false
+  ) => {
+    const accessToken = window.localStorage.getItem("accessToken");
+    const tokenData = jwt(accessToken);
+
+    const cvId = tokenData.cvIds[0];
+
+    cy.request({
+      method: "GET",
+      url: `${Cypress.env("EXTERNAL_API")}/schools`,
+      headers: {
+        Authorization: `Bearer ${adminToken}`,
+      },
+    })
+      .its("body")
+      .then((schools) => {
+        const school = R.find((s) => R.equals(s.name, schoolName), schools);
+        cy.request({
+          method: "POST",
+          url: `${Cypress.env("EXTERNAL_API")}/cv/${cvId}/educations`,
+          headers: {
+            Authorization: `Bearer ${adminToken}`,
+          },
+          body: {
+            schoolId: school.id,
+            degree,
+            fieldOfStudy,
+            description,
+            startYear,
+            endYear,
+            highlight,
+          },
+        });
+      });
+  }
+);
