@@ -1,9 +1,10 @@
 <template>
   <v-form v-model="valid">
-    <v-text-field v-model="template.name" label="Name"></v-text-field>
+    <v-text-field name="name" v-model="template.name" label="Name"></v-text-field>
 
     <v-select
       v-model="template.exporter"
+      name="exporter"
       :items="['pdf', 'docx']"
       label="Exporter"
     ></v-select>
@@ -16,6 +17,7 @@
       </p>
       <v-file-input
         label="File input"
+        name="file"
         accept=".doc,.docx,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
         placeholder="Insert .docx -file"
         @change="onFileChange"
@@ -26,6 +28,7 @@
       <v-textarea
         outlined
         v-model="template.data.bodyTemplate"
+        name="bodyTemplate"
         label="Body template"
         required
       ></v-textarea>
@@ -42,6 +45,7 @@
         >
           <template v-slot:append>
             <v-text-field
+              name="scale"
               v-model="template.data.scale"
               class="mt-0 pt-0"
               hide-details
@@ -56,6 +60,7 @@
       </v-card-text>
 
       <v-checkbox
+        name="displayHeaderFooter"
         v-model="template.data.displayHeaderFooter"
         label="Display header & footer"
       ></v-checkbox>
@@ -63,6 +68,7 @@
       <v-textarea
         v-if="template.data.displayHeaderFooter"
         outlined
+        name="headerTemplate"
         v-model="template.data.headerTemplate"
         label="Header template"
         required
@@ -71,27 +77,32 @@
       <v-textarea
         v-if="template.data.displayHeaderFooter"
         outlined
+        name="footerTemplate"
         v-model="template.data.footerTemplate"
         label="Footer template"
         required
       ></v-textarea>
 
       <v-checkbox
+        name="printBackground"
         v-model="template.data.printBackground"
         label="Print background"
       ></v-checkbox>
 
       <v-checkbox
+        name="landscape"
         v-model="template.data.landscape"
         label="Landscape"
       ></v-checkbox>
 
       <v-text-field
+        name="pageRanges"
         v-model="template.data.pageRanges"
         label="Page ranges"
       ></v-text-field>
 
       <v-select
+        name="format"
         v-model="template.data.format"
         :items="allowedFormats"
         label="Format"
@@ -99,34 +110,41 @@
 
       <v-text-field
         v-if="!template.data.format"
+        name="width"
         v-model="template.data.width"
         label="Width"
       ></v-text-field>
 
       <v-text-field
         v-if="!template.data.format"
+        name="height"
         v-model="template.data.height"
         label="Height"
       ></v-text-field>
 
       <v-text-field
+        name="marginTop"
         v-model="template.data.marginTop"
         label="Margin top"
       ></v-text-field>
       <v-text-field
+        name="marginRight"
         v-model="template.data.marginRight"
         label="Margin right"
       ></v-text-field>
       <v-text-field
+        name="marginBottom"
         v-model="template.data.marginBottom"
         label="Margin bottom"
       ></v-text-field>
       <v-text-field
+        name="marginLeft"
         v-model="template.data.marginLeft"
         label="Margin left"
       ></v-text-field>
 
       <v-checkbox
+        name="preferCSSPageSize"
         v-model="template.data.preferCSSPageSize"
         label="Prefer CSS page size"
       ></v-checkbox>

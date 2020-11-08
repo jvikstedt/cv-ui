@@ -432,3 +432,26 @@ Cypress.Commands.add(
       });
   }
 );
+
+Cypress.Commands.add("deleteTemplate", (templateName = "Test template") => {
+  cy.request({
+    method: "GET",
+    url: `${Cypress.env("EXTERNAL_API")}/templates`,
+    headers: {
+      Authorization: `Bearer ${adminToken}`,
+    },
+  })
+    .its("body")
+    .then((templates) => {
+      const template = R.find((t) => R.equals(t.name, templateName), templates);
+      if (template) {
+        cy.request({
+          method: "DELETE",
+          url: `${Cypress.env("EXTERNAL_API")}/templates/${template.id}`,
+          headers: {
+            Authorization: `Bearer ${adminToken}`,
+          },
+        });
+      }
+    });
+});

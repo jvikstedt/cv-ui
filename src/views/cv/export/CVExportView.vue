@@ -1,5 +1,5 @@
 <template>
-  <v-container style="max-width: 1024px">
+  <v-container style="max-width: 1024px" id="cv-export">
     <v-row>
       <v-col cols="12" sm="7">
         <v-select
