@@ -27,12 +27,11 @@
 import jwt from "jwt-decode";
 import * as R from "ramda";
 
+let adminToken;
+
 Cypress.Commands.add(
   "login",
-  (
-    username = Cypress.env("ADMIN_USERNAME"),
-    password = Cypress.env("ADMIN_PASSWORD")
-  ) => {
+  (username = Cypress.env("USERNAME"), password = Cypress.env("PASSWORD")) => {
     cy.request({
       method: "POST",
       url: `${Cypress.env("EXTERNAL_API")}/auth/signin`,
@@ -45,6 +44,21 @@ Cypress.Commands.add(
       .then((body) => {
         window.localStorage.setItem("accessToken", body.accessToken);
       });
+
+    if (!adminToken) {
+      cy.request({
+        method: "POST",
+        url: `${Cypress.env("EXTERNAL_API")}/auth/signin`,
+        body: {
+          username: Cypress.env("ADMIN_USERNAME"),
+          password: Cypress.env("ADMIN_PASSWORD"),
+        },
+      })
+        .its("body")
+        .then((body) => {
+          adminToken = body.accessToken;
+        });
+    }
   }
 );
 
@@ -69,7 +83,7 @@ Cypress.Commands.add(
       method: "GET",
       url: `${Cypress.env("EXTERNAL_API")}/skill_subjects`,
       headers: {
-        Authorization: `Bearer ${accessToken}`,
+        Authorization: `Bearer ${adminToken}`,
       },
     })
       .its("body")
@@ -83,7 +97,7 @@ Cypress.Commands.add(
           method: "POST",
           url: `${Cypress.env("EXTERNAL_API")}/cv/${cvId}/skills`,
           headers: {
-            Authorization: `Bearer ${accessToken}`,
+            Authorization: `Bearer ${adminToken}`,
           },
           body: {
             skillSubjectId: skillSubject.id,
@@ -105,7 +119,7 @@ Cypress.Commands.add("resetSkills", () => {
     method: "GET",
     url: `${Cypress.env("EXTERNAL_API")}/cv/${cvId}/skills`,
     headers: {
-      Authorization: `Bearer ${accessToken}`,
+      Authorization: `Bearer ${adminToken}`,
     },
   })
     .its("body")
@@ -115,7 +129,7 @@ Cypress.Commands.add("resetSkills", () => {
           method: "DELETE",
           url: `${Cypress.env("EXTERNAL_API")}/cv/${cvId}/skills/${skill.id}`,
           headers: {
-            Authorization: `Bearer ${accessToken}`,
+            Authorization: `Bearer ${adminToken}`,
           },
         });
       }
@@ -144,7 +158,7 @@ Cypress.Commands.add(
       method: "GET",
       url: `${Cypress.env("EXTERNAL_API")}/skill_subjects`,
       headers: {
-        Authorization: `Bearer ${accessToken}`,
+        Authorization: `Bearer ${adminToken}`,
       },
     })
       .its("body")
@@ -161,7 +175,7 @@ Cypress.Commands.add(
             method: "GET",
             url: `${Cypress.env("EXTERNAL_API")}/project`,
             headers: {
-              Authorization: `Bearer ${accessToken}`,
+              Authorization: `Bearer ${adminToken}`,
             },
           })
           .its("body")
@@ -177,7 +191,7 @@ Cypress.Commands.add(
           method: "POST",
           url: `${Cypress.env("EXTERNAL_API")}/cv/${cvId}/project_membership`,
           headers: {
-            Authorization: `Bearer ${accessToken}`,
+            Authorization: `Bearer ${adminToken}`,
           },
           body: {
             projectId: result.project.id,
@@ -211,7 +225,7 @@ Cypress.Commands.add("resetProjectMemberships", () => {
     method: "GET",
     url: `${Cypress.env("EXTERNAL_API")}/cv/${cvId}/project_membership`,
     headers: {
-      Authorization: `Bearer ${accessToken}`,
+      Authorization: `Bearer ${adminToken}`,
     },
   })
     .its("body")
@@ -223,7 +237,7 @@ Cypress.Commands.add("resetProjectMemberships", () => {
             project.id
           }`,
           headers: {
-            Authorization: `Bearer ${accessToken}`,
+            Authorization: `Bearer ${adminToken}`,
           },
         });
       }
@@ -244,7 +258,7 @@ Cypress.Commands.add("resetUserInformation", () => {
     method: "PATCH",
     url: `${Cypress.env("EXTERNAL_API")}/users/${user.userId}`,
     headers: {
-      Authorization: `Bearer ${accessToken}`,
+      Authorization: `Bearer ${adminToken}`,
     },
     body: {
       firstName: user.firstName,
@@ -261,10 +275,219 @@ Cypress.Commands.add("resetCVInformation", () => {
     method: "PATCH",
     url: `${Cypress.env("EXTERNAL_API")}/cv/${user.cvIds[0]}`,
     headers: {
-      Authorization: `Bearer ${accessToken}`,
+      Authorization: `Bearer ${adminToken}`,
     },
     body: {
       description: "",
     },
   });
+});
+
+Cypress.Commands.add("resetWorkExperiences", () => {
+  const accessToken = window.localStorage.getItem("accessToken");
+  const tokenData = jwt(accessToken);
+  const cvId = tokenData.cvIds[0];
+
+  cy.request({
+    method: "GET",
+    url: `${Cypress.env("EXTERNAL_API")}/cv/${cvId}/work_experience`,
+    headers: {
+      Authorization: `Bearer ${adminToken}`,
+    },
+  })
+    .its("body")
+    .then((body) => {
+      for (const workExperience of body) {
+        cy.request({
+          method: "DELETE",
+          url: `${Cypress.env("EXTERNAL_API")}/cv/${cvId}/work_experience/${
+            workExperience.id
+          }`,
+          headers: {
+            Authorization: `Bearer ${adminToken}`,
+          },
+        });
+      }
+    });
+});
+
+Cypress.Commands.add(
+  "createWorkExperience",
+  (
+    companyName = "Test company",
+    jobTitle = "Developer",
+    description = "foo",
+    startYear = 2000,
+    startMonth = 1,
+    endYear = 2002,
+    endMonth = 12,
+    highlight = false
+  ) => {
+    const accessToken = window.localStorage.getItem("accessToken");
+    const tokenData = jwt(accessToken);
+
+    const cvId = tokenData.cvIds[0];
+
+    cy.request({
+      method: "GET",
+      url: `${Cypress.env("EXTERNAL_API")}/company`,
+      headers: {
+        Authorization: `Bearer ${adminToken}`,
+      },
+    })
+      .its("body")
+      .then((companies) => {
+        const company = R.find((c) => R.equals(c.name, companyName), companies);
+        cy.request({
+          method: "POST",
+          url: `${Cypress.env("EXTERNAL_API")}/cv/${cvId}/work_experience`,
+          headers: {
+            Authorization: `Bearer ${adminToken}`,
+          },
+          body: {
+            companyId: company.id,
+            description,
+            jobTitle,
+            startYear,
+            startMonth,
+            endYear,
+            endMonth,
+            highlight,
+          },
+        });
+      });
+  }
+);
+
+Cypress.Commands.add("resetEducations", () => {
+  const accessToken = window.localStorage.getItem("accessToken");
+  const tokenData = jwt(accessToken);
+  const cvId = tokenData.cvIds[0];
+
+  cy.request({
+    method: "GET",
+    url: `${Cypress.env("EXTERNAL_API")}/cv/${cvId}/educations`,
+    headers: {
+      Authorization: `Bearer ${adminToken}`,
+    },
+  })
+    .its("body")
+    .then((body) => {
+      for (const education of body) {
+        cy.request({
+          method: "DELETE",
+          url: `${Cypress.env("EXTERNAL_API")}/cv/${cvId}/educations/${
+            education.id
+          }`,
+          headers: {
+            Authorization: `Bearer ${adminToken}`,
+          },
+        });
+      }
+    });
+});
+
+Cypress.Commands.add(
+  "createEducation",
+  (
+    schoolName = "Test school",
+    degree = "Bachelor's degree, Information Technology",
+    fieldOfStudy = "Computer Software Engineering",
+    description = "foo",
+    startYear = 2000,
+    endYear = 2002,
+    highlight = false
+  ) => {
+    const accessToken = window.localStorage.getItem("accessToken");
+    const tokenData = jwt(accessToken);
+
+    const cvId = tokenData.cvIds[0];
+
+    cy.request({
+      method: "GET",
+      url: `${Cypress.env("EXTERNAL_API")}/schools`,
+      headers: {
+        Authorization: `Bearer ${adminToken}`,
+      },
+    })
+      .its("body")
+      .then((schools) => {
+        const school = R.find((s) => R.equals(s.name, schoolName), schools);
+        cy.request({
+          method: "POST",
+          url: `${Cypress.env("EXTERNAL_API")}/cv/${cvId}/educations`,
+          headers: {
+            Authorization: `Bearer ${adminToken}`,
+          },
+          body: {
+            schoolId: school.id,
+            degree,
+            fieldOfStudy,
+            description,
+            startYear,
+            endYear,
+            highlight,
+          },
+        });
+      });
+  }
+);
+
+Cypress.Commands.add("deleteTemplate", (templateName = "Test template") => {
+  cy.request({
+    method: "GET",
+    url: `${Cypress.env("EXTERNAL_API")}/templates`,
+    headers: {
+      Authorization: `Bearer ${adminToken}`,
+    },
+  })
+    .its("body")
+    .then((templates) => {
+      const template = R.find((t) => R.equals(t.name, templateName), templates);
+      if (template) {
+        cy.request({
+          method: "DELETE",
+          url: `${Cypress.env("EXTERNAL_API")}/templates/${template.id}`,
+          headers: {
+            Authorization: `Bearer ${adminToken}`,
+          },
+        });
+      }
+    });
+});
+
+Cypress.Commands.add("createCompany", (name = "e2e test company") => {
+  cy.request({
+    method: "POST",
+    url: `${Cypress.env("EXTERNAL_API")}/company`,
+    headers: {
+      Authorization: `Bearer ${adminToken}`,
+    },
+    body: {
+      name,
+    },
+  });
+});
+
+Cypress.Commands.add("deleteCompany", (companyName = "e2e test company") => {
+  cy.request({
+    method: "GET",
+    url: `${Cypress.env("EXTERNAL_API")}/company`,
+    headers: {
+      Authorization: `Bearer ${adminToken}`,
+    },
+  })
+    .its("body")
+    .then((comapnies) => {
+      const company = R.find((c) => R.equals(c.name, companyName), comapnies);
+      if (company) {
+        cy.request({
+          method: "DELETE",
+          url: `${Cypress.env("EXTERNAL_API")}/company/${company.id}`,
+          headers: {
+            Authorization: `Bearer ${adminToken}`,
+          },
+        });
+      }
+    });
 });

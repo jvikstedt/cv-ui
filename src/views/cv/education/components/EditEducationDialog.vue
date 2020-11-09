@@ -29,6 +29,7 @@
       </v-card-actions>
       <v-card-text>
         <v-text-field
+          name="degree"
           v-model="degree"
           :counter="255"
           :rules="isRequiredRule"
@@ -37,6 +38,7 @@
         ></v-text-field>
 
         <v-text-field
+          name="fieldOfStudy"
           v-model="fieldOfStudy"
           :counter="255"
           :rules="isRequiredRule"
@@ -45,6 +47,7 @@
         ></v-text-field>
 
         <v-text-field
+          name="description"
           v-model="description"
           :counter="255"
           label="Description"
@@ -52,6 +55,7 @@
         ></v-text-field>
 
         <v-text-field
+          name="startYear"
           v-model.number="startYear"
           label="Start year"
           :rules="startYearRules"
@@ -60,6 +64,7 @@
         ></v-text-field>
 
         <v-text-field
+          name="endYear"
           v-model.number="endYear"
           label="End year"
           :rules="endYearRules"

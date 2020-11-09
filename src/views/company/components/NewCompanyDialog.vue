@@ -12,6 +12,7 @@
       </v-card-actions>
       <v-card-text>
         <v-text-field
+          name="name"
           v-model="name"
           :counter="255"
           :rules="isRequiredRule"

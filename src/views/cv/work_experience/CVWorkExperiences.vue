@@ -1,5 +1,5 @@
 <template>
-  <v-card class="mt-5">
+  <v-card class="mt-5" id="cv-work-experiences">
     <v-card-title class="headline">
       <v-icon left>mdi-domain</v-icon>
       Work experience
@@ -11,7 +11,12 @@
             <v-list-item-title class="headline mb-2 text-wrap">
               <v-icon v-if="workExperience.highlight">mdi-star</v-icon>
               {{ workExperience.company.name }}
-              <v-btn icon small @click="onWorkExperienceClick(workExperience)">
+              <v-btn
+                icon
+                class="edit-work-experience-btn"
+                small
+                @click="onWorkExperienceClick(workExperience)"
+              >
                 <v-icon v-if="canEdit">mdi-pencil</v-icon>
                 <v-icon v-else>mdi-information-outline</v-icon>
               </v-btn>

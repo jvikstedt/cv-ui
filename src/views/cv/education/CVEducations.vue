@@ -1,5 +1,5 @@
 <template>
-  <v-card class="mt-5">
+  <v-card class="mt-5" id="cv-educations">
     <v-card-title class="headline">
       <v-icon left>mdi-school</v-icon>
       Educations
@@ -11,7 +11,12 @@
             <v-list-item-title class="headline mb-2 text-wrap">
               <v-icon v-if="education.highlight">mdi-star</v-icon>
               {{ education.school.name }}
-              <v-btn icon small @click="onEducationClick(education)">
+              <v-btn
+                class="edit-education-btn"
+                icon
+                small
+                @click="onEducationClick(education)"
+              >
                 <v-icon v-if="canEdit">mdi-pencil</v-icon>
                 <v-icon v-else>mdi-information-outline</v-icon>
               </v-btn>

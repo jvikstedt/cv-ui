@@ -31,6 +31,7 @@
 
       <v-card-text>
         <v-text-field
+          name="jobTitle"
           v-model="jobTitle"
           :counter="255"
           :rules="isRequiredRule"
@@ -39,6 +40,7 @@
         ></v-text-field>
 
         <v-text-field
+          name="description"
           v-model="description"
           :counter="255"
           label="Description"

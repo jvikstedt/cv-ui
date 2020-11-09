@@ -11,6 +11,9 @@
     </v-card-actions>
 
     <v-card-text>
+      <a v-if="file" :download="fileName" :href="file" target="_blank">
+        Download
+      </a>
       <object
         v-if="template.exporter === 'pdf' && pdf"
         id="pdfviewer"
@@ -19,14 +22,6 @@
         width="100%"
         height="750px"
       />
-      <a
-        v-if="template.exporter === 'docx' && docx"
-        :download="docxFileName()"
-        :href="docx"
-        target="_blank"
-      >
-        Download docx
-      </a>
     </v-card-text>
   </v-card>
 </template>
@@ -107,11 +102,31 @@ export default class RenderTemplateDialog extends Mixins(DialogFormMixin) {
     return ExportModule.docx;
   }
 
-  docxFileName(): string {
-    if (this.cv && this.cv.user) {
-      return `${this.cv.user.firstName}-${this.cv.user.lastName}.docx`.toLowerCase();
+  get file(): string | null {
+    if (this.template.exporter === "pdf" && this.pdf) {
+      return this.pdf;
+    } else if (this.template.exporter === "docx" && this.docx) {
+      return this.docx;
     }
-    return "noname.docx";
+    return null;
+  }
+
+  get fileName(): string | null {
+    const fn = this.generateFileName();
+    if (this.template.exporter === "pdf" && this.pdf) {
+      return `${fn}.pdf`;
+    } else if (this.template.exporter === "docx" && this.docx) {
+      return `${fn}.docx`;
+    }
+
+    return null;
+  }
+
+  generateFileName(): string {
+    if (this.cv && this.cv.user) {
+      return `${this.cv.user.firstName}-${this.cv.user.lastName}`.toLowerCase();
+    }
+    return "noname";
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
