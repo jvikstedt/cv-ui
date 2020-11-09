@@ -1,6 +1,10 @@
 <template>
   <v-form v-model="valid">
-    <v-text-field name="name" v-model="template.name" label="Name"></v-text-field>
+    <v-text-field
+      name="name"
+      v-model="template.name"
+      label="Name"
+    ></v-text-field>
 
     <v-select
       v-model="template.exporter"

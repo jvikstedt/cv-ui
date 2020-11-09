@@ -455,3 +455,39 @@ Cypress.Commands.add("deleteTemplate", (templateName = "Test template") => {
       }
     });
 });
+
+Cypress.Commands.add("createCompany", (name = "e2e test company") => {
+  cy.request({
+    method: "POST",
+    url: `${Cypress.env("EXTERNAL_API")}/company`,
+    headers: {
+      Authorization: `Bearer ${adminToken}`,
+    },
+    body: {
+      name,
+    },
+  });
+});
+
+Cypress.Commands.add("deleteCompany", (companyName = "e2e test company") => {
+  cy.request({
+    method: "GET",
+    url: `${Cypress.env("EXTERNAL_API")}/company`,
+    headers: {
+      Authorization: `Bearer ${adminToken}`,
+    },
+  })
+    .its("body")
+    .then((comapnies) => {
+      const company = R.find((c) => R.equals(c.name, companyName), comapnies);
+      if (company) {
+        cy.request({
+          method: "DELETE",
+          url: `${Cypress.env("EXTERNAL_API")}/company/${company.id}`,
+          headers: {
+            Authorization: `Bearer ${adminToken}`,
+          },
+        });
+      }
+    });
+});
