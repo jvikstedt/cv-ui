@@ -27,16 +27,16 @@ describe("CV user", () => {
       `${user.firstName} ${user.lastName}`
     );
 
-    cy.get("input[name=firstName]").clear().type("John");
+    cy.get("input[name=firstName]").clear().type("Bob");
 
     cy.contains("Save").click();
 
     cy.get("#edit-user-details-btn").click();
-    cy.get(".v-dialog .v-card__title").contains(`John ${user.lastName}`);
+    cy.get(".v-dialog .v-card__title").contains(`Bob ${user.lastName}`);
     cy.contains("Cancel").click();
 
     cy.reload();
-    cy.contains("p", `John ${user.lastName}`);
+    cy.contains("p", `Bob ${user.lastName}`);
   });
 
   it("Edits cv information", () => {
