@@ -30,7 +30,7 @@ export class AuthCredentialsDto {
 const getUserFromLocalStorage = (): TokenData => {
   const accessToken = localStorage.getItem("accessToken");
   if (accessToken) {
-    return jwt(accessToken);
+    return jwt(accessToken) as TokenData;
   }
   return new TokenData();
 };
@@ -72,7 +72,7 @@ class AuthModule extends VuexModule {
   public authSuccess(accessToken: string): void {
     this.accessToken = accessToken;
     this.status = "success";
-    this.tokenData = jwt(accessToken);
+    this.tokenData = jwt(accessToken) as TokenData;
   }
 
   @Mutation
