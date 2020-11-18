@@ -54,23 +54,14 @@ export class ExportDocxDto {
   fileId!: string;
 }
 
-export interface TemplateDto {
-  id?: number;
-
-  name: string;
-
-  exporter?: string;
-
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  data: any;
-}
-
 export class Template {
   id!: number;
 
   name!: string;
 
   exporter!: string;
+
+  global!: boolean;
 
   userId!: number;
 
@@ -82,22 +73,23 @@ export class Template {
   updatedAt!: Date;
 }
 
-export class PatchTemplateDtoData {
+export class PatchTemplateDto {
+  id!: number;
+
   name!: string;
+
+  global!: boolean;
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   data!: any;
-}
-
-export class PatchTemplateDto {
-  id!: number;
-  data!: PatchTemplateDtoData;
 }
 
 export class CreateTemplateDto {
   name!: string;
 
   exporter!: string;
+
+  global!: boolean;
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   data!: any;
@@ -189,8 +181,15 @@ class ExportModule extends VuexModule {
   }
 
   @Action
-  public async patchTemplate({ id, data }: PatchTemplateDto): Promise<void> {
+  public async patchTemplate({
+    id,
+    name,
+    global,
+    data,
+  }: PatchTemplateDto): Promise<void> {
     const savedTemplate: Template = await Api.patch(`/templates/${id}`, {
+      name,
+      global,
       data,
     });
     this.context.commit("addTemplates", [savedTemplate]);
