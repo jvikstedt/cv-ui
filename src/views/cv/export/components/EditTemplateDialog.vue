@@ -7,7 +7,12 @@
 
       <v-btn color="red darken-1" text @click="onCancel"> Cancel </v-btn>
 
-      <v-btn color="green darken-1" text @click="onSave" :disabled="!template">
+      <v-btn
+        color="green darken-1"
+        text
+        @click="onSave"
+        :disabled="!template || !canEdit"
+      >
         Save
       </v-btn>
     </v-card-actions>
@@ -35,6 +40,7 @@
         :key="template.id"
         v-if="template"
         :initialTemplate="template"
+        :isAdmin="isAdmin"
         @change="onChange"
       />
     </v-card-text>
@@ -46,6 +52,7 @@ import * as R from "ramda";
 import { Component, Mixins } from "vue-property-decorator";
 import TemplateForm from "./TemplateForm.vue";
 import { DialogFormMixin } from "@/mixins";
+import AuthModule from "@/store/modules/auth";
 import ExportModule, { ExportPdfDto, Template } from "@/store/modules/export";
 
 @Component({
@@ -59,21 +66,30 @@ export default class EditTemplateDialog extends Mixins(DialogFormMixin) {
   }
 
   template: Template | null = null;
+  canEdit = true;
+  isAdmin = AuthModule.hasRole("ADMIN");
 
   async onChange(template: Template): Promise<void> {
     this.template = template;
+
+    if (template.id) {
+      this.canEdit = AuthModule.canEditTemplate(template);
+    }
   }
 
   async onSave(): Promise<void> {
     if (this.template && !this.template.id) {
       await ExportModule.createTemplate({
         name: this.template.name,
+        global: this.template.global,
         exporter: this.template.exporter,
         data: this.template.data,
       });
     } else if (this.template) {
       await ExportModule.patchTemplate({
         id: this.template.id,
+        name: this.template.name,
+        global: this.template.global,
         data: this.template.data,
       });
     }
@@ -87,6 +103,7 @@ export default class EditTemplateDialog extends Mixins(DialogFormMixin) {
       exporter: "pdf",
       data: new ExportPdfDto(),
     });
+    this.canEdit = true;
   }
 }
 </script>

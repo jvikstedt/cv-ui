@@ -6,6 +6,13 @@
       label="Name"
     ></v-text-field>
 
+    <v-checkbox
+      name="global"
+      v-model="template.global"
+      label="Global"
+      :disabled="!isAdmin"
+    ></v-checkbox>
+
     <v-select
       v-model="template.exporter"
       name="exporter"
@@ -165,6 +172,7 @@ import { CreateFile } from "@/api/file";
 @Component
 export default class TemplateForm extends Vue {
   @Prop({ required: true }) readonly initialTemplate!: Template;
+  @Prop({ required: true }) readonly isAdmin!: boolean;
 
   readonly allowedFormats = [
     "",
