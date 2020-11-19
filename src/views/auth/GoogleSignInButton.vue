@@ -10,18 +10,11 @@
 </template>
 
 <script lang="ts">
+import * as R from "ramda";
 import { Component, Vue } from "vue-property-decorator";
 import AuthModule from "@/store/modules/auth";
 
 const GOOGLE_CLIENT_ID = process.env.VUE_APP_GOOGLE_CLIENT_ID;
-
-interface WC {
-  id_token: string;
-}
-
-interface AuthData {
-  wc: WC;
-}
 
 @Component
 export default class GoogleSignInButton extends Vue {
@@ -31,9 +24,15 @@ export default class GoogleSignInButton extends Vue {
     ["client_id"]: GOOGLE_CLIENT_ID,
   };
 
-  async onSignInSuccess(authData: AuthData): Promise<void> {
-    await AuthModule.googleSignIn(authData.wc.id_token);
-    this.$router.push("/");
+  // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types, @typescript-eslint/no-explicit-any
+  async onSignInSuccess(authData: any): Promise<void> {
+    const key = R.keys(authData).find((e) =>
+      R.includes("id_token", R.keys(authData[e]))
+    );
+    if (key) {
+      await AuthModule.googleSignIn(authData[key].id_token);
+      this.$router.push("/");
+    }
   }
 
   created(): void {

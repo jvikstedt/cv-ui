@@ -24,4 +24,10 @@ module.exports = {
       return args;
     });
   },
+  pwa: {
+    workboxPluginMode: "GenerateSW",
+    workboxOptions: {
+      skipWaiting: true,
+    },
+  },
 };
