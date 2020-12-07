@@ -78,7 +78,7 @@ const calculateTotalSkillExperience = (
   const totalExperience =
     Math.round((projectExperience + skill.experienceInYears) * 100) / 100;
 
-  return totalExperience;
+  return totalExperience > 0 ? totalExperience : 1;
 };
 
 @Component

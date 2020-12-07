@@ -111,7 +111,11 @@
                     v-for="skill in commonSkills(item)"
                   >
                     <v-avatar left class="">
-                      {{ Math.ceil(skill.experienceInYears) }}
+                      {{
+                        Math.ceil(skill.experienceInYears) > 0
+                          ? Math.ceil(skill.experienceInYears)
+                          : 1
+                      }}
                     </v-avatar>
                     {{ skill.name }} ({{
                       findSkillSubject(skill.skillSubjectId).skillGroup.name
