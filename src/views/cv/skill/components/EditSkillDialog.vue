@@ -89,6 +89,8 @@
               ) / 100
             }}
             )
+            <br />
+            {{ skillExperience.totalExperience === 0 ? "Defaults to (1)" : "" }}
           </v-subheader>
           <v-simple-table>
             <template v-slot:default>

@@ -6,8 +6,12 @@
     text-color="blue-grey darken-4"
     v-on="{ click: () => onSkillClick(skill) }"
   >
-    <v-avatar left class="">
-      {{ Math.ceil(skillExperience.totalExperience) }}
+    <v-avatar left>
+      {{
+        Math.ceil(skillExperience.totalExperience) > 0
+          ? Math.ceil(skillExperience.totalExperience)
+          : 1
+      }}
     </v-avatar>
     {{
       `${skill.skillSubject.name} ${
