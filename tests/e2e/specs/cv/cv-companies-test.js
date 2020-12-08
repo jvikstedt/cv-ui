@@ -1,4 +1,4 @@
-describe("CV projects", () => {
+describe("CV companies", () => {
   let user;
 
   beforeEach(() => {
