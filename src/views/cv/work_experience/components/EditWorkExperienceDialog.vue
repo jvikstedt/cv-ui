@@ -30,6 +30,24 @@
         </v-btn>
       </v-card-actions>
       <v-card-text>
+        <v-autocomplete
+          name="company"
+          v-model="company"
+          :items="companies"
+          :search-input.sync="search"
+          :rules="isRequiredRule"
+          item-text="name"
+          item-value="id"
+          label="Company"
+          placeholder="Start typing to search"
+          return-object
+        >
+          <template v-slot:append-outer>
+            <v-btn @click="newCompany">New</v-btn>
+          </template>
+        </v-autocomplete>
+      </v-card-text>
+      <v-card-text>
         <v-text-field
           name="jobTitle"
           v-model="jobTitle"
@@ -78,6 +96,8 @@ import { ServiceManager, WorkExperienceService } from "@/services";
 import { InputValidationRules } from "vuetify";
 import { DateAfter, DateBefore, IsRequired } from "@/helpers/validator";
 import { DateTime } from "luxon";
+import CompanyModule, { Company } from "@/store/modules/company";
+import NewCompanyDialog from "@/views/company/components/NewCompanyDialog.vue";
 
 @Component({
   components: {
@@ -88,6 +108,8 @@ export default class EditWorkExperienceDialog extends Mixins(DialogFormMixin) {
   @Prop({ required: true }) readonly workExperience!: WorkExperience;
   @Prop({ required: false }) readonly canEdit!: boolean;
 
+  search = "";
+  company: Company | null = null;
   jobTitle = "";
   description = "";
   startYearMonth = new YearMonth();
@@ -100,14 +122,8 @@ export default class EditWorkExperienceDialog extends Mixins(DialogFormMixin) {
   ];
   endYearMonthRules: InputValidationRules = [];
 
-  @Watch("startYearMonth")
-  async startYearMonthChanged(ym: YearMonth): Promise<void> {
-    this.endYearMonthRules = [
-      DateAfter(DateTime.fromFormat(`${ym.year}-${ym.month}`, "yyyy-M")),
-    ];
-  }
-
   created(): void {
+    this.company = this.workExperience.company;
     this.jobTitle = this.workExperience.jobTitle;
     this.description = this.workExperience.description;
     this.highlight = this.workExperience.highlight;
@@ -119,6 +135,24 @@ export default class EditWorkExperienceDialog extends Mixins(DialogFormMixin) {
       year: this.workExperience.endYear || null,
       month: this.workExperience.endMonth || null,
     };
+  }
+
+  @Watch("startYearMonth")
+  async startYearMonthChanged(ym: YearMonth): Promise<void> {
+    this.endYearMonthRules = [
+      DateAfter(DateTime.fromFormat(`${ym.year}-${ym.month}`, "yyyy-M")),
+    ];
+  }
+
+  @Watch("search")
+  async searchChanged(keyword: string): Promise<void> {
+    await ServiceManager.company.searchCompanies({
+      name: keyword || "",
+    });
+  }
+
+  get companies(): Company[] {
+    return CompanyModule.list;
   }
 
   async onWorkExperienceDelete(): Promise<void> {
@@ -146,6 +180,7 @@ export default class EditWorkExperienceDialog extends Mixins(DialogFormMixin) {
         cvId: this.workExperience.cvId,
         workExperienceId: this.workExperience.id,
         data: {
+          companyId: this.company?.id,
           jobTitle: this.jobTitle,
           description: this.description,
           startYear: this.startYearMonth.year,
@@ -161,6 +196,17 @@ export default class EditWorkExperienceDialog extends Mixins(DialogFormMixin) {
 
       this.popDialogComponent();
     }
+  }
+
+  newCompany(): void {
+    this.pushDialogComponent({
+      component: NewCompanyDialog,
+      props: { afterCreate: this.afterCompanyCreate },
+    });
+  }
+
+  afterCompanyCreate(company: Company): void {
+    this.company = company;
   }
 }
 </script>

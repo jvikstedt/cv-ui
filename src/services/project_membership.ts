@@ -7,6 +7,7 @@ export const Playground = new PlaygroundService();
 export const Api = new ApiService();
 
 export interface PatchProjectMembershipDtoData {
+  projectId?: number;
   description?: string;
   role?: string;
   startYear?: number;

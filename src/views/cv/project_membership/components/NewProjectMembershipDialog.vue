@@ -23,6 +23,12 @@
           placeholder="Start typing to search"
           return-object
         >
+          <template slot="selection" slot-scope="data">
+            {{ data.item.name }} ({{ data.item.company.name }})
+          </template>
+          <template slot="item" slot-scope="data">
+            {{ data.item.name }} ({{ data.item.company.name }})
+          </template>
           <template v-slot:append-outer>
             <v-btn @click="newProject">New</v-btn>
           </template>

@@ -72,7 +72,6 @@ export default class CVEducations extends Vue {
       component: NewEducationDialog,
       props: {
         cvId: this.cvId,
-        existingEducations: this.educations,
       },
     });
   }

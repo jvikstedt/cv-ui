@@ -28,6 +28,24 @@
         </v-btn>
       </v-card-actions>
       <v-card-text>
+        <v-autocomplete
+          name="school"
+          v-model="school"
+          :items="schools"
+          :search-input.sync="search"
+          :rules="isRequiredRule"
+          item-text="name"
+          item-value="id"
+          label="School"
+          placeholder="Start typing to search"
+          return-object
+        >
+          <template v-slot:append-outer>
+            <v-btn @click="newSchool">New</v-btn>
+          </template>
+        </v-autocomplete>
+      </v-card-text>
+      <v-card-text>
         <v-text-field
           name="degree"
           v-model="degree"
@@ -87,11 +105,16 @@ import { PatchEducationDto } from "@/services/education";
 import { InputValidationRules } from "vuetify";
 import { DateAfter, DateBefore, IsRequired } from "@/helpers/validator";
 import { DateTime } from "luxon";
+import SchoolModule, { School } from "@/store/modules/school";
+import NewSchoolDialog from "@/views/school/components/NewSchoolDialog.vue";
 
 @Component
 export default class EditEducationDialog extends Mixins(DialogFormMixin) {
   @Prop({ required: true }) readonly education!: Education;
   @Prop({ required: false }) readonly canEdit!: boolean;
+
+  search = "";
+  school: School | null = null;
 
   degree = "";
   fieldOfStudy = "";
@@ -106,14 +129,8 @@ export default class EditEducationDialog extends Mixins(DialogFormMixin) {
   ];
   endYearRules: InputValidationRules = [];
 
-  @Watch("startYear")
-  async startYearChanged(year: number): Promise<void> {
-    this.endYearRules = [
-      DateAfter(DateTime.fromFormat(`${year}`, "yyyy"), "yyyy"),
-    ];
-  }
-
   created(): void {
+    this.school = this.education.school;
     this.degree = this.education.degree;
     this.fieldOfStudy = this.education.fieldOfStudy;
     this.description = this.education.description;
@@ -122,6 +139,24 @@ export default class EditEducationDialog extends Mixins(DialogFormMixin) {
     this.highlight = this.education.highlight;
 
     this.startYearChanged(this.startYear);
+  }
+
+  @Watch("startYear")
+  async startYearChanged(year: number): Promise<void> {
+    this.endYearRules = [
+      DateAfter(DateTime.fromFormat(`${year}`, "yyyy"), "yyyy"),
+    ];
+  }
+
+  @Watch("search")
+  async searchChanged(keyword: string): Promise<void> {
+    await ServiceManager.school.searchSchools({
+      name: keyword || "",
+    });
+  }
+
+  get schools(): School[] {
+    return SchoolModule.list;
   }
 
   async onEducationDelete(): Promise<void> {
@@ -143,6 +178,7 @@ export default class EditEducationDialog extends Mixins(DialogFormMixin) {
         cvId: this.education.cvId,
         educationId: this.education.id,
         data: {
+          schoolId: this.school?.id,
           degree: this.degree,
           fieldOfStudy: this.fieldOfStudy,
           description: this.description,
@@ -155,6 +191,17 @@ export default class EditEducationDialog extends Mixins(DialogFormMixin) {
 
       this.popDialogComponent();
     }
+  }
+
+  newSchool(): void {
+    this.pushDialogComponent({
+      component: NewSchoolDialog,
+      props: { afterCreate: this.afterSchoolCreate },
+    });
+  }
+
+  afterSchoolCreate(school: School): void {
+    this.school = school;
   }
 }
 </script>
