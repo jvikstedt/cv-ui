@@ -18,7 +18,7 @@ describe("CV projects", () => {
 
     cy.get("input[name=project]").first().type("Test project");
 
-    cy.get(".v-list-item__content").last().click();
+    cy.get(".v-list-item").last().click();
 
     cy.get("input[name=description]").type("foo");
     cy.get("input[name=role]").type("Developer");

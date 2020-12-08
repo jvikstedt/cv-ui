@@ -434,11 +434,12 @@ Cypress.Commands.add(
 );
 
 Cypress.Commands.add("deleteTemplate", (templateName = "Test template") => {
+  const accessToken = window.localStorage.getItem("accessToken");
   cy.request({
     method: "GET",
     url: `${Cypress.env("EXTERNAL_API")}/templates`,
     headers: {
-      Authorization: `Bearer ${adminToken}`,
+      Authorization: `Bearer ${accessToken}`,
     },
   })
     .its("body")
