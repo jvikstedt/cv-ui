@@ -84,7 +84,6 @@ import * as R from "ramda";
 import { Component, Prop, Watch, Mixins } from "vue-property-decorator";
 import NewSchoolDialog from "@/views/school/components/NewSchoolDialog.vue";
 import { DialogFormMixin } from "@/mixins";
-import { Education } from "@/store/modules/education";
 import SchoolModule, { School } from "@/store/modules/school";
 import { ServiceManager, EducationService } from "@/services";
 import { InputValidationRules } from "vuetify";
@@ -98,8 +97,6 @@ import { DateTime } from "luxon";
 })
 export default class NewEducationDialog extends Mixins(DialogFormMixin) {
   @Prop({ required: true }) readonly cvId!: number;
-  @Prop({ required: true, default: [] })
-  readonly existingEducations!: Education[];
 
   search = "";
   school: School | null = null;
@@ -118,14 +115,7 @@ export default class NewEducationDialog extends Mixins(DialogFormMixin) {
   endYearRules: InputValidationRules = [];
 
   get schools(): School[] {
-    return R.reject(
-      (school: School) =>
-        !!R.find(
-          (education: Education) => R.equals(school.id, education.school.id),
-          this.existingEducations
-        ),
-      SchoolModule.list
-    );
+    return SchoolModule.list;
   }
 
   @Watch("startYear")

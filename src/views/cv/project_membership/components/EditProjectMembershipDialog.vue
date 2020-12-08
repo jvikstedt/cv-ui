@@ -30,6 +30,30 @@
         </v-btn>
       </v-card-actions>
       <v-card-text>
+        <v-autocomplete
+          name="project"
+          v-model="project"
+          :items="projects"
+          :search-input.sync="search"
+          :rules="isRequiredRule"
+          item-text="name"
+          item-value="id"
+          label="Project"
+          placeholder="Start typing to search"
+          return-object
+        >
+          <template slot="selection" slot-scope="data">
+            {{ data.item.name }} ({{ data.item.company.name }})
+          </template>
+          <template slot="item" slot-scope="data">
+            {{ data.item.name }} ({{ data.item.company.name }})
+          </template>
+          <template v-slot:append-outer>
+            <v-btn @click="newProject">New</v-btn>
+          </template>
+        </v-autocomplete>
+      </v-card-text>
+      <v-card-text>
         <v-text-field
           v-model="description"
           :counter="255"
@@ -85,6 +109,8 @@ import { ServiceManager, ProjectMembershipService } from "@/services";
 import { DateAfter, DateBefore, IsRequired } from "@/helpers/validator";
 import { DateTime } from "luxon";
 import { InputValidationRules } from "vuetify";
+import ProjectModule, { Project } from "@/store/modules/project";
+import NewProjectDialog from "@/views/project/components/NewProjectDialog.vue";
 
 @Component({
   components: {
@@ -97,6 +123,9 @@ export default class EditProjectMembershipDialog extends Mixins(
 ) {
   @Prop({ required: true }) readonly projectMembership!: ProjectMembership;
   @Prop({ required: false }) readonly canEdit!: boolean;
+
+  search = "";
+  project: Project | null = null;
 
   description = "";
   role = "";
@@ -111,14 +140,8 @@ export default class EditProjectMembershipDialog extends Mixins(
   ];
   endYearMonthRules: InputValidationRules = [];
 
-  @Watch("startYearMonth")
-  async startYearMonthChanged(ym: YearMonth): Promise<void> {
-    this.endYearMonthRules = [
-      DateAfter(DateTime.fromFormat(`${ym.year}-${ym.month}`, "yyyy-M")),
-    ];
-  }
-
   created(): void {
+    this.project = this.projectMembership.project || null;
     this.description = this.projectMembership.description;
     this.role = this.projectMembership.role;
     this.startYearMonth = {
@@ -138,6 +161,24 @@ export default class EditProjectMembershipDialog extends Mixins(
       }),
       this.projectMembership.membershipSkills || []
     );
+  }
+
+  @Watch("startYearMonth")
+  async startYearMonthChanged(ym: YearMonth): Promise<void> {
+    this.endYearMonthRules = [
+      DateAfter(DateTime.fromFormat(`${ym.year}-${ym.month}`, "yyyy-M")),
+    ];
+  }
+
+  @Watch("search")
+  async searchChanged(keyword: string): Promise<void> {
+    await ServiceManager.project.searchProjects({
+      name: keyword || "",
+    });
+  }
+
+  get projects(): Project[] {
+    return ProjectModule.list;
   }
 
   async onProjectMembershipDelete(): Promise<void> {
@@ -164,6 +205,7 @@ export default class EditProjectMembershipDialog extends Mixins(
         cvId: this.projectMembership.cvId,
         projectMembershipId: this.projectMembership.id,
         data: {
+          projectId: this.project?.id,
           description: this.description,
           role: this.role,
           startYear: this.startYearMonth.year,
@@ -180,6 +222,17 @@ export default class EditProjectMembershipDialog extends Mixins(
 
       this.popDialogComponent();
     }
+  }
+
+  newProject(): void {
+    this.pushDialogComponent({
+      component: NewProjectDialog,
+      props: { afterCreate: this.afterProjectCreate },
+    });
+  }
+
+  afterProjectCreate(project: Project): void {
+    this.project = project;
   }
 }
 </script>

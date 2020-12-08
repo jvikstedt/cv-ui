@@ -6,6 +6,7 @@ export const Playground = new PlaygroundService();
 export const Api = new ApiService();
 
 export interface PatchEducationDtoData {
+  schoolId?: number;
   degree?: string;
   fieldOfStudy?: string;
   description?: string;

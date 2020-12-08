@@ -6,6 +6,7 @@ export const Playground = new PlaygroundService();
 export const Api = new ApiService();
 
 export interface PatchWorkExperienceDtoData {
+  companyId?: number;
   jobTitle?: string;
   description?: string;
   startYear?: number;
