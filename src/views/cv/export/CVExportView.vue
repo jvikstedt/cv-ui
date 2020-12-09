@@ -1,7 +1,7 @@
 <template>
   <v-container style="max-width: 1024px" id="cv-export">
-    <v-row>
-      <v-col cols="12" sm="7">
+    <v-row no-gutters>
+      <v-col cols="12" sm="12">
         <v-select
           v-model="template"
           :items="getTemplates"
@@ -16,27 +16,38 @@
           <template slot="item" slot-scope="data">
             {{ data.item.exporter }} - {{ data.item.name }}
           </template>
+
           <template v-slot:append-outer>
             <v-btn :disabled="!template" @click="exportTemplate">
               Export
             </v-btn>
-            <v-btn class="ml-2" @click="templateManager">
-              Template manager
-            </v-btn>
           </template>
         </v-select>
       </v-col>
+      <v-col cols="12" sm="12">
+        <v-btn @click="templateManager"> Template manager </v-btn>
+        <v-switch
+          :input-value="isPlayground"
+          @change="setIsPlayground($event)"
+          label="Playground"
+          class="ma-0 float-right"
+        ></v-switch>
+      </v-col>
     </v-row>
 
-    <v-alert dense outlined text type="warning">
-      This is an export mode, modifications to the CV are not persistent!
-      <a @click="openCV">Click here</a> to get back to normal mode.
+    <v-alert dense outlined text type="warning" v-if="isPlayground">
+      This is an playground mode, modifications to the CV are not persistent!
+      <a @click="openCV">Click here</a> to get back.
     </v-alert>
-    <CVDetails :cvId="id" :canEdit="true" :hideExport="true" />
-    <CVSkills :cvId="id" :canEdit="true" />
-    <CVEducations :cvId="id" :canEdit="true" />
-    <CVWorkExperiences :cvId="id" :canEdit="true" />
-    <CVProjectMemberships :cvId="id" :canEdit="true" />
+    <CVDetails
+      :cvId="id"
+      :canEdit="isPlayground || canEditCV(id)"
+      :hideExport="true"
+    />
+    <CVSkills :cvId="id" :canEdit="isPlayground || canEditCV(id)" />
+    <CVEducations :cvId="id" :canEdit="isPlayground || canEditCV(id)" />
+    <CVWorkExperiences :cvId="id" :canEdit="isPlayground || canEditCV(id)" />
+    <CVProjectMemberships :cvId="id" :canEdit="isPlayground || canEditCV(id)" />
   </v-container>
 </template>
 
@@ -52,6 +63,7 @@ import DialogModule from "@/store/modules/dialog";
 import EditTemplateDialog from "./components/EditTemplateDialog.vue";
 import ExportModule, { Template } from "@/store/modules/export";
 import RenderTemplateDialog from "./components/RenderTemplateDialog.vue";
+import AuthModule from "@/store/modules/auth";
 
 @Component({
   components: {
@@ -66,10 +78,11 @@ export default class CVExportView extends Vue {
   id: number | null = null;
 
   template: Template | null = null;
+  isPlayground = false;
 
   get canEditCV() {
-    return (): boolean => {
-      return true;
+    return (cvId: number): boolean => {
+      return AuthModule.canEditCV(cvId);
     };
   }
 
@@ -95,7 +108,7 @@ export default class CVExportView extends Vue {
   }
 
   async fetchCV(): Promise<void> {
-    ServiceManager.setIsPlayground(true);
+    this.setIsPlayground(true);
     if (this.id) {
       await Promise.all([
         ExportModule.fetchTemplates(),
@@ -122,8 +135,13 @@ export default class CVExportView extends Vue {
     await this.fetchCV();
   }
 
+  setIsPlayground(is: boolean): void {
+    this.isPlayground = is;
+    ServiceManager.setIsPlayground(is);
+  }
+
   beforeDestroy(): void {
-    ServiceManager.setIsPlayground(false);
+    this.setIsPlayground(false);
   }
 
   openCV(): void {
