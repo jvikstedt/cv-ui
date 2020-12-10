@@ -7,7 +7,7 @@
       :search-input.sync="searchInput"
       item-text="name"
       item-value="id"
-      label="Skill"
+      label="Skill subject"
       placeholder="Start typing to search"
       return-object
       @change="onSelect"
@@ -18,6 +18,9 @@
       </template>
       <template slot="item" slot-scope="data">
         {{ data.item.name }} ({{ data.item.skillGroup.name }})
+      </template>
+      <template v-slot:append-outer>
+        <v-btn @click="newSkillSubject">New</v-btn>
       </template>
     </v-autocomplete>
 
@@ -70,11 +73,13 @@
 
 <script lang="ts">
 import * as R from "ramda";
-import { Component, Emit, Prop, Vue, Watch } from "vue-property-decorator";
+import { Component, Emit, Prop, Watch, Mixins } from "vue-property-decorator";
 import { MembershipSkillDto } from "@/store/modules/membership_skill";
+import { DialogFormMixin } from "@/mixins";
 import SkillSubjectModule, {
   SkillSubject,
 } from "@/store/modules/skill_subject";
+import NewSkillSubjectDialog from "@/views/skill_subject/components/NewSkillSubjectDialog.vue";
 import { IsRequired } from "@/helpers/validator";
 import { ServiceManager } from "@/services";
 
@@ -87,7 +92,7 @@ interface MembershipSkillRow {
 }
 
 @Component
-export default class MembershipSkillsField extends Vue {
+export default class MembershipSkillsField extends Mixins(DialogFormMixin) {
   @Prop({ required: true }) readonly value!: MembershipSkillDto[];
   @Prop({ required: false }) readonly readonly!: boolean;
 
@@ -201,6 +206,24 @@ export default class MembershipSkillsField extends Vue {
   @Emit("input")
   updateValue(membershipSkills: MembershipSkillDto[]): MembershipSkillDto[] {
     return membershipSkills;
+  }
+
+  newSkillSubject(): void {
+    this.pushDialogComponent({
+      component: NewSkillSubjectDialog,
+      props: { afterCreate: this.afterSkillSubjectCreate },
+    });
+  }
+
+  afterSkillSubjectCreate(skillSubject: SkillSubject): void {
+    this.updateValue([
+      ...this.value,
+      {
+        skillSubjectId: skillSubject.id,
+        automaticCalculation: true,
+        experienceInYears: 0,
+      },
+    ]);
   }
 }
 </script>
