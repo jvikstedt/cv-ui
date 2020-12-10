@@ -45,8 +45,41 @@
       :hideExport="true"
     />
     <CVSkills :cvId="id" :canEdit="isPlayground || canEditCV(id)" />
+    <v-alert
+      dense
+      outlined
+      text
+      type="warning"
+      v-if="isPlayground"
+      class="mt-5"
+    >
+      This is an playground mode, modifications to the CV are not persistent!
+      <a @click="openCV">Click here</a> to get back.
+    </v-alert>
     <CVEducations :cvId="id" :canEdit="isPlayground || canEditCV(id)" />
+    <v-alert
+      dense
+      outlined
+      text
+      type="warning"
+      v-if="isPlayground"
+      class="mt-5"
+    >
+      This is an playground mode, modifications to the CV are not persistent!
+      <a @click="openCV">Click here</a> to get back.
+    </v-alert>
     <CVWorkExperiences :cvId="id" :canEdit="isPlayground || canEditCV(id)" />
+    <v-alert
+      dense
+      outlined
+      text
+      type="warning"
+      v-if="isPlayground"
+      class="mt-5"
+    >
+      This is an playground mode, modifications to the CV are not persistent!
+      <a @click="openCV">Click here</a> to get back.
+    </v-alert>
     <CVProjectMemberships :cvId="id" :canEdit="isPlayground || canEditCV(id)" />
   </v-container>
 </template>
