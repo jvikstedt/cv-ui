@@ -9,7 +9,6 @@
         ref="form"
         v-model="valid"
         lazy-validation
-        :readonly="!canEdit"
         @submit.prevent="onSave"
       >
         <v-card-actions>
@@ -17,9 +16,7 @@
 
           <v-btn color="red darken-1" text @click="onCancel"> Cancel </v-btn>
 
-          <v-btn color="green darken-1" :disabled="!canEdit" text type="submit">
-            Save
-          </v-btn>
+          <v-btn color="green darken-1" text type="submit"> Save </v-btn>
         </v-card-actions>
         <v-card-text>
           <v-text-field

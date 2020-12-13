@@ -6,7 +6,6 @@
         ref="form"
         v-model="valid"
         lazy-validation
-        :readonly="!canEdit"
         @submit.prevent="onSave"
       >
         <v-card-actions>
@@ -14,9 +13,7 @@
 
           <v-btn color="red darken-1" text @click="onCancel"> Cancel </v-btn>
 
-          <v-btn color="green darken-1" :disabled="!canEdit" text type="submit">
-            Save
-          </v-btn>
+          <v-btn color="green darken-1" text type="submit"> Save </v-btn>
         </v-card-actions>
         <v-card-text>
           <v-text-field
@@ -28,6 +25,8 @@
           ></v-text-field>
         </v-card-text>
       </v-form>
+
+      <SkillSubjectList :skillGroupId="skillGroup.id" />
     </template>
   </v-card>
 </template>
@@ -38,8 +37,13 @@ import { DialogFormMixin } from "@/mixins";
 import SkillGroupModule, { SkillGroup } from "@/store/modules/skill_group";
 import { ServiceManager, SkillGroupService } from "@/services";
 import AuthModule from "@/store/modules/auth";
+import SkillSubjectList from "@/views/skill_subject/components/SkillSubjectList.vue";
 
-@Component
+@Component({
+  components: {
+    SkillSubjectList,
+  },
+})
 export default class EditSkillGroupDialog extends Mixins(DialogFormMixin) {
   @Prop({ required: true }) readonly skillGroup!: SkillGroup;
   @Prop({ required: false }) readonly afterSave!: (

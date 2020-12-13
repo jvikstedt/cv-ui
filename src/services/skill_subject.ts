@@ -22,6 +22,8 @@ export interface PatchSkillSubjectDto {
 export interface SearchSkillSubjectDto {
   name?: string;
 
+  skillGroupId?: number;
+
   take?: number;
 
   skip?: number;

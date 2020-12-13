@@ -27,6 +27,21 @@ export class CVSearchDtoSkill {
   name?: string;
 }
 
+export class CVSearchDtoWorkExperience {
+  required? = false;
+  companyId!: number;
+}
+
+export class CVSearchDtoEducation {
+  required? = false;
+  schoolId!: number;
+}
+
+export class CVSearchDtoProjectMembership {
+  required? = false;
+  projectId!: number;
+}
+
 export class Sort {
   field!: string;
   order?: string;
@@ -37,6 +52,9 @@ export class CVSearchDtoData {
   text?: string = "";
   limit?: number = 10;
   skills?: CVSearchDtoSkill[] = [];
+  workExperiences?: CVSearchDtoWorkExperience[] = [];
+  educations?: CVSearchDtoEducation[] = [];
+  projectMemberships?: CVSearchDtoProjectMembership[] = [];
   sorts?: Sort[];
 
   public constructor(init?: Partial<CVSearchDto>) {
