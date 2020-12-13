@@ -22,6 +22,8 @@ export interface PatchProjectDto {
 export interface SearchProjectDto {
   name?: string;
 
+  companyId?: number;
+
   take?: number;
 
   skip?: number;

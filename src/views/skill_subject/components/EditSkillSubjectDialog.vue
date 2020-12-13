@@ -9,17 +9,44 @@
         ref="form"
         v-model="valid"
         lazy-validation
-        :readonly="!canEdit"
         @submit.prevent="onSave"
       >
         <v-card-actions>
           <v-spacer></v-spacer>
 
+          <AuthorizedButton
+            :errorTooltip="DeleteTooltipError"
+            :endpoint="`/skill_subjects/${skillSubject.id}`"
+            method="delete"
+          >
+            <template v-slot:btn="item">
+              <v-btn
+                color="red darken-1"
+                :disabled="!item.valid"
+                text
+                @click="onDelete"
+              >
+                Delete
+              </v-btn>
+            </template>
+          </AuthorizedButton>
           <v-btn color="red darken-1" text @click="onCancel"> Cancel </v-btn>
-
-          <v-btn color="green darken-1" :disabled="!canEdit" text type="submit">
-            Save
-          </v-btn>
+          <AuthorizedButton
+            :errorTooltip="UpdateTooltipError"
+            :endpoint="`/skill_subjects/${skillSubject.id}`"
+            method="patch"
+          >
+            <template v-slot:btn="item">
+              <v-btn
+                color="green darken-1"
+                :disabled="!item.valid"
+                text
+                type="submit"
+              >
+                Save
+              </v-btn>
+            </template>
+          </AuthorizedButton>
         </v-card-actions>
         <v-card-text>
           <v-text-field
@@ -67,14 +94,22 @@ import SkillSubjectModule, {
 } from "@/store/modules/skill_subject";
 import { ServiceManager, SkillSubjectService } from "@/services";
 import AuthModule from "@/store/modules/auth";
+import AuthorizedButton from "@/components/AuthorizedButton.vue";
 
-@Component
+@Component({
+  components: {
+    AuthorizedButton,
+  },
+})
 export default class EditSkillSubjectDialog extends Mixins(
   SearchMixin,
   DialogFormMixin
 ) {
   @Prop({ required: true }) readonly skillSubject!: SkillSubject;
   @Prop({ required: false }) readonly afterSave!: (
+    skillSubject: SkillSubject
+  ) => Promise<void>;
+  @Prop({ required: false }) readonly afterDelete!: (
     skillSubject: SkillSubject
   ) => Promise<void>;
   searchKey = "SkillSearchKey";
@@ -114,6 +149,19 @@ export default class EditSkillSubjectDialog extends Mixins(
 
       if (this.afterSave) {
         await this.afterSave(skillSubject);
+      }
+      this.popDialogComponent();
+    }
+  }
+
+  async onDelete(): Promise<void> {
+    if (confirm("Are you sure you want to delete?")) {
+      await ServiceManager.skillSubject.deleteSkillSubject(
+        this.skillSubject.id
+      );
+
+      if (this.afterDelete) {
+        await this.afterDelete(this.skillSubject);
       }
       this.popDialogComponent();
     }

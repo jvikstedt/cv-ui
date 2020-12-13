@@ -16,4 +16,7 @@ export default class DialogFormMixin extends DialogMixin {
   }
 
   isRequiredRule = [IsRequired()];
+
+  UpdateTooltipError = `Can't update item when other people are using it`;
+  DeleteTooltipError = `Can't delete item with relations`;
 }
