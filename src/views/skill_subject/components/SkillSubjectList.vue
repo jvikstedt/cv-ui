@@ -117,6 +117,13 @@ export default class SkillSubjectList extends Vue {
     }, this.skillSubjects);
   }
 
+  async afterDelete(skillSubject: SkillSubject): Promise<void> {
+    this.skillSubjects = R.reject(
+      (s) => R.equals(s.id, skillSubject.id),
+      this.skillSubjects
+    );
+  }
+
   newSkillSubject(): void {
     DialogModule.pushDialogComponent({
       component: NewSkillSubjectDialog,
@@ -130,6 +137,7 @@ export default class SkillSubjectList extends Vue {
       props: {
         skillSubject: skillSubject,
         afterSave: this.afterSave,
+        afterDelete: this.afterDelete,
       },
     });
   }

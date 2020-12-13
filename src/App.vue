@@ -134,6 +134,16 @@ export default class App extends Vue {
         return new Promise((resolve, reject) => {
           let responseData = error.response.data;
 
+          // If dry run, skip error
+          if (error.request && error.request.responseURL) {
+            const url = new URL(error.request.responseURL);
+            const urlParams = new URLSearchParams(url.search);
+            if (urlParams.get("dry") === "true") {
+              reject(error);
+              return;
+            }
+          }
+
           // When dealing with arraybuffer response, error message has to be
           // manually parsed
           if (
