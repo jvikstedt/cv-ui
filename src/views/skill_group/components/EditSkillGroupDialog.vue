@@ -6,17 +6,46 @@
         ref="form"
         v-model="valid"
         lazy-validation
-        :readonly="!canEdit"
         @submit.prevent="onSave"
       >
         <v-card-actions>
           <v-spacer></v-spacer>
 
+          <AuthorizedButton
+            :errorTooltip="DeleteTooltipError"
+            :endpoint="`/skill_groups/${skillGroup.id}`"
+            method="delete"
+          >
+            <template v-slot:btn="item">
+              <v-btn
+                color="red darken-1"
+                :disabled="!item.valid"
+                text
+                @click="onDelete"
+              >
+                Delete
+              </v-btn>
+            </template>
+          </AuthorizedButton>
+
           <v-btn color="red darken-1" text @click="onCancel"> Cancel </v-btn>
 
-          <v-btn color="green darken-1" :disabled="!canEdit" text type="submit">
-            Save
-          </v-btn>
+          <AuthorizedButton
+            :errorTooltip="UpdateTooltipError"
+            :endpoint="`/skill_groups/${skillGroup.id}`"
+            method="patch"
+          >
+            <template v-slot:btn="item">
+              <v-btn
+                color="green darken-1"
+                :disabled="!item.valid"
+                text
+                type="submit"
+              >
+                Save
+              </v-btn>
+            </template>
+          </AuthorizedButton>
         </v-card-actions>
         <v-card-text>
           <v-text-field
@@ -28,6 +57,8 @@
           ></v-text-field>
         </v-card-text>
       </v-form>
+
+      <SkillSubjectList :skillGroupId="skillGroup.id" />
     </template>
   </v-card>
 </template>
@@ -38,11 +69,19 @@ import { DialogFormMixin } from "@/mixins";
 import SkillGroupModule, { SkillGroup } from "@/store/modules/skill_group";
 import { ServiceManager, SkillGroupService } from "@/services";
 import AuthModule from "@/store/modules/auth";
+import SkillSubjectList from "@/views/skill_subject/components/SkillSubjectList.vue";
 
-@Component
+@Component({
+  components: {
+    SkillSubjectList,
+  },
+})
 export default class EditSkillGroupDialog extends Mixins(DialogFormMixin) {
   @Prop({ required: true }) readonly skillGroup!: SkillGroup;
   @Prop({ required: false }) readonly afterSave!: (
+    skillGroup: SkillGroup
+  ) => Promise<void>;
+  @Prop({ required: false }) readonly afterDelete!: (
     skillGroup: SkillGroup
   ) => Promise<void>;
   name = "";
@@ -71,6 +110,17 @@ export default class EditSkillGroupDialog extends Mixins(DialogFormMixin) {
 
       if (this.afterSave) {
         await this.afterSave(skillGroup);
+      }
+      this.popDialogComponent();
+    }
+  }
+
+  async onDelete(): Promise<void> {
+    if (confirm("Are you sure you want to delete?")) {
+      await ServiceManager.skillGroup.deleteSkillGroup(this.skillGroup.id);
+
+      if (this.afterDelete) {
+        await this.afterDelete(this.skillGroup);
       }
       this.popDialogComponent();
     }

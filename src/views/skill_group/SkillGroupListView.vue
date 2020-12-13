@@ -110,6 +110,13 @@ export default class SkillGroupListView extends Vue {
     }, this.skillGroups);
   }
 
+  async afterDelete(skillGroup: SkillGroup): Promise<void> {
+    this.skillGroups = R.reject(
+      (s) => R.equals(s.id, skillGroup.id),
+      this.skillGroups
+    );
+  }
+
   newSkillGroupDialog(): void {
     DialogModule.pushDialogComponent({
       component: NewSkillGroupDialog,
@@ -123,6 +130,7 @@ export default class SkillGroupListView extends Vue {
       props: {
         skillGroup: skillGroup,
         afterSave: this.afterSave,
+        afterDelete: this.afterDelete,
       },
     });
   }

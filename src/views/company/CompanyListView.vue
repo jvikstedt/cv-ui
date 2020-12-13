@@ -110,6 +110,13 @@ export default class CompanyListView extends Vue {
     }, this.companies);
   }
 
+  async afterDelete(company: Company): Promise<void> {
+    this.companies = R.reject(
+      (s) => R.equals(s.id, company.id),
+      this.companies
+    );
+  }
+
   newCompanyDialog(): void {
     DialogModule.pushDialogComponent({
       component: NewCompanyDialog,
@@ -123,6 +130,7 @@ export default class CompanyListView extends Vue {
       props: {
         company: company,
         afterSave: this.afterSave,
+        afterDelete: this.afterDelete,
       },
     });
   }

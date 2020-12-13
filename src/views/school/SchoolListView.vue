@@ -110,6 +110,10 @@ export default class SchoolListView extends Vue {
     }, this.schools);
   }
 
+  async afterDelete(school: School): Promise<void> {
+    this.schools = R.reject((s) => R.equals(s.id, school.id), this.schools);
+  }
+
   newSchoolDialog(): void {
     DialogModule.pushDialogComponent({
       component: NewSchoolDialog,
@@ -123,6 +127,7 @@ export default class SchoolListView extends Vue {
       props: {
         school: school,
         afterSave: this.afterSave,
+        afterDelete: this.afterDelete,
       },
     });
   }
