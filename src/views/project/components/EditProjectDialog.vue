@@ -13,9 +13,41 @@
         <v-card-actions>
           <v-spacer></v-spacer>
 
+          <AuthorizedButton
+            :errorTooltip="DeleteTooltipError"
+            :endpoint="`/project/${project.id}`"
+            method="delete"
+          >
+            <template v-slot:btn="item">
+              <v-btn
+                color="red darken-1"
+                :disabled="!item.valid"
+                text
+                @click="onDelete"
+              >
+                Delete
+              </v-btn>
+            </template>
+          </AuthorizedButton>
+
           <v-btn color="red darken-1" text @click="onCancel"> Cancel </v-btn>
 
-          <v-btn color="green darken-1" text type="submit"> Save </v-btn>
+          <AuthorizedButton
+            :errorTooltip="UpdateTooltipError"
+            :endpoint="`/project/${project.id}`"
+            method="patch"
+          >
+            <template v-slot:btn="item">
+              <v-btn
+                color="green darken-1"
+                :disabled="!item.valid"
+                text
+                type="submit"
+              >
+                Save
+              </v-btn>
+            </template>
+          </AuthorizedButton>
         </v-card-actions>
         <v-card-text>
           <v-text-field
@@ -61,14 +93,22 @@ import ProjectModule, { Project } from "@/store/modules/project";
 import { ServiceManager, ProjectService } from "@/services";
 import AuthModule from "@/store/modules/auth";
 import { CVSearchDto } from "@/store/modules/cv";
+import AuthorizedButton from "@/components/AuthorizedButton.vue";
 
-@Component
+@Component({
+  components: {
+    AuthorizedButton,
+  },
+})
 export default class EditProjectDialog extends Mixins(
   SearchMixin,
   DialogFormMixin
 ) {
   @Prop({ required: true }) readonly project!: Project;
   @Prop({ required: false }) readonly afterSave!: (
+    project: Project
+  ) => Promise<void>;
+  @Prop({ required: false }) readonly afterDelete!: (
     project: Project
   ) => Promise<void>;
   searchKey = "ProjectMembershipSearchKey";
@@ -107,6 +147,17 @@ export default class EditProjectDialog extends Mixins(
 
       if (this.afterSave) {
         await this.afterSave(project);
+      }
+      this.popDialogComponent();
+    }
+  }
+
+  async onDelete(): Promise<void> {
+    if (confirm("Are you sure you want to delete?")) {
+      await ServiceManager.project.deleteProject(this.project.id);
+
+      if (this.afterDelete) {
+        await this.afterDelete(this.project);
       }
       this.popDialogComponent();
     }

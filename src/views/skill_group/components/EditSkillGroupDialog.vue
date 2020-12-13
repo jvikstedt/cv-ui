@@ -11,9 +11,41 @@
         <v-card-actions>
           <v-spacer></v-spacer>
 
+          <AuthorizedButton
+            :errorTooltip="DeleteTooltipError"
+            :endpoint="`/skill_groups/${skillGroup.id}`"
+            method="delete"
+          >
+            <template v-slot:btn="item">
+              <v-btn
+                color="red darken-1"
+                :disabled="!item.valid"
+                text
+                @click="onDelete"
+              >
+                Delete
+              </v-btn>
+            </template>
+          </AuthorizedButton>
+
           <v-btn color="red darken-1" text @click="onCancel"> Cancel </v-btn>
 
-          <v-btn color="green darken-1" text type="submit"> Save </v-btn>
+          <AuthorizedButton
+            :errorTooltip="UpdateTooltipError"
+            :endpoint="`/skill_groups/${skillGroup.id}`"
+            method="patch"
+          >
+            <template v-slot:btn="item">
+              <v-btn
+                color="green darken-1"
+                :disabled="!item.valid"
+                text
+                type="submit"
+              >
+                Save
+              </v-btn>
+            </template>
+          </AuthorizedButton>
         </v-card-actions>
         <v-card-text>
           <v-text-field
@@ -49,6 +81,9 @@ export default class EditSkillGroupDialog extends Mixins(DialogFormMixin) {
   @Prop({ required: false }) readonly afterSave!: (
     skillGroup: SkillGroup
   ) => Promise<void>;
+  @Prop({ required: false }) readonly afterDelete!: (
+    skillGroup: SkillGroup
+  ) => Promise<void>;
   name = "";
 
   canEdit = AuthModule.hasRole("ADMIN");
@@ -75,6 +110,17 @@ export default class EditSkillGroupDialog extends Mixins(DialogFormMixin) {
 
       if (this.afterSave) {
         await this.afterSave(skillGroup);
+      }
+      this.popDialogComponent();
+    }
+  }
+
+  async onDelete(): Promise<void> {
+    if (confirm("Are you sure you want to delete?")) {
+      await ServiceManager.skillGroup.deleteSkillGroup(this.skillGroup.id);
+
+      if (this.afterDelete) {
+        await this.afterDelete(this.skillGroup);
       }
       this.popDialogComponent();
     }

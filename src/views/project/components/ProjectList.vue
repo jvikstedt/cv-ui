@@ -115,6 +115,10 @@ export default class ProjectList extends Vue {
     }, this.projects);
   }
 
+  async afterDelete(project: Project): Promise<void> {
+    this.projects = R.reject((s) => R.equals(s.id, project.id), this.projects);
+  }
+
   newProject(): void {
     DialogModule.pushDialogComponent({
       component: NewProjectDialog,
@@ -128,6 +132,7 @@ export default class ProjectList extends Vue {
       props: {
         project: project,
         afterSave: this.afterSave,
+        afterDelete: this.afterDelete,
       },
     });
   }

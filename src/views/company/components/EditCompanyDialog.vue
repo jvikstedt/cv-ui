@@ -11,9 +11,41 @@
         <v-card-actions>
           <v-spacer></v-spacer>
 
+          <AuthorizedButton
+            :errorTooltip="DeleteTooltipError"
+            :endpoint="`/company/${company.id}`"
+            method="delete"
+          >
+            <template v-slot:btn="item">
+              <v-btn
+                color="red darken-1"
+                :disabled="!item.valid"
+                text
+                @click="onDelete"
+              >
+                Delete
+              </v-btn>
+            </template>
+          </AuthorizedButton>
+
           <v-btn color="red darken-1" text @click="onCancel"> Cancel </v-btn>
 
-          <v-btn color="green darken-1" text type="submit"> Save </v-btn>
+          <AuthorizedButton
+            :errorTooltip="UpdateTooltipError"
+            :endpoint="`/company/${company.id}`"
+            method="patch"
+          >
+            <template v-slot:btn="item">
+              <v-btn
+                color="green darken-1"
+                :disabled="!item.valid"
+                text
+                type="submit"
+              >
+                Save
+              </v-btn>
+            </template>
+          </AuthorizedButton>
         </v-card-actions>
         <v-card-text>
           <v-text-field
@@ -63,10 +95,12 @@ import { ServiceManager, CompanyService } from "@/services";
 import AuthModule from "@/store/modules/auth";
 import ProjectList from "@/views/project/components/ProjectList.vue";
 import { CVSearchDto } from "@/store/modules/cv";
+import AuthorizedButton from "@/components/AuthorizedButton.vue";
 
 @Component({
   components: {
     ProjectList,
+    AuthorizedButton,
   },
 })
 export default class EditCompanyDialog extends Mixins(
@@ -75,6 +109,9 @@ export default class EditCompanyDialog extends Mixins(
 ) {
   @Prop({ required: true }) readonly company!: Company;
   @Prop({ required: false }) readonly afterSave!: (
+    company: Company
+  ) => Promise<void>;
+  @Prop({ required: false }) readonly afterDelete!: (
     company: Company
   ) => Promise<void>;
   searchKey = "WorkExperienceSearchKey";
@@ -113,6 +150,17 @@ export default class EditCompanyDialog extends Mixins(
 
       if (this.afterSave) {
         await this.afterSave(company);
+      }
+      this.popDialogComponent();
+    }
+  }
+
+  async onDelete(): Promise<void> {
+    if (confirm("Are you sure you want to delete?")) {
+      await ServiceManager.company.deleteCompany(this.company.id);
+
+      if (this.afterDelete) {
+        await this.afterDelete(this.company);
       }
       this.popDialogComponent();
     }

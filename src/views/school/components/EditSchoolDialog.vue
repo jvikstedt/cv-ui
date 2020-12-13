@@ -11,9 +11,41 @@
         <v-card-actions>
           <v-spacer></v-spacer>
 
+          <AuthorizedButton
+            :errorTooltip="DeleteTooltipError"
+            :endpoint="`/schools/${school.id}`"
+            method="delete"
+          >
+            <template v-slot:btn="item">
+              <v-btn
+                color="red darken-1"
+                :disabled="!item.valid"
+                text
+                @click="onDelete"
+              >
+                Delete
+              </v-btn>
+            </template>
+          </AuthorizedButton>
+
           <v-btn color="red darken-1" text @click="onCancel"> Cancel </v-btn>
 
-          <v-btn color="green darken-1" text type="submit"> Save </v-btn>
+          <AuthorizedButton
+            :errorTooltip="UpdateTooltipError"
+            :endpoint="`/schools/${school.id}`"
+            method="patch"
+          >
+            <template v-slot:btn="item">
+              <v-btn
+                color="green darken-1"
+                :disabled="!item.valid"
+                text
+                type="submit"
+              >
+                Save
+              </v-btn>
+            </template>
+          </AuthorizedButton>
         </v-card-actions>
         <v-card-text>
           <v-text-field
@@ -59,14 +91,22 @@ import SchoolModule, { School } from "@/store/modules/school";
 import { ServiceManager, SchoolService } from "@/services";
 import AuthModule from "@/store/modules/auth";
 import { CVSearchDto } from "@/store/modules/cv";
+import AuthorizedButton from "@/components/AuthorizedButton.vue";
 
-@Component
+@Component({
+  components: {
+    AuthorizedButton,
+  },
+})
 export default class EditSchoolDialog extends Mixins(
   SearchMixin,
   DialogFormMixin
 ) {
   @Prop({ required: true }) readonly school!: School;
   @Prop({ required: false }) readonly afterSave!: (
+    school: School
+  ) => Promise<void>;
+  @Prop({ required: false }) readonly afterDelete!: (
     school: School
   ) => Promise<void>;
   searchKey = "EducationshipSearchKey";
@@ -103,6 +143,17 @@ export default class EditSchoolDialog extends Mixins(
 
       if (this.afterSave) {
         await this.afterSave(school);
+      }
+      this.popDialogComponent();
+    }
+  }
+
+  async onDelete(): Promise<void> {
+    if (confirm("Are you sure you want to delete?")) {
+      await ServiceManager.school.deleteSchool(this.school.id);
+
+      if (this.afterDelete) {
+        await this.afterDelete(this.school);
       }
       this.popDialogComponent();
     }
