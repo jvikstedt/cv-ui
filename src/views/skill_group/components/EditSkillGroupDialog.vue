@@ -70,10 +70,12 @@ import SkillGroupModule, { SkillGroup } from "@/store/modules/skill_group";
 import { ServiceManager, SkillGroupService } from "@/services";
 import AuthModule from "@/store/modules/auth";
 import SkillSubjectList from "@/views/skill_subject/components/SkillSubjectList.vue";
+import AuthorizedButton from "@/components/AuthorizedButton.vue";
 
 @Component({
   components: {
     SkillSubjectList,
+    AuthorizedButton,
   },
 })
 export default class EditSkillGroupDialog extends Mixins(DialogFormMixin) {
