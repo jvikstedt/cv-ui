@@ -54,6 +54,7 @@ import TemplateForm from "./TemplateForm.vue";
 import { DialogFormMixin } from "@/mixins";
 import AuthModule from "@/store/modules/auth";
 import ExportModule, { ExportPdfDto, Template } from "@/store/modules/export";
+import { ROLES } from "@/constants";
 
 @Component({
   components: {
@@ -67,7 +68,7 @@ export default class EditTemplateDialog extends Mixins(DialogFormMixin) {
 
   template: Template | null = null;
   canEdit = true;
-  isAdmin = AuthModule.hasRole("ADMIN");
+  isAdmin = AuthModule.hasRole(ROLES.ADMIN);
 
   async onChange(template: Template): Promise<void> {
     this.template = template;

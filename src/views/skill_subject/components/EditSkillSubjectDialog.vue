@@ -95,6 +95,7 @@ import SkillSubjectModule, {
 import { ServiceManager, SkillSubjectService } from "@/services";
 import AuthModule from "@/store/modules/auth";
 import AuthorizedButton from "@/components/AuthorizedButton.vue";
+import { ROLES } from "@/constants";
 
 @Component({
   components: {
@@ -116,7 +117,7 @@ export default class EditSkillSubjectDialog extends Mixins(
 
   name = "";
 
-  canEdit = AuthModule.hasRole("ADMIN");
+  canEdit = AuthModule.hasRole(ROLES.ADMIN);
 
   get fetching(): boolean {
     return SkillSubjectModule.fetching;

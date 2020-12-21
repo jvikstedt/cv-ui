@@ -1,5 +1,5 @@
 import Vue from "vue";
-import VueRouter, { RouteConfig } from "vue-router";
+import VueRouter, { Route, RouteConfig, RouteRecord } from "vue-router";
 import Dashboard from "@/views/Dashboard.vue";
 import store from "@/store";
 
@@ -11,6 +11,8 @@ import { CompanyListView } from "@/views/company";
 import { ProjectListView } from "@/views/project";
 import { SkillGroupListView } from "@/views/skill_group";
 import { SchoolListView } from "@/views/school";
+import { MergeView } from "@/views/admin";
+import { ROLES } from "@/constants";
 
 Vue.use(VueRouter);
 
@@ -87,6 +89,15 @@ const routes: Array<RouteConfig> = [
       requiresAuth: true,
     },
   },
+  {
+    path: "/admin/merge",
+    name: "AdminMergeView",
+    component: MergeView,
+    meta: {
+      requiresAuth: true,
+      requiredRoles: [ROLES.ADMIN],
+    },
+  },
 ];
 
 const router = new VueRouter({
@@ -95,14 +106,34 @@ const router = new VueRouter({
   routes,
 });
 
-router.beforeEach((to, _, next) => {
-  if (to.matched.some((record) => record.meta.requiresAuth)) {
-    if (store.getters["auth/isLoggedIn"]) {
-      next();
-      return;
+const guards = [
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  (to: Route, _from: Route, next: any): boolean => {
+    if (to.matched.some((record: RouteRecord) => record.meta.requiresAuth)) {
+      if (!store.getters["auth/isLoggedIn"]) {
+        next("/login");
+        return false;
+      }
     }
-    next("/login");
-  } else {
+    return true;
+  },
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  (to: Route, _from: Route, next: any): boolean => {
+    return to.matched.every((record: RouteRecord) => {
+      const requiredRoles = record.meta.requiredRoles || [];
+
+      if (!store.getters["auth/hasRoles"](requiredRoles)) {
+        next("/");
+        return false;
+      }
+      return true;
+    });
+  },
+];
+
+router.beforeEach((to: Route, from: Route, next) => {
+  if (guards.every((guard) => guard(to, from, next))) {
     next();
   }
 });

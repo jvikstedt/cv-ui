@@ -71,6 +71,7 @@ import { ServiceManager, SkillGroupService } from "@/services";
 import AuthModule from "@/store/modules/auth";
 import SkillSubjectList from "@/views/skill_subject/components/SkillSubjectList.vue";
 import AuthorizedButton from "@/components/AuthorizedButton.vue";
+import { ROLES } from "@/constants";
 
 @Component({
   components: {
@@ -88,7 +89,7 @@ export default class EditSkillGroupDialog extends Mixins(DialogFormMixin) {
   ) => Promise<void>;
   name = "";
 
-  canEdit = AuthModule.hasRole("ADMIN");
+  canEdit = AuthModule.hasRole(ROLES.ADMIN);
 
   get fetching(): boolean {
     return SkillGroupModule.fetching;

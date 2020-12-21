@@ -94,6 +94,7 @@ import { ServiceManager, ProjectService } from "@/services";
 import AuthModule from "@/store/modules/auth";
 import { CVSearchDto } from "@/store/modules/cv";
 import AuthorizedButton from "@/components/AuthorizedButton.vue";
+import { ROLES } from "@/constants";
 
 @Component({
   components: {
@@ -114,7 +115,7 @@ export default class EditProjectDialog extends Mixins(
   searchKey = "ProjectMembershipSearchKey";
   name = "";
 
-  canEdit = AuthModule.hasRole("ADMIN");
+  canEdit = AuthModule.hasRole(ROLES.ADMIN);
 
   get fetching(): boolean {
     return ProjectModule.fetching;
