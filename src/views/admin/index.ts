@@ -1,3 +1,4 @@
+import AdminView from "./AdminView.vue";
 import MergeView from "./merge/MergeView.vue";
 
-export { MergeView };
+export { AdminView, MergeView };
