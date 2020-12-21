@@ -58,6 +58,10 @@ export default class SkillSubjectService extends ApiService {
     return skillSubject;
   }
 
+  public async mergeSkillSubjects(): Promise<void> {
+    throw new Error("not implemented");
+  }
+
   public async searchSkillSubjects(
     searchSkillSubjectDto: SearchSkillSubjectDto
   ): Promise<SkillSubjectSearchResult> {
