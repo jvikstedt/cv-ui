@@ -57,11 +57,11 @@
             </v-list-item-title>
           </v-list-item-content>
         </v-list-item>
-        <v-list-item link router to="/admin" v-if="isAdmin">
+        <v-list-item link router to="/merge_requests">
           <v-list-item-content>
             <v-list-item-title>
-              <v-icon left>mdi-account-cog</v-icon>
-              Admin tools
+              <v-icon left>mdi-merge</v-icon>
+              Merge Requests
             </v-list-item-title>
           </v-list-item-content>
         </v-list-item>

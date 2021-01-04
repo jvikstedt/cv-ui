@@ -38,15 +38,8 @@ export interface SkillSubjectSearchResult {
   total: number;
 }
 
-export interface MergeSkillSubjectsDto {
-  sourceId: number;
-  targetId: number;
-}
-
 export interface Service {
-  mergeSkillSubjects(
-    mergeSkillSubjectsDto: MergeSkillSubjectsDto
-  ): Promise<void>;
+  findOne(id: number): Promise<SkillSubject>;
   fetchSkillSubjects(): Promise<void>;
   deleteSkillSubject(id: number): Promise<void>;
   createSkillSubject(

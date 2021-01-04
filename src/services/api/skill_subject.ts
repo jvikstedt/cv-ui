@@ -4,7 +4,6 @@ import SkillSubjectModule, {
 } from "@/store/modules/skill_subject";
 import {
   CreateSkillSubjectDto,
-  MergeSkillSubjectsDto,
   PatchSkillSubjectDto,
   SearchSkillSubjectDto,
   SkillSubjectSearchResult,
@@ -50,17 +49,6 @@ export default class SkillSubjectService {
     return skillSubject;
   }
 
-  public async mergeSkillSubjects(
-    mergeSkillSubjectsDto: MergeSkillSubjectsDto
-  ): Promise<void> {
-    await Api.post("/merge/skill_Subjects", mergeSkillSubjectsDto);
-
-    SkillSubjectModule.delete([
-      mergeSkillSubjectsDto.sourceId,
-      mergeSkillSubjectsDto.targetId,
-    ]);
-  }
-
   public async searchSkillSubjects(
     searchSkillSubjectDto: SearchSkillSubjectDto
   ): Promise<SkillSubjectSearchResult> {
@@ -71,5 +59,15 @@ export default class SkillSubjectService {
     await SkillSubjectModule.saveSkillSubjects(result.items);
 
     return result;
+  }
+
+  public async findOne(id: number): Promise<SkillSubject> {
+    await SkillSubjectModule.setFetching(true);
+
+    const skillSubject: SkillSubject = await Api.get(`/skill_Subjects/${id}`);
+    await SkillSubjectModule.saveSkillSubjects([skillSubject]);
+
+    await SkillSubjectModule.setFetching(false);
+    return skillSubject;
   }
 }

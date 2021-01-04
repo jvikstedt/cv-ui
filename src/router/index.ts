@@ -11,8 +11,7 @@ import { CompanyListView } from "@/views/company";
 import { ProjectListView } from "@/views/project";
 import { SkillGroupListView } from "@/views/skill_group";
 import { SchoolListView } from "@/views/school";
-import { AdminView, MergeView } from "@/views/admin";
-import { ROLES } from "@/constants";
+import { MergeRequestsView } from "@/views/merge_requests";
 
 Vue.use(VueRouter);
 
@@ -90,21 +89,11 @@ const routes: Array<RouteConfig> = [
     },
   },
   {
-    path: "/admin",
-    name: "AdminView",
-    component: AdminView,
+    path: "/merge_requests",
+    name: "MergeRequestsView",
+    component: MergeRequestsView,
     meta: {
       requiresAuth: true,
-      requiredRoles: [ROLES.ADMIN],
-    },
-  },
-  {
-    path: "/admin/merge",
-    name: "AdminMergeView",
-    component: MergeView,
-    meta: {
-      requiresAuth: true,
-      requiredRoles: [ROLES.ADMIN],
     },
   },
 ];
