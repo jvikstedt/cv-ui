@@ -11,7 +11,7 @@ import { CompanyListView } from "@/views/company";
 import { ProjectListView } from "@/views/project";
 import { SkillGroupListView } from "@/views/skill_group";
 import { SchoolListView } from "@/views/school";
-import { MergeRequestsView } from "@/views/merge_requests";
+import { JobsView } from "@/views/jobs";
 
 Vue.use(VueRouter);
 
@@ -89,9 +89,9 @@ const routes: Array<RouteConfig> = [
     },
   },
   {
-    path: "/merge_requests",
-    name: "MergeRequestsView",
-    component: MergeRequestsView,
+    path: "/jobs",
+    name: "JobsView",
+    component: JobsView,
     meta: {
       requiresAuth: true,
     },

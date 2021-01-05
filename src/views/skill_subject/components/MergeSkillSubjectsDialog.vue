@@ -12,6 +12,9 @@
         <v-btn color="green darken-1" text type="submit"> Create </v-btn>
       </v-card-actions>
       <v-card-text>
+        <p>
+          This will create a new background job which requires admin approval.
+        </p>
         <v-autocomplete
           name="sourceSkillSubject"
           v-model="sourceSkillSubject"
@@ -51,15 +54,6 @@
             {{ data.item.name }} ({{ data.item.skillGroup.name }})
           </template>
         </v-autocomplete>
-
-        <v-text-field
-          v-model="description"
-          name="description"
-          :counter="255"
-          label="Description"
-          :rules="isRequiredRule"
-          required
-        ></v-text-field>
       </v-card-text>
     </v-form>
   </v-card>
@@ -72,13 +66,11 @@ import SkillSubjectModule, {
 } from "@/store/modules/skill_subject";
 import { DialogFormMixin } from "@/mixins";
 import { ServiceManager } from "@/services";
-import { MergeRequest } from "@/store/modules/merge_request";
+import { Job } from "@/store/modules/job";
 
 @Component
 export default class MergeSkillSubjectsDialog extends Mixins(DialogFormMixin) {
-  @Prop({ required: true }) readonly afterCreate!: (
-    mergeRequest: MergeRequest
-  ) => Promise<void>;
+  @Prop({ required: true }) readonly afterCreate!: (job: Job) => Promise<void>;
 
   sourceSearch = "";
   targetSearch = "";
@@ -104,16 +96,17 @@ export default class MergeSkillSubjectsDialog extends Mixins(DialogFormMixin) {
       this.sourceSkillSubject &&
       this.targetSkillSubject
     ) {
-      const mergeRequest = await ServiceManager.mergeRequest.createMergeRequest(
-        {
-          entity: "SkillSubject",
+      const description = `${this.sourceSkillSubject.name} -> ${this.targetSkillSubject.name}`;
+      const job = await ServiceManager.job.createJob({
+        runner: "SkillSubjectMerge",
+        data: {
           sourceId: this.sourceSkillSubject.id,
           targetId: this.targetSkillSubject.id,
-          description: this.description,
-        }
-      );
+        },
+        description,
+      });
 
-      await this.afterCreate(mergeRequest);
+      await this.afterCreate(job);
       this.popDialogComponent();
     }
   }

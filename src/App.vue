@@ -57,11 +57,11 @@
             </v-list-item-title>
           </v-list-item-content>
         </v-list-item>
-        <v-list-item link router to="/merge_requests">
+        <v-list-item link router to="/jobs">
           <v-list-item-content>
             <v-list-item-title>
               <v-icon left>mdi-merge</v-icon>
-              Merge Requests
+              Background jobs
             </v-list-item-title>
           </v-list-item-content>
         </v-list-item>

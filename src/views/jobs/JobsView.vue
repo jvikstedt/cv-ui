@@ -3,13 +3,17 @@
     <v-card>
       <v-card-title class="headline">
         <v-icon left>mdi-merge</v-icon>
-        Merge requests
+        Background jobs
         <v-spacer></v-spacer>
       </v-card-title>
       <v-card-text>
+        <p>
+          List of jobs created by you. Users with admin role can approve jobs.
+        </p>
+        <v-checkbox v-model="showAll" label="Show all" />
         <v-data-table
           :headers="headers"
-          :items="mergeRequests"
+          :items="jobs"
           :options.sync="options"
           :loading="fetching"
           :server-items-length="itemsTotal"
@@ -44,35 +48,37 @@
 <script lang="ts">
 import * as R from "ramda";
 import { Component, Vue, Watch } from "vue-property-decorator";
-import MergeRequestModule, {
-  MergeRequest,
-} from "@/store/modules/merge_request";
+import JobModule, { Job } from "@/store/modules/job";
 import { ServiceManager } from "@/services";
 import { DataOptions } from "vuetify";
 import { FormatDateTime } from "@/helpers";
 import DialogModule from "@/store/modules/dialog";
-import ReviewMergeRequestDialog from "./components/ReviewMergeRequestDialog.vue";
+import ReviewJobDialog from "./components/ReviewJobDialog.vue";
 
 @Component
 export default class CompanyListView extends Vue {
-  fetching = MergeRequestModule.fetching;
-  mergeRequests: MergeRequest[] = [];
-  mergeRequest: MergeRequest | null = null;
+  fetching = JobModule.fetching;
+  jobs: Job[] = [];
+  job: Job | null = null;
   search = "";
+
+  showAll = false;
+
+  searchItems: Job[] = [];
+  searchItemsTotal = 0;
 
   formatDateTime = FormatDateTime;
 
   options: DataOptions | Partial<DataOptions> = {
-    sortBy: ["mergeRequest.createdAt"],
+    sortBy: ["job.createdAt"],
     sortDesc: [true],
   };
 
   itemsTotal = 0;
   headers = [
     { text: "State", value: "state" },
-    { text: "Entity", value: "entity" },
-    { text: "Source", value: "sourceName" },
-    { text: "Target", value: "targetName" },
+    { text: "Runner", value: "runner" },
+    { text: "Description", value: "description" },
     { text: "Creator", value: "user.username" },
     { text: "Created at", value: "createdAt" },
     { text: "Actions", value: "actions", sortable: false },
@@ -86,52 +92,66 @@ export default class CompanyListView extends Vue {
     };
   }
 
+  @Watch("searchItems")
+  @Watch("showAll")
+  async searchItemsChanged(): Promise<void> {
+    if (this.showAll) {
+      this.jobs = this.searchItems;
+      this.itemsTotal = this.searchItemsTotal;
+    } else {
+      const items = R.filter(
+        (i) => R.equals(i.state, "pending"),
+        this.searchItems
+      );
+      this.jobs = items;
+      this.itemsTotal = R.length(items);
+    }
+  }
+
   @Watch("options", { deep: true })
   async optionsChanged(): Promise<void> {
     const sortDesc = this.options.sortDesc || [];
     const page = this.options.page || 1;
     const itemsPerPage = this.options.itemsPerPage || 10;
 
-    const orderColumnName = "mergeRequest.createdAt";
+    const orderColumnName = "job.createdAt";
     const orderSort = sortDesc[0] ? "DESC" : "ASC";
 
-    const result = await ServiceManager.mergeRequest.searchMergeRequests({
+    const result = await ServiceManager.job.searchJobs({
       skip: (page - 1) * itemsPerPage,
       take: itemsPerPage,
       orderColumnName,
       orderSort,
     });
 
-    this.mergeRequests = result.items;
-    this.itemsTotal = result.total;
+    this.searchItems = result.items;
+    this.searchItemsTotal = result.total;
   }
 
-  updateMergeRequest(mergeRequest: MergeRequest): void {
-    this.mergeRequests = R.map((s) => {
-      if (R.equals(s.id, mergeRequest.id)) {
-        return mergeRequest;
+  updateJob(job: Job): void {
+    this.jobs = R.map((s) => {
+      if (R.equals(s.id, job.id)) {
+        return job;
       }
       return s;
-    }, this.mergeRequests);
+    }, this.jobs);
   }
 
-  async reviewItem(mergeRequest: MergeRequest): Promise<void> {
+  async reviewItem(job: Job): Promise<void> {
     DialogModule.pushDialogComponent({
-      component: ReviewMergeRequestDialog,
+      component: ReviewJobDialog,
       props: {
-        mergeRequest,
-        afterUpdate: this.updateMergeRequest,
+        job,
+        afterUpdate: this.updateJob,
       },
     });
   }
 
-  async deleteItem(mergeRequest: MergeRequest): Promise<void> {
+  async deleteItem(job: Job): Promise<void> {
     if (confirm("Are you sure you want to delete?")) {
-      const deletedMergeRequest = await ServiceManager.mergeRequest.deleteMergeRequest(
-        mergeRequest.id
-      );
+      const deletedJob = await ServiceManager.job.deleteJob(job.id);
 
-      this.updateMergeRequest(deletedMergeRequest);
+      this.updateJob(deletedJob);
     }
   }
 }

@@ -14,7 +14,7 @@
     </v-card-title>
     <v-card-actions>
       <v-spacer></v-spacer>
-      <v-btn color="primary" @click="mergeSkillSubject"> Merge request</v-btn>
+      <v-btn color="warning" @click="mergeSkillSubject"> Merge request</v-btn>
       <v-btn color="primary" @click="newSkillSubject"> New </v-btn>
     </v-card-actions>
     <v-card-text>
@@ -138,7 +138,7 @@ export default class SkillSubjectList extends Vue {
       component: MergeSkillSubjectDialog,
       props: {
         afterCreate: () => {
-          this.$router.push("/merge_requests");
+          this.$router.push("/jobs");
         },
       },
     });
