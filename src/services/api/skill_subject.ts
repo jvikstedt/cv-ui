@@ -60,4 +60,14 @@ export default class SkillSubjectService {
 
     return result;
   }
+
+  public async findOne(id: number): Promise<SkillSubject> {
+    await SkillSubjectModule.setFetching(true);
+
+    const skillSubject: SkillSubject = await Api.get(`/skill_Subjects/${id}`);
+    await SkillSubjectModule.saveSkillSubjects([skillSubject]);
+
+    await SkillSubjectModule.setFetching(false);
+    return skillSubject;
+  }
 }

@@ -39,6 +39,7 @@ export interface SkillSubjectSearchResult {
 }
 
 export interface Service {
+  findOne(id: number): Promise<SkillSubject>;
   fetchSkillSubjects(): Promise<void>;
   deleteSkillSubject(id: number): Promise<void>;
   createSkillSubject(

@@ -96,6 +96,7 @@ import AuthModule from "@/store/modules/auth";
 import ProjectList from "@/views/project/components/ProjectList.vue";
 import { CVSearchDto } from "@/store/modules/cv";
 import AuthorizedButton from "@/components/AuthorizedButton.vue";
+import { ROLES } from "@/constants";
 
 @Component({
   components: {
@@ -117,7 +118,7 @@ export default class EditCompanyDialog extends Mixins(
   searchKey = "WorkExperienceSearchKey";
   name = "";
 
-  canEdit = AuthModule.hasRole("ADMIN");
+  canEdit = AuthModule.hasRole(ROLES.ADMIN);
 
   get fetching(): boolean {
     return CompanyModule.fetching;

@@ -57,6 +57,14 @@
             </v-list-item-title>
           </v-list-item-content>
         </v-list-item>
+        <v-list-item link router to="/jobs">
+          <v-list-item-content>
+            <v-list-item-title>
+              <v-icon left>mdi-merge</v-icon>
+              Background jobs
+            </v-list-item-title>
+          </v-list-item-content>
+        </v-list-item>
       </v-list>
     </v-navigation-drawer>
 
@@ -110,6 +118,7 @@ import { Alert } from "@/components/alert";
 import AlertModule, { AlertInfo } from "@/store/modules/alert";
 import AuthModule from "@/store/modules/auth";
 import DialogModule from "@/store/modules/dialog";
+import { ROLES } from "./constants";
 
 @Component({
   components: {
@@ -123,6 +132,10 @@ export default class App extends Vue {
 
   get isLoggedIn(): boolean {
     return AuthModule.isLoggedIn;
+  }
+
+  get isAdmin(): boolean {
+    return AuthModule.hasRole(ROLES.ADMIN);
   }
 
   created(): void {

@@ -14,6 +14,7 @@
     </v-card-title>
     <v-card-actions>
       <v-spacer></v-spacer>
+      <v-btn color="warning" @click="mergeSkillSubject"> Merge request</v-btn>
       <v-btn color="primary" @click="newSkillSubject"> New </v-btn>
     </v-card-actions>
     <v-card-text>
@@ -42,6 +43,7 @@
 import * as R from "ramda";
 import { Component, Prop, Vue, Watch } from "vue-property-decorator";
 import NewSkillSubjectDialog from "./NewSkillSubjectDialog.vue";
+import MergeSkillSubjectDialog from "./MergeSkillSubjectsDialog.vue";
 import SkillSubjectModule, {
   SkillSubject,
 } from "@/store/modules/skill_subject";
@@ -128,6 +130,17 @@ export default class SkillSubjectList extends Vue {
     DialogModule.pushDialogComponent({
       component: NewSkillSubjectDialog,
       props: { afterCreate: this.afterCreate },
+    });
+  }
+
+  mergeSkillSubject(): void {
+    DialogModule.pushDialogComponent({
+      component: MergeSkillSubjectDialog,
+      props: {
+        afterCreate: () => {
+          this.$router.push("/jobs");
+        },
+      },
     });
   }
 

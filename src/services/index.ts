@@ -9,6 +9,7 @@ import * as CompanyService from "./company";
 import * as SkillSubjectService from "./skill_subject";
 import * as SkillGroupService from "./skill_group";
 import * as ProjectService from "./project";
+import * as JobService from "./job";
 
 class Manager {
   private isPlayground: boolean;
@@ -71,6 +72,10 @@ class Manager {
     return this.isPlayground ? ProjectService.Playground : ProjectService.Api;
   }
 
+  get job(): JobService.Service {
+    return JobService.Api;
+  }
+
   setIsPlayground(isPlayground: boolean) {
     this.isPlayground = isPlayground;
   }
@@ -90,4 +95,5 @@ export {
   SkillSubjectService,
   SkillGroupService,
   ProjectService,
+  JobService,
 };
