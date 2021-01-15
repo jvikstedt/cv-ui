@@ -129,6 +129,7 @@ class ExportModule extends VuexModule {
   public selectedTemplate: Template | null = null;
   public pdf: string | null = null;
   public docx: string | null = null;
+  public docxBlob: Blob | null = null;
 
   get getTemplates(): Template[] {
     return Object.values(this.templates);
@@ -147,6 +148,11 @@ class ExportModule extends VuexModule {
   @Mutation
   public setDocx(docx: string): void {
     this.docx = docx;
+  }
+
+  @Mutation
+  public setDocxBlob(blob: Blob): void {
+    this.docxBlob = blob;
   }
 
   @Mutation
@@ -230,7 +236,31 @@ class ExportModule extends VuexModule {
     });
     const docxURL = window.URL.createObjectURL(blob);
 
+    this.context.commit("setDocxBlob", blob);
     this.context.commit("setDocx", docxURL);
+    this.context.commit("setFetching", false);
+  }
+
+  @Action
+  public async convertDocxToPDF(): Promise<void> {
+    if (!this.docxBlob) {
+      return;
+    }
+    this.context.commit("setFetching", true);
+
+    const formData = new FormData();
+    formData.append("file", this.docxBlob);
+    const pdf = await Api.post("/convert", formData, {
+      responseType: "arraybuffer",
+      headers: {
+        "Content-Type": "multipart/form-data",
+        Accept: "application/pdf",
+      },
+    });
+    const blob = new Blob([pdf], { type: "application/pdf" });
+    const pdfUrl = window.URL.createObjectURL(blob);
+
+    this.context.commit("setPDF", pdfUrl);
     this.context.commit("setFetching", false);
   }
 }

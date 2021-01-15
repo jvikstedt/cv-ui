@@ -11,11 +11,20 @@
     </v-card-actions>
 
     <v-card-text>
-      <a v-if="file" :download="fileName" :href="file" target="_blank">
-        Download
-      </a>
+      <div>
+        <a v-if="file" :download="fileName" :href="file" target="_blank">
+          Download
+        </a>
+      </div>
+
+      <div class="mt-1">
+        <a v-if="template.exporter === 'docx' && docx" @click.prevent="convert">
+          Convert to pdf
+        </a>
+      </div>
+
       <object
-        v-if="template.exporter === 'pdf' && pdf"
+        v-if="pdf"
         id="pdfviewer"
         v-bind:data="pdf"
         type="application/pdf"
@@ -277,6 +286,12 @@ export default class RenderTemplateDialog extends Mixins(DialogFormMixin) {
         });
         break;
       default:
+    }
+  }
+
+  async convert(): Promise<void> {
+    if (!this.fetching) {
+      ExportModule.convertDocxToPDF();
     }
   }
 }
